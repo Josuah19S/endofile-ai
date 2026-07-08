@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+:root {
+  /* Midnight Logic / Kinetic Mono Design Tokens */
+
+  /* Colors - Primary (Navy) */
+  --primary: #001b4b;
+  --on-primary: #ffffff;
+  --primary-container: #002f76;
+  --on-primary-container: #6c98ff;
+  --primary-fixed: #dae2ff;
+  --on-primary-fixed: #001946;
+  --on-primary-fixed-variant: #00419e;
+
+  /* Colors - Secondary (Slate/Grey) */
+  --secondary: #4c616c;
+  --on-secondary: #ffffff;
+  --secondary-container: #cfe6f2;
+  --on-secondary-container: #526772;
+  --secondary-fixed: #cfe6f2;
+  --secondary-fixed-dim: #b4cad6;
+  --on-secondary-fixed: #071e27;
+  --on-secondary-fixed-variant: #354a53;
+
+  /* Colors - Tertiary (Emerald/Teal) */
+  --tertiary: #002413;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #003c23;
+  --on-tertiary-container: #1db173;
+  --tertiary-fixed: #78fbb6;
+  --tertiary-fixed-dim: #59de9b;
+  --on-tertiary-fixed: #002111;
+  --on-tertiary-fixed-variant: #005232;
+
+  /* Surface & Background */
+  --background: #f8f9fa;
+  --on-background: #191c1d;
+  --surface: #f8f9fa;
+  --on-surface: #191c1d;
+  --surface-variant: #e1e3e4;
+  --on-surface-variant: #43474f;
+  --inverse-surface: #2e3132;
+  --inverse-on-surface: #f0f1f2;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f3f4f5;
+  --surface-container: #edeeef;
+  --surface-container-high: #e7e8e9;
+  --surface-container-highest: #e1e3e4;
+  --surface-bright: #f8f9fa;
+  --surface-dim: #d9dadb;
+  --surface-tint: #2559bd;
+
+  /* Error */
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  /* Outline */
+  --outline: #737780;
+  --outline-variant: #c3c6d1;
+
+  /* Typography */
+  --token-font-headline: "Manrope", sans-serif;
+  --token-font-body: "Inter", sans-serif;
+  --token-font-label: "Inter", sans-serif;
+
+  /* Border Radius */
+  --token-radius-none: 0px;
+  --token-radius-xs: 0.125rem;
+  --token-radius-sm: 0.25rem;
+  --token-radius-md: 0.5rem;
+  --token-radius-lg: 1rem;
+  --token-radius-xl: 1.5rem;
+  --token-radius-full: 9999px;
+
+  /* Elevations / Shadows */
+  --token-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --token-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --token-shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --token-shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-on-background: var(--on-background);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-tint: var(--surface-tint);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-on-primary-fixed: var(--on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+  --color-secondary: var(--secondary);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-secondary-fixed: var(--secondary-fixed);
+  --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-on-secondary-fixed: var(--on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-foreground: var(--on-background);
+  --font-headline: var(--token-font-headline);
+  --font-body: var(--token-font-body);
+  --font-label: var(--token-font-label);
+  --font-sans: var(--token-font-body);
+  --font-mono: var(--font-geist-mono);
+  --radius-none: var(--token-radius-none);
+  --radius-xs: var(--token-radius-xs);
+  --radius-sm: var(--token-radius-sm);
+  --radius-md: var(--token-radius-md);
+  --radius-lg: var(--token-radius-lg);
+  --radius-xl: var(--token-radius-xl);
+  --radius-full: var(--token-radius-full);
+  --shadow-sm: var(--token-shadow-sm);
+  --shadow-md: var(--token-shadow-md);
+  --shadow-lg: var(--token-shadow-lg);
+  --shadow-xl: var(--token-shadow-xl);
+
+  /* Custom Animations for EndoScan AI */
+  --animate-pan-vertical: panVertical 1.8s ease-in-out infinite;
+  --animate-scale-in: scaleIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.2s ease-out;
+  --animate-fade-in: fadeIn 0.5s ease-out;
+
+  @keyframes panVertical {
+    0%, 100% { top: 8%; opacity: 0.3; }
+    50% { top: 92%; opacity: 1; }
+  }
+  @keyframes scaleIn {
+    0% { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes slideUp {
+    0% { transform: translateY(12px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+}
+
+
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  width: 100%;
+}
