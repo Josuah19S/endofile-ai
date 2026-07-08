@@ -10,9 +10,17 @@ import {
   CheckCircleIcon 
 } from './icons';
 
-export default function CameraScreen() {
-  const [cameraAvailable, setCameraAvailable] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+interface CameraScreenProps {
+  initialStream?: MediaStream | null;
+  initialCameraAvailable?: boolean;
+}
+
+export default function CameraScreen({ 
+  initialStream = null, 
+  initialCameraAvailable = false 
+}: CameraScreenProps) {
+  const [cameraAvailable, setCameraAvailable] = useState(initialCameraAvailable);
+  const [stream, setStream] = useState<MediaStream | null>(initialStream);
   const [flashOn, setFlashOn] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [limaDetected, setLimaDetected] = useState<string | null>(null);
@@ -24,7 +32,7 @@ export default function CameraScreen() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Request actual camera access
+  // Request actual camera access (as a fallback or retry)
   const requestCameraAccess = async () => {
     try {
       const constraints = { 
@@ -51,18 +59,23 @@ export default function CameraScreen() {
   };
 
   useEffect(() => {
-    requestCameraAccess();
+    // If we don't have a stream but camera should be available, request it
+    if (!stream && cameraAvailable) {
+      requestCameraAccess();
+    }
     return () => {
+      // Clean up the stream when unmounting
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     };
   }, []);
 
-  // Update video element when stream is available
+  // Update video element when stream is available or changes
   useEffect(() => {
     if (cameraAvailable && stream && videoRef.current) {
       videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(() => {});
     }
   }, [cameraAvailable, stream]);
 

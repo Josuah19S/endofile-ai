@@ -3,7 +3,7 @@
  */
 export const cameraStyles = {
   // Main screen container - dark midnight background, full screen
-  screenContainer: "relative flex flex-col justify-between min-h-screen bg-[#0b121f] text-white overflow-hidden select-none",
+  screenContainer: "relative w-full h-screen h-dvh bg-[#0b121f] text-white overflow-hidden select-none",
 
   // Top header area containing menu, status, aspect-ratio controls
   topHeader: "absolute top-0 left-0 right-0 z-20 flex justify-between items-start p-4 md:p-6 w-full pointer-events-none",
@@ -15,10 +15,10 @@ export const cameraStyles = {
   rightControls: "flex flex-col gap-3 pointer-events-auto",
 
   // Icon buttons (menu, fullscreen, flash, upload, history)
-  iconButton: "flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900/60 backdrop-blur-md border border-slate-700/50 text-white shadow-lg transition-all duration-200 active:scale-95 hover:bg-slate-800/80 cursor-pointer",
+  iconButton: "flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-950/70 backdrop-blur-md border border-slate-800/60 text-white shadow-lg transition-all duration-200 active:scale-95 hover:bg-slate-900/90 cursor-pointer",
   
   // Status badge (Modelo: ---)
-  statusBadge: "pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/60 backdrop-blur-md border border-slate-700/50 text-sm font-medium text-slate-200 shadow-lg",
+  statusBadge: "pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950/70 backdrop-blur-md border border-slate-800/60 text-sm font-medium text-slate-200 shadow-lg",
   
   // Green active dot
   statusDot: "w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_8px_#10b981]",
@@ -26,8 +26,8 @@ export const cameraStyles = {
   // Flash button variation when active
   flashActive: "bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30",
 
-  // Camera viewport area in the center
-  viewportArea: "relative flex-1 flex items-center justify-center w-full h-full",
+  // Camera viewport area - absolutely filling the entire screen behind everything
+  viewportArea: "absolute inset-0 w-full h-full z-0 flex items-center justify-center",
   
   // The interactive video stream
   videoPreview: "w-full h-full object-cover",
@@ -47,11 +47,11 @@ export const cameraStyles = {
   // Center focusing dot
   focusCenterDot: "w-1 h-1 rounded-full bg-white/40",
 
-  // Bottom info overlay (Lima detectada card)
-  infoOverlayContainer: "absolute bottom-24 left-0 right-0 z-10 px-4 md:px-6 w-full flex justify-center",
+  // Bottom info overlay (Lima detectada card) - adjusted above the overlay action bar
+  infoOverlayContainer: "absolute bottom-28 md:bottom-32 left-0 right-0 z-20 px-4 md:px-6 w-full flex justify-center pointer-events-none",
   
   // Lima detectada card
-  infoCard: "flex items-center gap-3 w-full max-w-sm px-4 py-3.5 rounded-2xl bg-slate-900/70 backdrop-blur-md border border-slate-700/50 shadow-xl transition-all duration-300",
+  infoCard: "pointer-events-auto flex items-center gap-3 w-full max-w-sm px-4 py-3.5 rounded-2xl bg-slate-950/80 backdrop-blur-lg border border-slate-800/80 shadow-2xl transition-all duration-300",
   
   // Blue check icon container
   infoIconContainer: "flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30",
@@ -59,8 +59,8 @@ export const cameraStyles = {
   // Lima status text
   infoText: "text-sm font-semibold tracking-wide text-slate-100",
 
-  // Solid dark bottom action bar
-  bottomActionBar: "relative z-20 w-full bg-[#040810] px-6 py-6 pb-8 md:pb-6 flex justify-between items-center border-t border-slate-800/40",
+  // Solid dark bottom action bar - overlays at the bottom of the screen
+  bottomActionBar: "absolute bottom-0 left-0 right-0 z-20 w-full bg-[#040810]/85 backdrop-blur-lg px-6 py-6 pb-8 md:pb-6 flex justify-between items-center border-t border-slate-800/40 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]",
   
   // Camera shutter button (center action)
   shutterOuterRing: "flex items-center justify-center w-20 h-20 rounded-full border-4 border-white bg-transparent transition-all duration-300 active:scale-90 cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.2)]",
