@@ -10,21 +10,43 @@ import {
   CheckCircleIcon 
 } from './icons';
 
-export default function CameraScreen() {
-  const [cameraAvailable, setCameraAvailable] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+// Model classes as specified by the user
+const FILE_CLASSES = [
+  'mg3-blue_1-sv', 'mg3-blue_2-px', 'mg3-blue_3-g1', 'mg3-blue_4-g2x', 'mg3-blue_5-g2',
+  'rc-blue_1-r25', 'rc-blue_2-r40', 'rc-blue_3-r50',
+  're-treaty_1-bully', 're-treaty_2-skinny', 're-treaty_3-shapy1', 're-treaty_4-shapy2', 're-treaty_5-shapy3',
+  's-blue_1-b0', 's-blue_2-b1', 's-blue_3-b2', 's-blue_4-b3'
+];
+
+interface CameraScreenProps {
+  initialStream?: MediaStream | null;
+  initialCameraAvailable?: boolean;
+}
+
+export default function CameraScreen({ 
+  initialStream = null, 
+  initialCameraAvailable = false 
+}: CameraScreenProps) {
+  const [cameraAvailable, setCameraAvailable] = useState(initialCameraAvailable);
+  const [stream, setStream] = useState<MediaStream | null>(initialStream);
   const [flashOn, setFlashOn] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(true);
   const [limaDetected, setLimaDetected] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFlashOverlay, setShowFlashOverlay] = useState(false);
   const [scanHistory, setScanHistory] = useState<string[]>([]);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   
+  // TensorFlow States
+  const [tf, setTf] = useState<any>(null);
+  const [model, setModel] = useState<any>(null);
+  const [modelStatus, setModelStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
+  
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Request actual camera access
+  // Request actual camera access (as a fallback or retry)
   const requestCameraAccess = async () => {
     try {
       const constraints = { 
@@ -50,24 +72,113 @@ export default function CameraScreen() {
     }
   };
 
+  // 1. Initialize TensorFlow.js and load MobileNetV3 Graph Model on client mount (SSR Safe)
   useEffect(() => {
-    requestCameraAccess();
+    let active = true;
+    const initModel = async () => {
+      try {
+        console.log("Loading TensorFlow.js...");
+        // Dynamic import to avoid Next.js node-side compile/SSR issues
+        const tfjs = await import('@tensorflow/tfjs');
+        if (!active) return;
+        setTf(tfjs);
+        
+        console.log("Loading graph model...");
+        // Load the graph model from public directory (served at root /model_proto/model.json)
+        const loadedModel = await tfjs.loadGraphModel('/model_proto/model.json');
+        
+        if (!active) return;
+        setModel(loadedModel);
+        setModelStatus('ready');
+        console.log("EndoScan Graph Model loaded successfully!");
+      } catch (err) {
+        console.error("Error initializing model:", err);
+        if (active) setModelStatus('error');
+      }
+    };
+    initModel();
     return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    // If we don't have a stream but camera should be available, request it
+    if (!stream && cameraAvailable) {
+      requestCameraAccess();
+    }
+    return () => {
+      // Clean up the stream when unmounting
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     };
   }, []);
 
-  // Update video element when stream is available
+  // Update video element when stream is available or changes
   useEffect(() => {
-    if (cameraAvailable && stream && videoRef.current) {
+    if (cameraAvailable && stream && videoRef.current && !selectedPhotoUrl) {
       videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(() => {});
     }
-  }, [cameraAvailable, stream]);
+  }, [cameraAvailable, stream, selectedPhotoUrl]);
 
-  // Handle Photo Capture & Mock Analysis
-  const capturePhoto = () => {
+  // 2. Predict on selected recent file photo url
+  const predictImage = async (photoUrl: string) => {
+    if (isAnalyzing) return;
+    setIsAnalyzing(true);
+    setLimaDetected(null);
+
+    // Create image element in memory
+    const img = new Image();
+    img.src = photoUrl;
+    img.crossOrigin = 'anonymous';
+    img.onload = async () => {
+      if (!tf || !model) {
+        console.warn("TF.js or model not loaded yet.");
+        setTimeout(() => {
+          setLimaDetected("Modelo no cargado");
+          setIsAnalyzing(false);
+        }, 1200);
+        return;
+      }
+      try {
+        // Preprocess: Convert image to 3D tensor
+        const tensor = tf.browser.fromPixels(img);
+        // Resize to 224x224 (MobileNetV3 input shape)
+        const resized = tf.image.resizeBilinear(tensor, [224, 224]);
+        // Cast to float32
+        const casted = resized.cast('float32');
+        // Expand to [1, 224, 224, 3]
+        const expanded = casted.expandDims(0);
+        
+        // Predict using GraphModel execution
+        const prediction = await model.executeAsync(expanded) as any;
+        const probabilities = await prediction.data();
+        const maxIdx = probabilities.indexOf(Math.max(...probabilities));
+        
+        const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
+        setLimaDetected(predictedClass);
+        setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
+
+        // Cleanup tensors
+        tf.dispose([tensor, resized, casted, expanded, prediction]);
+      } catch (err) {
+        console.error("Inference error:", err);
+        setLimaDetected("Error en análisis");
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
+    img.onerror = () => {
+      console.error("Failed to load radiography image: " + photoUrl);
+      setLimaDetected("Error al cargar imagen");
+      setIsAnalyzing(false);
+    };
+  };
+
+  // 3. Predict on live camera frame (Triggered by Shutter Button)
+  const runCameraPrediction = async () => {
     if (isAnalyzing) return;
     
     // Trigger screen flash animation
@@ -75,39 +186,79 @@ export default function CameraScreen() {
     setTimeout(() => setShowFlashOverlay(false), 150);
 
     setIsAnalyzing(true);
-    
-    // Mock the AI model processing time
-    setTimeout(() => {
-      const mockLimas = [
-        "Lima K-File #15 (21mm)",
-        "Lima K-File #20 (25mm)",
-        "Lima K-File #25 (21mm)",
-        "Lima H-File #30 (25mm)",
-        "Lima Protaper F1 (25mm)"
-      ];
-      const randomLima = mockLimas[Math.floor(Math.random() * mockLimas.length)];
-      setLimaDetected(randomLima);
-      setScanHistory(prev => [randomLima, ...prev.slice(0, 9)]); // Keep last 10 scans
-      setIsAnalyzing(false);
-    }, 1800);
-  };
+    setLimaDetected(null);
 
-  // Handle local image file upload (mock detection on upload)
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setIsAnalyzing(true);
+    const videoElement = videoRef.current;
+    if (videoElement && cameraAvailable && tf && model) {
+      try {
+        const tensor = tf.browser.fromPixels(videoElement);
+        const resized = tf.image.resizeBilinear(tensor, [224, 224]);
+        const casted = resized.cast('float32');
+        const expanded = casted.expandDims(0);
+        
+        const prediction = await model.executeAsync(expanded) as any;
+        const probabilities = await prediction.data();
+        const maxIdx = probabilities.indexOf(Math.max(...probabilities));
+        const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
+        
+        setLimaDetected(predictedClass);
+        setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
+        
+        tf.dispose([tensor, resized, casted, expanded, prediction]);
+      } catch (err) {
+        console.error("Live video inference error:", err);
+        setLimaDetected("Error al analizar cuadro");
+      } finally {
+        setIsAnalyzing(false);
+      }
+    } else {
+      // Mock Fallback if camera is simulated/permission-denied
       setTimeout(() => {
-        const mockUploadedLimas = [
-          "Lima K-File #35 (25mm)",
-          "Lima K-File #40 (21mm)",
-          "Lima Protaper F2 (25mm)"
-        ];
-        const randomLima = mockUploadedLimas[Math.floor(Math.random() * mockUploadedLimas.length)];
+        const randomLima = FILE_CLASSES[Math.floor(Math.random() * FILE_CLASSES.length)];
         setLimaDetected(randomLima);
         setScanHistory(prev => [randomLima, ...prev.slice(0, 9)]);
         setIsAnalyzing(false);
       }, 1500);
+    }
+  };
+
+  // Handle local image file upload (Inference on upload)
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && tf && model) {
+      setIsAnalyzing(true);
+      setLimaDetected(null);
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target?.result as string;
+        img.onload = async () => {
+          try {
+            const tensor = tf.browser.fromPixels(img);
+            const resized = tf.image.resizeBilinear(tensor, [224, 224]);
+            const casted = resized.cast('float32');
+            const expanded = casted.expandDims(0);
+            
+            const prediction = await model.executeAsync(expanded) as any;
+            const probabilities = await prediction.data();
+            const maxIdx = probabilities.indexOf(Math.max(...probabilities));
+            const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
+            
+            setSelectedPhotoUrl(img.src);
+            setLimaDetected(predictedClass);
+            setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
+            
+            tf.dispose([tensor, resized, casted, expanded, prediction]);
+          } catch (err) {
+            console.error("Uploaded file prediction error:", err);
+            setLimaDetected("Error al analizar archivo");
+          } finally {
+            setIsAnalyzing(false);
+          }
+        };
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -133,58 +284,50 @@ export default function CameraScreen() {
         <div className="absolute inset-0 bg-white z-50 transition-opacity duration-75 pointer-events-none" />
       )}
 
-      {/* Top Header Controls overlay */}
-      <div className={cameraStyles.topHeader}>
-        <div className={cameraStyles.leftControls}>
-          <button 
-            type="button"
-            className={cameraStyles.iconButton}
-            onClick={() => alert("Menú de Configuración EndoScan AI")}
-            aria-label="Abrir menú"
-          >
-            <MenuIcon size={22} />
-          </button>
-        </div>
-        
-        {/* Model status indicator */}
-        <div className={cameraStyles.statusBadge}>
-          <span className={cameraStyles.statusDot} />
-          <span>Modelo: EndoX-v2.1</span>
-        </div>
+      {/* Float Back to Live Camera button when viewing a static photo */}
+      {selectedPhotoUrl && (
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedPhotoUrl(null);
+            setLimaDetected(null);
+          }}
+          className="absolute top-4 left-4 z-30 flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-950/75 backdrop-blur-md border border-slate-800/80 text-xs font-semibold text-white shadow-lg cursor-pointer hover:bg-slate-900 active:scale-95 transition-all"
+        >
+          <span className="text-base leading-none">←</span> Volver a Cámara
+        </button>
+      )}
 
-        <div className={cameraStyles.rightControls}>
-          {/* Toggle camera view fit (Aspect Ratio indicator) */}
-          <button 
-            type="button"
-            className={cameraStyles.iconButton}
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            aria-label="Cambiar escala"
-          >
-            <ExpandIcon size={22} className={isFullscreen ? "rotate-45" : ""} />
-          </button>
-          
-          {/* Simulated Flash toggle */}
-          <button 
-            type="button"
-            className={`${cameraStyles.iconButton} ${flashOn ? cameraStyles.flashActive : ""}`}
-            onClick={() => setFlashOn(!flashOn)}
-            aria-label="Alternar flash"
-          >
-            <FlashIcon size={22} />
-          </button>
-        </div>
+      {/* Model loading status indicator */}
+      <div className="absolute top-4 right-4 z-30 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950/70 backdrop-blur-md border border-slate-800/60 text-xs font-medium text-slate-300 shadow-lg">
+        <span className={`w-2 h-2 rounded-full ${
+          modelStatus === 'ready' ? 'bg-[#10b981] animate-pulse shadow-[0_0_8px_#10b981]' :
+          modelStatus === 'loading' ? 'bg-amber-400 animate-spin border-t-transparent border-2' : 'bg-red-500'
+        }`} />
+        <span>
+          {modelStatus === 'ready' ? 'EndoX IA' :
+           modelStatus === 'loading' ? 'Cargando IA...' : 'Error de IA'}
+        </span>
       </div>
 
       {/* Viewport / Cam Area */}
       <div className={cameraStyles.viewportArea}>
-        {cameraAvailable ? (
+        {selectedPhotoUrl ? (
+          /* Show selected static endodontic file photo */
+          <img 
+            id="selected-file-preview"
+            src={selectedPhotoUrl}
+            className="w-full h-full object-cover animate-[fadeIn_0.3s_ease-out]"
+            alt="Foto de la lima"
+          />
+        ) : cameraAvailable ? (
           <video 
             ref={videoRef}
             id="camera-preview"
             autoPlay 
             playsInline
             muted
-            className={`${cameraStyles.videoPreview} ${isFullscreen ? 'object-cover' : 'object-contain'}`}
+            className={`${cameraStyles.videoPreview} object-cover`}
           />
         ) : (
           /* Premium Mock Viewfinder for previewing without physical hardware */
@@ -201,7 +344,7 @@ export default function CameraScreen() {
                 <path d="M12 2C10.5 2 9 3 8 4.5 7.2 3.8 6 3.5 5 4c-1.5.8-2 2.5-2 4 0 3.5 1.5 6 2.5 8 .8 1.6 1.5 3 2 4.5.3 1 1 1.5 2 1.5.8 0 1.5-.5 1.8-1.2.3-.7.7-1.3.7-1.8 0-.5.4-.7.7-.7s.7.2.7.7c0 .5.4 1.1.7 1.8.3.7 1 1.2 1.8 1.2 1 0 1.7-.5 2-1.5.5-1.5 1.2-2.9 2-4.5 1-2 2.5-4.5 2.5-8 0-1.5-.5-3.2-2-4-.9-.5-2.2-.2-3 .5C15 3 13.5 2 12 2z" />
               </svg>
               <span className="text-xs text-slate-500 mt-4 tracking-wider text-center max-w-[200px]">
-                Simulador de cámara activo. Apunte a la radiografía dental.
+                Simulador de cámara activo. Apunte a la lima de endodoncia.
               </span>
             </div>
           </div>
@@ -239,7 +382,7 @@ export default function CameraScreen() {
             </p>
             <p className={cameraStyles.infoText}>
               {isAnalyzing 
-                ? "Analizando radiografía..." 
+                ? "Analizando lima..." 
                 : (limaDetected ? `Lima detectada: ${limaDetected}` : "Lima detectada: ---")
               }
             </p>
@@ -262,41 +405,33 @@ export default function CameraScreen() {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className={cameraStyles.iconButton}
-          aria-label="Subir radiografía"
-          title="Cargar radiografía local"
+          aria-label="Subir foto de lima"
+          title="Cargar foto de lima local"
         >
           <UploadIcon size={20} />
         </button>
 
-        {/* Center: Shutter trigger */}
+        {/* Center: Shutter trigger - now opens the test photo selector */}
         <button 
           type="button"
-          onClick={capturePhoto}
+          onClick={() => setShowHistoryModal(true)}
           className={cameraStyles.shutterOuterRing}
-          aria-label="Capturar radiografía"
-          disabled={isAnalyzing}
+          aria-label="Seleccionar foto de lima de prueba"
+          disabled={isAnalyzing || modelStatus === 'loading'}
         >
           <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : cameraStyles.shutterInnerCircle} />
         </button>
 
-        {/* Right: History / Previous scans */}
-        <button 
-          type="button"
-          onClick={() => setShowHistoryModal(true)}
-          className={cameraStyles.iconButton}
-          aria-label="Ver historial"
-          title="Historial de detecciones"
-        >
-          <HistoryIcon size={20} />
-        </button>
+        {/* Right: Layout spacer to maintain symmetry */}
+        <div className="w-12 h-12" />
       </div>
 
-      {/* Scanning history modal overlay */}
+      {/* Recent photos selector modal (replacing raw text history list) */}
       {showHistoryModal && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-40 flex items-end md:items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-45 flex items-end md:items-center justify-center p-4">
           <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl animate-[slideUp_0.2s_ease-out]">
             <div className="p-5 border-b border-slate-800 flex justify-between items-center">
-              <h3 className="font-semibold text-lg text-white">Historial de Detección</h3>
+              <h3 className="font-semibold text-lg text-white">Fotos de Limas de Prueba</h3>
               <button 
                 onClick={() => setShowHistoryModal(false)}
                 className="text-slate-400 hover:text-white text-sm font-medium"
@@ -304,26 +439,43 @@ export default function CameraScreen() {
                 Cerrar
               </button>
             </div>
-            <div className="p-4 max-h-[300px] overflow-y-auto">
-              {scanHistory.length === 0 ? (
-                <p className="text-sm text-slate-500 text-center py-8">
-                  No hay detecciones previas en esta sesión.
-                </p>
-              ) : (
-                <ul className="space-y-2">
-                  {scanHistory.map((item, index) => (
-                    <li 
-                      key={index}
-                      className="flex items-center gap-3 p-3 bg-slate-950/50 border border-slate-800/40 rounded-xl"
-                    >
-                      <div className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 text-xs font-bold">
-                        {scanHistory.length - index}
-                      </div>
-                      <span className="text-sm text-slate-300 font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+            
+            <div className="p-5">
+              <p className="text-xs text-slate-400 mb-4 leading-normal">
+                Seleccione una de las siguientes 4 fotos de limas para correr la predicción con el modelo de IA:
+              </p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { id: 1, name: 'Muestra 01', url: '/model_test/1783529426027.jpg' },
+                  { id: 2, name: 'Muestra 02', url: '/model_test/1783529678661.jpg' },
+                  { id: 3, name: 'Muestra 03', url: '/model_test/1783529748280.jpg' },
+                  { id: 4, name: 'Muestra 04', url: '/model_test/IMG_20260708_133623.jpg' }
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPhotoUrl(item.url);
+                      predictImage(item.url);
+                      setShowHistoryModal(false);
+                    }}
+                    className="group flex flex-col items-center p-2.5 bg-slate-950/60 hover:bg-slate-950/90 border border-slate-800 hover:border-blue-500/50 rounded-2xl transition-all duration-200 active:scale-95 text-center cursor-pointer"
+                  >
+                    {/* Image Thumbnail */}
+                    <div className="relative w-full h-24 rounded-xl overflow-hidden bg-slate-900 mb-2">
+                      <img 
+                        src={item.url} 
+                        alt={item.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">
+                      {item.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

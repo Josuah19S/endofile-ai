@@ -24,5 +24,17 @@ export const loadingStyles = {
   spinnerRing: "animate-spin rounded-full h-8 w-8 border-3 border-blue-100 border-t-[#0056b3]",
   
   // Small "CARGANDO..." status text
-  loadingText: "text-xs font-bold text-slate-400 tracking-[0.2em] uppercase font-sans animate-pulse"
+  loadingText: "text-xs font-bold text-slate-400 tracking-[0.2em] uppercase font-sans animate-pulse",
+
+  // Subtitle explaining permission request
+  subtitleText: "text-sm text-slate-500 max-w-[260px] mb-6 leading-relaxed font-medium",
+
+  // Main primary CTA button for camera access
+  actionButton: "mt-6 px-6 py-3.5 w-full bg-[#0056b3] hover:bg-[#004494] text-white font-bold rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 active:scale-98 text-sm cursor-pointer",
+
+  // Secondary/Skip button to run in simulator mode
+  secondaryButton: "mt-3 px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-600 bg-transparent rounded-xl transition-colors duration-200 cursor-pointer",
+
+  // Error message formatting
+  errorText: "mt-4 text-xs font-semibold text-red-500 max-w-[260px] leading-normal"
 };

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "EndoScan AI - Detector de Limas de Endodoncia",
-  description: "Aplicación móvil asistida por IA para odontólogos y endodoncistas. Detección y medición automática de limas a partir de radiografías dentales.",
+  description: "Aplicación móvil asistida por IA para odontólogos y endodoncistas. Detección y clasificación de limas de endodoncia a partir de fotografías de la lima.",
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="h-full w-full overflow-hidden flex flex-col">{children}</body>
     </html>
   );
 }

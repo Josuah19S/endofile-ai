@@ -6,34 +6,45 @@ import CameraScreen from "@/app/components/camera-screen";
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [fadeAway, setFadeAway] = useState(false);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [cameraAvailable, setCameraAvailable] = useState(false);
 
-  useEffect(() => {
-    // Show loading screen for 2.5 seconds, then trigger fade out transition
-    const fadeTimer = setTimeout(() => {
-      setFadeAway(true);
-    }, 2200);
-
-    const finishTimer = setTimeout(() => {
+  const transitionToCamera = () => {
+    setFadeAway(true);
+    setTimeout(() => {
       setIsLoading(false);
-    }, 2500);
+    }, 350);
+  };
 
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(finishTimer);
-    };
-  }, []);
+  const handlePermissionGranted = (stream: MediaStream) => {
+    setCameraStream(stream);
+    setCameraAvailable(true);
+    transitionToCamera();
+  };
+
+  const handleSimulatorMode = () => {
+    setCameraStream(null);
+    setCameraAvailable(false);
+    transitionToCamera();
+  };
 
   if (isLoading) {
     return (
-      <div className={`transition-opacity duration-300 ${fadeAway ? 'opacity-0' : 'opacity-100'}`}>
-        <LoadingScreen />
+      <div className={`w-full h-screen h-dvh overflow-hidden transition-opacity duration-300 ${fadeAway ? 'opacity-0' : 'opacity-100'}`}>
+        <LoadingScreen 
+          onPermissionGranted={handlePermissionGranted} 
+          onSimulatorMode={handleSimulatorMode} 
+        />
       </div>
     );
   }
 
   return (
-    <div className="animate-[fadeIn_0.5s_ease-out]">
-      <CameraScreen />
+    <div className="w-full h-screen h-dvh overflow-hidden animate-[fadeIn_0.5s_ease-out]">
+      <CameraScreen 
+        initialStream={cameraStream} 
+        initialCameraAvailable={cameraAvailable} 
+      />
     </div>
   );
 }
