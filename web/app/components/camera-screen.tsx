@@ -35,7 +35,6 @@ export default function CameraScreen({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFlashOverlay, setShowFlashOverlay] = useState(false);
   const [scanHistory, setScanHistory] = useState<string[]>([]);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
   
   // TensorFlow States
   const [tf, setTf] = useState<any>(null);
@@ -123,62 +122,10 @@ export default function CameraScreen({
     }
   }, [cameraAvailable, stream, selectedPhotoUrl]);
 
-  // 2. Predict on selected recent file photo url
-  const predictImage = async (photoUrl: string) => {
-    if (isAnalyzing) return;
-    setIsAnalyzing(true);
-    setLimaDetected(null);
 
-    // Create image element in memory
-    const img = new Image();
-    img.src = photoUrl;
-    img.crossOrigin = 'anonymous';
-    img.onload = async () => {
-      if (!tf || !model) {
-        console.warn("TF.js or model not loaded yet.");
-        setTimeout(() => {
-          setLimaDetected("Modelo no cargado");
-          setIsAnalyzing(false);
-        }, 1200);
-        return;
-      }
-      try {
-        // Preprocess: Convert image to 3D tensor
-        const tensor = tf.browser.fromPixels(img);
-        // Resize to 224x224 (MobileNetV3 input shape)
-        const resized = tf.image.resizeBilinear(tensor, [224, 224]);
-        // Cast to float32
-        const casted = resized.cast('float32');
-        // Expand to [1, 224, 224, 3]
-        const expanded = casted.expandDims(0);
-        
-        // Predict using GraphModel execution
-        const prediction = await model.executeAsync(expanded) as any;
-        const probabilities = await prediction.data();
-        const maxIdx = probabilities.indexOf(Math.max(...probabilities));
-        
-        const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
-        setLimaDetected(predictedClass);
-        setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
 
-        // Cleanup tensors
-        tf.dispose([tensor, resized, casted, expanded, prediction]);
-      } catch (err) {
-        console.error("Inference error:", err);
-        setLimaDetected("Error en análisis");
-      } finally {
-        setIsAnalyzing(false);
-      }
-    };
-    img.onerror = () => {
-      console.error("Failed to load radiography image: " + photoUrl);
-      setLimaDetected("Error al cargar imagen");
-      setIsAnalyzing(false);
-    };
-  };
-
-  // 3. Predict on live camera frame (Triggered by Shutter Button)
-  const runCameraPrediction = async () => {
+  // 3. Capture frame from live camera stream, freeze view, and run prediction
+  const captureAndPredict = async () => {
     if (isAnalyzing) return;
     
     // Trigger screen flash animation
@@ -191,7 +138,20 @@ export default function CameraScreen({
     const videoElement = videoRef.current;
     if (videoElement && cameraAvailable && tf && model) {
       try {
-        const tensor = tf.browser.fromPixels(videoElement);
+        // Create canvas to capture the current video frame
+        const canvas = document.createElement('canvas');
+        canvas.width = videoElement.videoWidth || 1280;
+        canvas.height = videoElement.videoHeight || 720;
+        
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg');
+          setSelectedPhotoUrl(dataUrl); // Freeze viewport on captured image
+        }
+
+        // Run prediction directly on the canvas element
+        const tensor = tf.browser.fromPixels(canvas);
         const resized = tf.image.resizeBilinear(tensor, [224, 224]);
         const casted = resized.cast('float32');
         const expanded = casted.expandDims(0);
@@ -206,8 +166,8 @@ export default function CameraScreen({
         
         tf.dispose([tensor, resized, casted, expanded, prediction]);
       } catch (err) {
-        console.error("Live video inference error:", err);
-        setLimaDetected("Error al analizar cuadro");
+        console.error("Capture prediction error:", err);
+        setLimaDetected("Error al analizar");
       } finally {
         setIsAnalyzing(false);
       }
@@ -215,6 +175,7 @@ export default function CameraScreen({
       // Mock Fallback if camera is simulated/permission-denied
       setTimeout(() => {
         const randomLima = FILE_CLASSES[Math.floor(Math.random() * FILE_CLASSES.length)];
+        setSelectedPhotoUrl('/model_test/1783529426027.jpg');
         setLimaDetected(randomLima);
         setScanHistory(prev => [randomLima, ...prev.slice(0, 9)]);
         setIsAnalyzing(false);
@@ -262,9 +223,10 @@ export default function CameraScreen({
     }
   };
 
-  // Reset current detection state
+  // Reset current detection state and return to live camera
   const resetDetection = () => {
     setLimaDetected(null);
+    setSelectedPhotoUrl(null);
   };
 
   return (
@@ -411,75 +373,20 @@ export default function CameraScreen({
           <UploadIcon size={20} />
         </button>
 
-        {/* Center: Shutter trigger - now opens the test photo selector */}
+        {/* Center: Shutter trigger - captures frame or resets view */}
         <button 
           type="button"
-          onClick={() => setShowHistoryModal(true)}
+          onClick={selectedPhotoUrl ? resetDetection : captureAndPredict}
           className={cameraStyles.shutterOuterRing}
-          aria-label="Seleccionar foto de lima de prueba"
+          aria-label={selectedPhotoUrl ? "Volver a la cámara en vivo" : "Capturar foto de lima"}
           disabled={isAnalyzing || modelStatus === 'loading'}
         >
-          <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : cameraStyles.shutterInnerCircle} />
+          <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : (selectedPhotoUrl ? "w-10 h-10 rounded-full bg-amber-500 scale-95 transition-all duration-300" : cameraStyles.shutterInnerCircle)} />
         </button>
 
         {/* Right: Layout spacer to maintain symmetry */}
         <div className="w-12 h-12" />
       </div>
-
-      {/* Recent photos selector modal (replacing raw text history list) */}
-      {showHistoryModal && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-45 flex items-end md:items-center justify-center p-4">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl animate-[slideUp_0.2s_ease-out]">
-            <div className="p-5 border-b border-slate-800 flex justify-between items-center">
-              <h3 className="font-semibold text-lg text-white">Fotos de Limas de Prueba</h3>
-              <button 
-                onClick={() => setShowHistoryModal(false)}
-                className="text-slate-400 hover:text-white text-sm font-medium"
-              >
-                Cerrar
-              </button>
-            </div>
-            
-            <div className="p-5">
-              <p className="text-xs text-slate-400 mb-4 leading-normal">
-                Seleccione una de las siguientes 4 fotos de limas para correr la predicción con el modelo de IA:
-              </p>
-              
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { id: 1, name: 'Muestra 01', url: '/model_test/1783529426027.jpg' },
-                  { id: 2, name: 'Muestra 02', url: '/model_test/1783529678661.jpg' },
-                  { id: 3, name: 'Muestra 03', url: '/model_test/1783529748280.jpg' },
-                  { id: 4, name: 'Muestra 04', url: '/model_test/IMG_20260708_133623.jpg' }
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedPhotoUrl(item.url);
-                      predictImage(item.url);
-                      setShowHistoryModal(false);
-                    }}
-                    className="group flex flex-col items-center p-2.5 bg-slate-950/60 hover:bg-slate-950/90 border border-slate-800 hover:border-blue-500/50 rounded-2xl transition-all duration-200 active:scale-95 text-center cursor-pointer"
-                  >
-                    {/* Image Thumbnail */}
-                    <div className="relative w-full h-24 rounded-xl overflow-hidden bg-slate-900 mb-2">
-                      <img 
-                        src={item.url} 
-                        alt={item.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                    <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">
-                      {item.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
