@@ -378,7 +378,7 @@ export default function CameraScreen({
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 leading-none mb-1">
-              Detector de Limas (MobileNetV3)
+              Detector de Limas
             </p>
             <p className={cameraStyles.infoText}>
               {isAnalyzing 
@@ -442,7 +442,7 @@ export default function CameraScreen({
             
             <div className="p-5">
               <p className="text-xs text-slate-400 mb-4 leading-normal">
-                Seleccione una de las siguientes 4 fotos de limas para correr la predicción con el modelo TensorFlow MobileNetV3:
+                Seleccione una de las siguientes 4 fotos de limas para correr la predicción con el modelo de IA:
               </p>
               
               <div className="grid grid-cols-2 gap-3">
