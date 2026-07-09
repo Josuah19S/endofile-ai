@@ -52,8 +52,8 @@ export default function CameraScreen({
       const constraints = { 
         video: { 
           facingMode: 'environment', // Rear camera for mobiles
-          width: { ideal: 1080 },
-          height: { ideal: 1920 }
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         } 
       };
       
