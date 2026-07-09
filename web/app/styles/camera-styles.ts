@@ -47,8 +47,8 @@ export const cameraStyles = {
   // Center focusing dot
   focusCenterDot: "w-1 h-1 rounded-full bg-white/40",
 
-  // Bottom info overlay (Lima detectada card) - adjusted above the overlay action bar
-  infoOverlayContainer: "absolute bottom-28 md:bottom-32 left-0 right-0 z-20 px-4 md:px-6 w-full flex justify-center pointer-events-none",
+  // Bottom info overlay (Lima detectada card) - raised further to prevent control overlap
+  infoOverlayContainer: "absolute bottom-36 md:bottom-40 left-0 right-0 z-20 px-4 md:px-6 w-full flex justify-center pointer-events-none",
   
   // Lima detectada card
   infoCard: "pointer-events-auto flex items-center gap-3 w-full max-w-sm px-4 py-3.5 rounded-2xl bg-slate-950/80 backdrop-blur-lg border border-slate-800/80 shadow-2xl transition-all duration-300",
@@ -59,8 +59,8 @@ export const cameraStyles = {
   // Lima status text
   infoText: "text-sm font-semibold tracking-wide text-slate-100",
 
-  // Solid dark bottom action bar - overlays at the bottom of the screen
-  bottomActionBar: "absolute bottom-0 left-0 right-0 z-20 w-full bg-[#040810]/85 backdrop-blur-lg px-6 py-6 pb-8 md:pb-6 flex justify-between items-center border-t border-slate-800/40 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]",
+  // Solid dark bottom action bar - padded more at the bottom to avoid mobile browser toolbar overlap
+  bottomActionBar: "absolute bottom-0 left-0 right-0 z-20 w-full bg-[#040810]/85 backdrop-blur-lg px-6 py-6 pb-12 md:pb-6 flex justify-between items-center border-t border-slate-800/40 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]",
   
   // Camera shutter button (center action)
   shutterOuterRing: "flex items-center justify-center w-20 h-20 rounded-full border-4 border-white bg-transparent transition-all duration-300 active:scale-90 cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.2)]",
