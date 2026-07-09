@@ -411,27 +411,19 @@ export default function CameraScreen({
           <UploadIcon size={20} />
         </button>
 
-        {/* Center: Shutter trigger */}
+        {/* Center: Shutter trigger - now opens the test photo selector */}
         <button 
           type="button"
-          onClick={selectedPhotoUrl ? () => predictImage(selectedPhotoUrl) : runCameraPrediction}
+          onClick={() => setShowHistoryModal(true)}
           className={cameraStyles.shutterOuterRing}
-          aria-label="Capturar foto de lima"
+          aria-label="Seleccionar foto de lima de prueba"
           disabled={isAnalyzing || modelStatus === 'loading'}
         >
           <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : cameraStyles.shutterInnerCircle} />
         </button>
 
-        {/* Right: Gallery of Recent Photos */}
-        <button 
-          type="button"
-          onClick={() => setShowHistoryModal(true)}
-          className={cameraStyles.iconButton}
-          aria-label="Ver fotos de limas recientes"
-          title="Fotos de limas de prueba"
-        >
-          <HistoryIcon size={20} />
-        </button>
+        {/* Right: Layout spacer to maintain symmetry */}
+        <div className="w-12 h-12" />
       </div>
 
       {/* Recent photos selector modal (replacing raw text history list) */}
