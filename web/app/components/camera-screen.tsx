@@ -3,16 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
 import { UploadIcon, CheckCircleIcon } from './icons';
 import { useEndofileAi } from "@/app/components/model-provider";
-import Image from "next/image";
+import NextImage from "next/image";
 
-
-// Model classes as specified by the user
-const FILE_CLASSES = [
-  'mg3-blue_1-sv', 'mg3-blue_2-px', 'mg3-blue_3-g1', 'mg3-blue_4-g2x', 'mg3-blue_5-g2',
-  'rc-blue_1-r25', 'rc-blue_2-r40', 'rc-blue_3-r50',
-  're-treaty_1-bully', 're-treaty_2-skinny', 're-treaty_3-shapy1', 're-treaty_4-shapy2', 're-treaty_5-shapy3',
-  's-blue_1-b0', 's-blue_2-b1', 's-blue_3-b2', 's-blue_4-b3'
-];
 
 interface CameraScreenProps {
   initialStream?: MediaStream | null;
@@ -29,17 +21,11 @@ export default function CameraScreen({
   const [limaDetected, setLimaDetected] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFlashOverlay, setShowFlashOverlay] = useState(false);
-
-  const { predict } = useEndofileAi()
-
-  // TensorFlow States
-  const [tf, setTf] = useState<any>(null);
-  const [model, setModel] = useState<any>(null);
-  const [modelStatus, setModelStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
-  
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { predict, model, tf, modelStatus } = useEndofileAi()
 
   // Request actual camera access (as a fallback or retry)
   const requestCameraAccess = async () => {
@@ -219,7 +205,7 @@ export default function CameraScreen({
       <div className={cameraStyles.viewportArea}>
         {selectedPhotoUrl ? (
           /* Show selected static endodontic file photo */
-          <Image
+          <NextImage
             id="selected-file-preview"
             src={selectedPhotoUrl}
             className="w-full h-full object-cover animate-[fadeIn_0.3s_ease-out]"
@@ -248,7 +234,7 @@ export default function CameraScreen({
               <svg className="w-32 h-32 text-blue-500/20 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C10.5 2 9 3 8 4.5 7.2 3.8 6 3.5 5 4c-1.5.8-2 2.5-2 4 0 3.5 1.5 6 2.5 8 .8 1.6 1.5 3 2 4.5.3 1 1 1.5 2 1.5.8 0 1.5-.5 1.8-1.2.3-.7.7-1.3.7-1.8 0-.5.4-.7.7-.7s.7.2.7.7c0 .5.4 1.1.7 1.8.3.7 1 1.2 1.8 1.2 1 0 1.7-.5 2-1.5.5-1.5 1.2-2.9 2-4.5 1-2 2.5-4.5 2.5-8 0-1.5-.5-3.2-2-4-.9-.5-2.2-.2-3 .5C15 3 13.5 2 12 2z" />
               </svg>
-              <span className="text-xs text-slate-500 mt-4 tracking-wider text-center max-w-[200px]">
+              <span className="text-xs text-slate-500 mt-4 tracking-wider text-center max-w-50">
                 Simulador de cámara activo. Apunte a la lima de endodoncia.
               </span>
             </div>

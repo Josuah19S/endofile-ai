@@ -1,6 +1,7 @@
 "use client"
-import React, { createContext, RefObject, useContext, useState, useEffect } from "react"
-
+import React, { createContext, useContext, useState, useEffect } from "react"
+import type { GraphModel, Tensor } from "@tensorflow/tfjs"
+type TensorFlow = typeof import("@tensorflow/tfjs")
 
 // Model classes as specified by the user
 const FILE_CLASSES = [
@@ -10,17 +11,17 @@ const FILE_CLASSES = [
   's-blue_1-b0', 's-blue_2-b1', 's-blue_3-b2', 's-blue_4-b3'
 ];
 
+type PredictionSource = HTMLCanvasElement | HTMLImageElement | HTMLVideoElement | ImageData | ImageBitmap
+
 export interface EndofileAiContextType {
-  tf: any;
-  model: any;
+  tf: TensorFlow | null;
+  model: GraphModel | null;
   modelLoaded: boolean;
   modelStatus: 'loading' | 'ready' | 'error';
-  predict: (canvas: HTMLCanvasElement) => Promise<void>;
+  predict: (canvas: PredictionSource) => Promise<void>;
   limaDetected: string | null;
   scanHistory: string[];
   isAnalyzing: boolean;
-  selectedPhotoUrl: string | null;
-  setSelectedPhotoUrl: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const EndofileAiContext = createContext<EndofileAiContextType | null>(null)
@@ -30,10 +31,12 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
   const [scanHistory, setScanHistory] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const [tf, setTf] = useState<any>(null);
-  const [model, setModel] = useState<any>(null);
-  const [modelStatus, setModelStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
+  // TensorFlow States
+  type TensorFlow = typeof import ("@tensorflow/tfjs");
+  type ModelStatus = 'loading' | 'ready' | 'error';
+  const [tf, setTf] = useState<TensorFlow | null>(null);
+  const [model, setModel] = useState<GraphModel | null>(null);
+  const [modelStatus, setModelStatus] = useState<ModelStatus>('loading');
 
   // 1. Initialize TensorFlow.js and load MobileNetV3 Graph Model on client mount (SSR Safe)
   useEffect(() => {
@@ -66,16 +69,16 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
   }, []);
 
 
-  const predict = async (canvas: HTMLCanvasElement) => {
-    if (isAnalyzing) return;
+  const predict = async (src: PredictionSource) => {
+    if (isAnalyzing || !tf || !model) return;
     try {
       // Run prediction directly on the canvas element
-      const tensor = tf.browser.fromPixels(canvas);
+      const tensor = tf.browser.fromPixels(src);
       const resized = tf.image.resizeBilinear(tensor, [224, 224]);
       const casted = resized.cast('float32');
       const expanded = casted.expandDims(0);
 
-      const prediction = await model.executeAsync(expanded) as any;
+      const prediction = await model.executeAsync(expanded) as Tensor;
       const probabilities = await prediction.data();
       const maxIdx = probabilities.indexOf(Math.max(...probabilities));
       const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
@@ -102,8 +105,6 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         limaDetected,
         scanHistory,
         isAnalyzing,
-        selectedPhotoUrl,
-        setSelectedPhotoUrl: setSelectedPhotoUrl
       }}>
       { children }
     </EndofileAiContext.Provider>
@@ -112,7 +113,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
 export function useEndofileAi() {
   const context = useContext(EndofileAiContext)
-  if (context === undefined) {
+  if (context === null) {
     throw new Error('useEndofileAi must be used within a EndofileAiProvider')
   }
   return context
