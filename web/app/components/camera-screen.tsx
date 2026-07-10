@@ -2,12 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
 import { 
-  MenuIcon, 
-  ExpandIcon, 
-  FlashIcon, 
-  UploadIcon, 
-  HistoryIcon, 
-  CheckCircleIcon 
+  MenuIcon,
+  ExpandIcon,
+  FlashIcon,
+  UploadIcon,
+  HistoryIcon,
+  CheckCircleIcon
 } from './icons';
 
 // Model classes as specified by the user
