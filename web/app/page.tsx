@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import LoadingScreen from "@/app/components/loading-screen";
 import CameraScreen from "@/app/components/camera-screen";
+import { EndofileContextProvider } from "@/app/components/model-provider";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,11 +36,13 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-screen h-dvh overflow-hidden animate-[fadeIn_0.5s_ease-out]">
-      <CameraScreen 
-        initialStream={cameraStream} 
-        initialCameraAvailable={cameraAvailable} 
-      />
+    <div className="w-full h-screen overflow-hidden animate-fade-in">
+      <EndofileContextProvider>
+        <CameraScreen
+          initialStream={cameraStream}
+          initialCameraAvailable={cameraAvailable}
+        />
+      </EndofileContextProvider>
     </div>
   );
 }

@@ -1,14 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
-import { 
-  MenuIcon,
-  ExpandIcon,
-  FlashIcon,
-  UploadIcon,
-  HistoryIcon,
-  CheckCircleIcon
-} from './icons';
+import { UploadIcon, CheckCircleIcon } from './icons';
+import { useEndofileAi } from "@/app/components/model-provider";
+import Image from "next/image";
+
 
 // Model classes as specified by the user
 const FILE_CLASSES = [
@@ -27,15 +23,15 @@ export default function CameraScreen({
   initialStream = null, 
   initialCameraAvailable = false 
 }: CameraScreenProps) {
+  // camera variables
   const [cameraAvailable, setCameraAvailable] = useState(initialCameraAvailable);
   const [stream, setStream] = useState<MediaStream | null>(initialStream);
-  const [flashOn, setFlashOn] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(true);
   const [limaDetected, setLimaDetected] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFlashOverlay, setShowFlashOverlay] = useState(false);
-  const [scanHistory, setScanHistory] = useState<string[]>([]);
-  
+
+  const { predict } = useEndofileAi()
+
   // TensorFlow States
   const [tf, setTf] = useState<any>(null);
   const [model, setModel] = useState<any>(null);
@@ -51,15 +47,15 @@ export default function CameraScreen({
       const constraints = { 
         video: { 
           facingMode: 'environment', // Rear camera for mobiles
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: 1080 },
+          height: { ideal: 1920 }
         } 
       };
-      
+      // get camera
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
       setCameraAvailable(true);
-      
+      // update camera if there was already one being used
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.play().catch(() => {});
@@ -71,39 +67,10 @@ export default function CameraScreen({
     }
   };
 
-  // 1. Initialize TensorFlow.js and load MobileNetV3 Graph Model on client mount (SSR Safe)
-  useEffect(() => {
-    let active = true;
-    const initModel = async () => {
-      try {
-        console.log("Loading TensorFlow.js...");
-        // Dynamic import to avoid Next.js node-side compile/SSR issues
-        const tfjs = await import('@tensorflow/tfjs');
-        if (!active) return;
-        setTf(tfjs);
-        
-        console.log("Loading graph model...");
-        // Load the graph model from public directory (served at root /model_proto/model.json)
-        const loadedModel = await tfjs.loadGraphModel('/model_proto/model.json');
-        
-        if (!active) return;
-        setModel(loadedModel);
-        setModelStatus('ready');
-        console.log("EndoScan Graph Model loaded successfully!");
-      } catch (err) {
-        console.error("Error initializing model:", err);
-        if (active) setModelStatus('error');
-      }
-    };
-    initModel();
-    return () => {
-      active = false;
-    };
-  }, []);
-
   useEffect(() => {
     // If we don't have a stream but camera should be available, request it
     if (!stream && cameraAvailable) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       requestCameraAccess();
     }
     return () => {
@@ -125,7 +92,7 @@ export default function CameraScreen({
 
 
   // 3. Capture frame from live camera stream, freeze view, and run prediction
-  const captureAndPredict = async () => {
+  const capturePhoto = async () => {
     if (isAnalyzing) return;
     
     // Trigger screen flash animation
@@ -135,6 +102,7 @@ export default function CameraScreen({
     setIsAnalyzing(true);
     setLimaDetected(null);
 
+    // extract video element and start the processing
     const videoElement = videoRef.current;
     if (videoElement && cameraAvailable && tf && model) {
       try {
@@ -150,28 +118,16 @@ export default function CameraScreen({
           setSelectedPhotoUrl(dataUrl); // Freeze viewport on captured image
         }
 
-        // Run prediction directly on the canvas element
-        const tensor = tf.browser.fromPixels(canvas);
-        const resized = tf.image.resizeBilinear(tensor, [224, 224]);
-        const casted = resized.cast('float32');
-        const expanded = casted.expandDims(0);
-        
-        const prediction = await model.executeAsync(expanded) as any;
-        const probabilities = await prediction.data();
-        const maxIdx = probabilities.indexOf(Math.max(...probabilities));
-        const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
-        
-        setLimaDetected(predictedClass);
-        setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
-        
-        tf.dispose([tensor, resized, casted, expanded, prediction]);
+        await predict(canvas)
       } catch (err) {
         console.error("Capture prediction error:", err);
         setLimaDetected("Error al analizar");
       } finally {
         setIsAnalyzing(false);
       }
-    } else {
+    }
+    /*
+    else {
       // Mock Fallback if camera is simulated/permission-denied
       setTimeout(() => {
         const randomLima = FILE_CLASSES[Math.floor(Math.random() * FILE_CLASSES.length)];
@@ -181,6 +137,7 @@ export default function CameraScreen({
         setIsAnalyzing(false);
       }, 1500);
     }
+    */
   };
 
   // Handle local image file upload (Inference on upload)
@@ -196,21 +153,7 @@ export default function CameraScreen({
         img.src = e.target?.result as string;
         img.onload = async () => {
           try {
-            const tensor = tf.browser.fromPixels(img);
-            const resized = tf.image.resizeBilinear(tensor, [224, 224]);
-            const casted = resized.cast('float32');
-            const expanded = casted.expandDims(0);
-            
-            const prediction = await model.executeAsync(expanded) as any;
-            const probabilities = await prediction.data();
-            const maxIdx = probabilities.indexOf(Math.max(...probabilities));
-            const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
-            
-            setSelectedPhotoUrl(img.src);
-            setLimaDetected(predictedClass);
-            setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
-            
-            tf.dispose([tensor, resized, casted, expanded, prediction]);
+            await predict(img)
           } catch (err) {
             console.error("Uploaded file prediction error:", err);
             setLimaDetected("Error al analizar archivo");
@@ -276,7 +219,7 @@ export default function CameraScreen({
       <div className={cameraStyles.viewportArea}>
         {selectedPhotoUrl ? (
           /* Show selected static endodontic file photo */
-          <img 
+          <Image
             id="selected-file-preview"
             src={selectedPhotoUrl}
             className="w-full h-full object-cover animate-[fadeIn_0.3s_ease-out]"
@@ -295,10 +238,10 @@ export default function CameraScreen({
           /* Premium Mock Viewfinder for previewing without physical hardware */
           <div className="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden">
             {/* Animated medical grid background */}
-            <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:16px_16px]" />
+            <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-size-[16px_16px]" />
             
             {/* Glowing scanline effect */}
-            <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-[bounce_4s_infinite] opacity-40 top-1/4" />
+            <div className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-blue-500 to-transparent animate-[bounce_4s_infinite] opacity-40 top-1/4" />
             
             {/* Visual representation of tooth being scanned */}
             <div className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-blue-500/10 bg-slate-900/40 backdrop-blur-sm">
@@ -326,7 +269,7 @@ export default function CameraScreen({
 
             {/* Pulsing scanning overlay during analysis */}
             {isAnalyzing && (
-              <div className="absolute inset-x-2 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-[panVertical_1.8s_ease-in-out_infinite]" />
+              <div className="absolute inset-x-2 h-1 bg-linear-to-r from-transparent via-blue-500 to-transparent animate-pan-vertical" />
             )}
           </div>
         </div>
@@ -336,7 +279,7 @@ export default function CameraScreen({
       <div className={cameraStyles.infoOverlayContainer}>
         <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-blue-500/50 bg-[#0e172a]/90' : 'border-slate-800/80'}`}>
           <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500 border-transparent'}`}>
-            <CheckCircleIcon size={14} className={limaDetected ? "animate-[scaleIn_0.3s_ease-out]" : ""} />
+            <CheckCircleIcon size={14} className={limaDetected ? "animate-scale-in" : ""} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 leading-none mb-1">
@@ -376,7 +319,7 @@ export default function CameraScreen({
         {/* Center: Shutter trigger - captures frame or resets view */}
         <button 
           type="button"
-          onClick={selectedPhotoUrl ? resetDetection : captureAndPredict}
+          onClick={selectedPhotoUrl ? resetDetection : capturePhoto}
           className={cameraStyles.shutterOuterRing}
           aria-label={selectedPhotoUrl ? "Volver a la cámara en vivo" : "Capturar foto de lima"}
           disabled={isAnalyzing || modelStatus === 'loading'}
