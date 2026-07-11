@@ -18,14 +18,12 @@ export default function CameraScreen({
   // camera variables
   const [cameraAvailable, setCameraAvailable] = useState(initialCameraAvailable);
   const [stream, setStream] = useState<MediaStream | null>(initialStream);
-  const [limaDetected, setLimaDetected] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFlashOverlay, setShowFlashOverlay] = useState(false);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { predict, model, tf, modelStatus } = useEndofileAi()
+  const { predict, model, tf, modelStatus, limaDetected, isAnalyzing, setLimaDetected } = useEndofileAi();
 
   // Request actual camera access (as a fallback or retry)
   const requestCameraAccess = async () => {
@@ -52,7 +50,7 @@ export default function CameraScreen({
       setStream(null);
     }
   };
-
+  // useEffect block to ask for camera permissions
   useEffect(() => {
     // If we don't have a stream but camera should be available, request it
     if (!stream && cameraAvailable) {
@@ -66,7 +64,6 @@ export default function CameraScreen({
       }
     };
   }, []);
-
   // Update video element when stream is available or changes
   useEffect(() => {
     if (cameraAvailable && stream && videoRef.current && !selectedPhotoUrl) {
@@ -76,21 +73,16 @@ export default function CameraScreen({
   }, [cameraAvailable, stream, selectedPhotoUrl]);
 
 
-
-  // 3. Capture frame from live camera stream, freeze view, and run prediction
+  // Callback to capture a frame from live camera stream, freeze view, and run prediction
   const capturePhoto = async () => {
     if (isAnalyzing) return;
     
-    // Trigger screen flash animation
+    // trigger screen flash animation
     setShowFlashOverlay(true);
     setTimeout(() => setShowFlashOverlay(false), 150);
 
-    setIsAnalyzing(true);
-    setLimaDetected(null);
-
-    // extract video element and start the processing
     const videoElement = videoRef.current;
-    if (videoElement && cameraAvailable && tf && model) {
+    if (videoElement && cameraAvailable) {
       try {
         // Create canvas to capture the current video frame
         const canvas = document.createElement('canvas');
@@ -103,48 +95,28 @@ export default function CameraScreen({
           const dataUrl = canvas.toDataURL('image/jpeg');
           setSelectedPhotoUrl(dataUrl); // Freeze viewport on captured image
         }
-
-        await predict(canvas)
+        // predict via context
+        await predict(canvas);
       } catch (err) {
         console.error("Capture prediction error:", err);
-        setLimaDetected("Error al analizar");
-      } finally {
-        setIsAnalyzing(false);
       }
     }
-    /*
-    else {
-      // Mock Fallback if camera is simulated/permission-denied
-      setTimeout(() => {
-        const randomLima = FILE_CLASSES[Math.floor(Math.random() * FILE_CLASSES.length)];
-        setSelectedPhotoUrl('/model_test/1783529426027.jpg');
-        setLimaDetected(randomLima);
-        setScanHistory(prev => [randomLima, ...prev.slice(0, 9)]);
-        setIsAnalyzing(false);
-      }, 1500);
-    }
-    */
   };
 
   // Handle local image file upload (Inference on upload)
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && tf && model) {
-      setIsAnalyzing(true);
-      setLimaDetected(null);
-      
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.src = e.target?.result as string;
         img.onload = async () => {
           try {
-            await predict(img)
+            setSelectedPhotoUrl(img.src); // Freeze view on uploaded image
+            await predict(img);
           } catch (err) {
             console.error("Uploaded file prediction error:", err);
-            setLimaDetected("Error al analizar archivo");
-          } finally {
-            setIsAnalyzing(false);
           }
         };
       };

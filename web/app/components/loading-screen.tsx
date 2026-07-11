@@ -27,7 +27,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
       // Explicitly trigger the browser's permission prompt
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       onPermissionGranted(stream);
-    } catch (err: Error) {
+    } catch (err: any) {
       console.error("Camera permission error:", err);
       setStatus('error');
       

@@ -20,6 +20,7 @@ export interface EndofileAiContextType {
   modelStatus: 'loading' | 'ready' | 'error';
   predict: (canvas: PredictionSource) => Promise<void>;
   limaDetected: string | null;
+  setLimaDetected: React.Dispatch<React.SetStateAction<string | null>>;
   scanHistory: string[];
   isAnalyzing: boolean;
 }
@@ -32,11 +33,9 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // TensorFlow States
-  type TensorFlow = typeof import ("@tensorflow/tfjs");
-  type ModelStatus = 'loading' | 'ready' | 'error';
   const [tf, setTf] = useState<TensorFlow | null>(null);
   const [model, setModel] = useState<GraphModel | null>(null);
-  const [modelStatus, setModelStatus] = useState<ModelStatus>('loading');
+  const [modelStatus, setModelStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   // 1. Initialize TensorFlow.js and load MobileNetV3 Graph Model on client mount (SSR Safe)
   useEffect(() => {
@@ -71,6 +70,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
   const predict = async (src: PredictionSource) => {
     if (isAnalyzing || !tf || !model) return;
+    setIsAnalyzing(true);
+    setLimaDetected(null);
     try {
       // Run prediction directly on the canvas element
       const tensor = tf.browser.fromPixels(src);
@@ -103,6 +104,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         modelStatus,
         predict,
         limaDetected,
+        setLimaDetected,
         scanHistory,
         isAnalyzing,
       }}>
