@@ -5,10 +5,9 @@ import { ToothIcon } from './icons';
 
 interface LoadingScreenProps {
   onPermissionGranted: (stream: MediaStream) => void;
-  onSimulatorMode: () => void;
 }
 
-export default function LoadingScreen({ onPermissionGranted, onSimulatorMode }: LoadingScreenProps) {
+export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProps) {
   const [status, setStatus] = useState<'idle' | 'requesting' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -21,7 +20,7 @@ export default function LoadingScreen({ onPermissionGranted, onSimulatorMode }: 
         facingMode: 'environment', // Request back/rear camera on mobile
         width: { ideal: 1080 },
         height: { ideal: 1920 }
-      } 
+      }
     };
 
     try {
@@ -56,6 +55,7 @@ export default function LoadingScreen({ onPermissionGranted, onSimulatorMode }: 
           EndoScan AI
         </h1>
 
+        {/* Request permission button */}
         {status === 'idle' && (
           <>
             <p className={loadingStyles.subtitleText}>
@@ -68,14 +68,6 @@ export default function LoadingScreen({ onPermissionGranted, onSimulatorMode }: 
               className={loadingStyles.actionButton}
             >
               Activar Cámara
-            </button>
-            
-            <button
-              type="button"
-              onClick={onSimulatorMode}
-              className={loadingStyles.secondaryButton}
-            >
-              Probar en Modo Simulador
             </button>
           </>
         )}
@@ -103,14 +95,6 @@ export default function LoadingScreen({ onPermissionGranted, onSimulatorMode }: 
               className={loadingStyles.actionButton}
             >
               Reintentar Permiso
-            </button>
-
-            <button
-              type="button"
-              onClick={onSimulatorMode}
-              className={loadingStyles.secondaryButton}
-            >
-              Continuar con Simulador
             </button>
           </>
         )}
