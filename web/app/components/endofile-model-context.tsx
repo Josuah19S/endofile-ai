@@ -52,10 +52,16 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         // Load the graph model from public directory (served at root /model_proto/model.json)
         const loadedModel = await tfjs.loadGraphModel('/model_proto/model.json');
 
+        // Warm up the model (compiles WebGL shaders in the background to avoid first-click latency)
+        console.log("Warming up model...");
+        const dummyInput = tfjs.zeros([1, 224, 224, 3]);
+        const warmupPrediction = await loadedModel.executeAsync(dummyInput) as any;
+        tfjs.dispose([dummyInput, warmupPrediction]);
+
         if (!active) return;
         setModel(loadedModel);
         setModelStatus('ready');
-        console.log("EndoScan Graph Model loaded successfully!");
+        console.log("EndoScan Graph Model loaded and warmed up successfully!");
       } catch (err) {
         console.error("Error initializing model:", err);
         if (active) setModelStatus('error');
