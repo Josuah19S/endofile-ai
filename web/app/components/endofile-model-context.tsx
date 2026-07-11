@@ -55,7 +55,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         // Warm up the model (compiles WebGL shaders in the background to avoid first-click latency)
         console.log("Warming up model...");
         const dummyInput = tfjs.zeros([1, 224, 224, 3]);
-        const warmupPrediction = await loadedModel.executeAsync(dummyInput) as any;
+        const warmupPrediction = await loadedModel.executeAsync(dummyInput) as Tensor;
         tfjs.dispose([dummyInput, warmupPrediction]);
 
         if (!active) return;
