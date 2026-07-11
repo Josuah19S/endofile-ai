@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
 import { UploadIcon, CheckCircleIcon } from './icons';
-import { useEndofileAi } from "@/app/components/model-provider";
+import { useEndofileAi } from "@/app/components/endofile-model-context";
 import NextImage from "next/image";
 
 

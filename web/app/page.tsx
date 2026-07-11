@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import LoadingScreen from "@/app/components/loading-screen";
 import CameraScreen from "@/app/components/camera-screen";
-import { EndofileContextProvider } from "@/app/components/model-provider";
+import { EndofileContextProvider } from "@/app/components/endofile-model-context";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
