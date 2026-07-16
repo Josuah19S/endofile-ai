@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
-import { UploadIcon, CheckCircleIcon } from './icons';
+import { UploadIcon, CheckCircleIcon, HistoryIcon as SwitchCameraIcon } from './icons';
 import { useEndofileAi } from "@/app/components/endofile-model-context";
 import NextImage from "next/image";
 
@@ -20,50 +20,100 @@ export default function CameraScreen({
   const [stream, setStream] = useState<MediaStream | null>(initialStream);
   const [showFlashOverlay, setShowFlashOverlay] = useState(false);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [activeDeviceIndex, setActiveDeviceIndex] = useState<number>(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { predict, model, tf, modelStatus, limaDetected, isAnalyzing, setLimaDetected } = useEndofileAi();
 
-  // Request actual camera access (as a fallback or retry)
-  const requestCameraAccess = async () => {
+  // Enumerate all video inputs to allow switching between lenses
+  const enumerateCameras = async () => {
     try {
-      const constraints = { 
-        video: { 
-          facingMode: 'environment', // Rear camera for mobiles
-          width: { ideal: 1080 },
-          height: { ideal: 1920 }
-        } 
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoInputs = devices.filter(device => device.kind === 'videoinput');
+      setVideoDevices(videoInputs);
+      
+      // Try to default to the rear lens (back, environment, 0.5x, etc.)
+      const backCamIdx = videoInputs.findIndex(device => 
+        device.label.toLowerCase().includes('back') || 
+        device.label.toLowerCase().includes('entorno') || 
+        device.label.toLowerCase().includes('0.5x') ||
+        device.label.toLowerCase().includes('ultra')
+      );
+      if (backCamIdx !== -1) {
+        setActiveDeviceIndex(backCamIdx);
+      }
+    } catch (err) {
+      console.warn("Failed to enumerate camera devices:", err);
+    }
+  };
+
+  // Request actual camera access (as a fallback or retry)
+  const requestCameraAccess = async (deviceIndex = activeDeviceIndex) => {
+    try {
+      // Stop any existing stream tracks first
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      const constraints: MediaStreamConstraints = {
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
       };
-      // get camera
+
+      // Target the specific active device ID if populated
+      if (videoDevices.length > 0 && videoDevices[deviceIndex]) {
+        constraints.video = {
+          deviceId: { exact: videoDevices[deviceIndex].deviceId },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        };
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
       setCameraAvailable(true);
-      // update camera if there was already one being used
+
+      // Populate camera list now that permissions are granted
+      if (videoDevices.length === 0) {
+        await enumerateCameras();
+      }
+
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.play().catch(() => {});
       }
     } catch (error) {
-      console.warn('Physical camera not available or permission denied. Loading premium mock camera feed.', error);
+      console.warn('Physical camera access failed:', error);
       setCameraAvailable(false);
       setStream(null);
     }
   };
+
+  // Toggle/cycle through available camera lenses
+  const handleSwitchCamera = async () => {
+    if (videoDevices.length <= 1) return;
+    const nextIndex = (activeDeviceIndex + 1) % videoDevices.length;
+    setActiveDeviceIndex(nextIndex);
+    await requestCameraAccess(nextIndex);
+  };
+
   // useEffect block to ask for camera permissions
   useEffect(() => {
-    // If we don't have a stream but camera should be available, request it
     if (!stream && cameraAvailable) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       requestCameraAccess();
     }
     return () => {
-      // Clean up the stream when unmounting
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, []);
+  }, [cameraAvailable]);
+
   // Update video element when stream is available or changes
   useEffect(() => {
     if (cameraAvailable && stream && videoRef.current && !selectedPhotoUrl) {
@@ -180,7 +230,7 @@ export default function CameraScreen({
           <NextImage
             id="selected-file-preview"
             src={selectedPhotoUrl}
-            className="w-full h-full object-cover animate-[fadeIn_0.3s_ease-out]"
+            className="w-full h-full object-contain bg-slate-950 animate-[fadeIn_0.3s_ease-out]"
             alt="Foto de la lima"
           />
         ) : cameraAvailable ? (
@@ -190,7 +240,7 @@ export default function CameraScreen({
             autoPlay 
             playsInline
             muted
-            className={`${cameraStyles.videoPreview} object-cover`}
+            className={cameraStyles.videoPreview}
           />
         ) : (
           /* Premium Mock Viewfinder for previewing without physical hardware */
@@ -285,8 +335,20 @@ export default function CameraScreen({
           <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : (selectedPhotoUrl ? "w-10 h-10 rounded-full bg-amber-500 scale-95 transition-all duration-300" : cameraStyles.shutterInnerCircle)} />
         </button>
 
-        {/* Right: Layout spacer to maintain symmetry */}
-        <div className="w-12 h-12" />
+        {/* Right: Switch camera button or layout spacer */}
+        {videoDevices.length > 1 ? (
+          <button 
+            type="button"
+            onClick={handleSwitchCamera}
+            className={cameraStyles.iconButton}
+            aria-label="Cambiar cámara"
+            title="Cambiar lente de cámara"
+          >
+            <SwitchCameraIcon size={20} />
+          </button>
+        ) : (
+          <div className="w-12 h-12" />
+        )}
       </div>
     </div>
   );
