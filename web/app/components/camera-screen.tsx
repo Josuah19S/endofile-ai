@@ -61,6 +61,7 @@ export default function CameraScreen({
       const isPortrait = typeof window !== 'undefined' && window.innerHeight > window.innerWidth;
       const idealWidth = isPortrait ? 1080 : 1920;
       const idealHeight = isPortrait ? 1920 : 1080;
+      console.log("Ideal dimensions:", idealWidth, "x", idealHeight);
 
       const constraints: MediaStreamConstraints = {
         video: {
@@ -235,7 +236,8 @@ export default function CameraScreen({
           <NextImage
             id="selected-file-preview"
             src={selectedPhotoUrl}
-            className="w-full h-full object-contain bg-slate-950 animate-[fadeIn_0.3s_ease-out]"
+            fill
+            className="object-cover animate-[fadeIn_0.3s_ease-out]"
             alt="Foto de la lima"
           />
         ) : cameraAvailable ? (

@@ -30,7 +30,7 @@ export const cameraStyles = {
   viewportArea: "absolute inset-0 w-full h-full z-0 flex items-center justify-center",
   
   // The interactive video stream
-  videoPreview: "w-full h-full object-contain bg-slate-950",
+  videoPreview: "w-full h-full object-cover",
   
   // Focus frame overlays in the middle of screen
   focusFrameContainer: "absolute inset-0 flex items-center justify-center pointer-events-none",
