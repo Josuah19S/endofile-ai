@@ -57,11 +57,16 @@ export default function CameraScreen({
         stream.getTracks().forEach(track => track.stop());
       }
 
+      // Dynamically invert dimensions based on screen orientation to fit portrait/landscape viewports
+      const isPortrait = typeof window !== 'undefined' && window.innerHeight > window.innerWidth;
+      const idealWidth = isPortrait ? 1080 : 1920;
+      const idealHeight = isPortrait ? 1920 : 1080;
+
       const constraints: MediaStreamConstraints = {
         video: {
           facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: idealWidth },
+          height: { ideal: idealHeight }
         }
       };
 
@@ -69,8 +74,8 @@ export default function CameraScreen({
       if (videoDevices.length > 0 && videoDevices[deviceIndex]) {
         constraints.video = {
           deviceId: { exact: videoDevices[deviceIndex].deviceId },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: idealWidth },
+          height: { ideal: idealHeight }
         };
       }
 
