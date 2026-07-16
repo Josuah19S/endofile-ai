@@ -59,9 +59,9 @@ export default function CameraScreen({
 
       // Dynamically invert dimensions based on screen orientation to fit portrait/landscape viewports
       const isPortrait = typeof window !== 'undefined' && window.innerHeight > window.innerWidth;
-      alert(`${window.innerHeight}, ${window.innerWidth}`);
       const idealWidth = isPortrait ? 1080 : 1920;
       const idealHeight = isPortrait ? 1920 : 1080;
+      console.log("Ideal dimensions:", idealWidth, "x", idealHeight);
 
       const constraints: MediaStreamConstraints = {
         video: {

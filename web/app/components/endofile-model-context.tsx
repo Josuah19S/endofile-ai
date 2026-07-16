@@ -87,6 +87,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
       const prediction = await model.executeAsync(expanded) as Tensor;
       const probabilities = await prediction.data();
+      console.log(probabilities)
       const maxIdx = probabilities.indexOf(Math.max(...probabilities));
       const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
 
