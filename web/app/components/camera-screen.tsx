@@ -236,7 +236,8 @@ export default function CameraScreen({
           <NextImage
             id="selected-file-preview"
             src={selectedPhotoUrl}
-            className="w-full h-full object-contain bg-slate-950 animate-[fadeIn_0.3s_ease-out]"
+            fill
+            className="object-cover animate-[fadeIn_0.3s_ease-out]"
             alt="Foto de la lima"
           />
         ) : cameraAvailable ? (
