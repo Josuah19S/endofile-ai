@@ -26,8 +26,8 @@ export const cameraStyles = {
   // Flash button variation when active
   flashActive: "bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30",
 
-  // Camera viewport area - absolutely filling the entire screen behind everything
-  viewportArea: "absolute inset-0 w-full h-full z-0 flex items-center justify-center",
+  // Camera viewport area - centered, rounded square box for both desktop and mobile
+  viewportArea: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] max-w-[420px] max-h-[420px] z-10 flex items-center justify-center bg-slate-950 rounded-3xl border border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden",
   
   // The interactive video stream
   videoPreview: "w-full h-full object-cover",
@@ -35,8 +35,8 @@ export const cameraStyles = {
   // Focus frame overlays in the middle of screen
   focusFrameContainer: "absolute inset-0 flex items-center justify-center pointer-events-none",
   
-  // Focus square container (aspect-ratio square in mobile)
-  focusSquare: "relative w-72 h-72 md:w-96 md:h-96 border border-white/10 flex items-center justify-center transition-all duration-300",
+  // Focus square container (scaled to fit nicely inside the squared viewport)
+  focusSquare: "relative w-[80%] h-[80%] border border-white/10 flex items-center justify-center transition-all duration-300",
   
   // Focus corner markers (L-shapes)
   focusCornerTL: "absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white rounded-tl-sm",
