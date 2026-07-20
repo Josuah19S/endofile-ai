@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
-import { UploadIcon, CheckCircleIcon, HistoryIcon as SwitchCameraIcon } from './icons';
+import { UploadIcon, CheckCircleIcon, HistoryIcon as SwitchCameraIcon, MenuIcon, ExpandIcon, FlashIcon, FocusIcon } from './icons';
 import { useEndofileAi } from "@/app/components/endofile-model-context";
 import NextImage from "next/image";
 
@@ -22,6 +22,11 @@ export default function CameraScreen({
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
   const [activeDeviceIndex, setActiveDeviceIndex] = useState<number>(0);
+  
+  // Controls states
+  const [flashOn, setFlashOn] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -106,6 +111,69 @@ export default function CameraScreen({
     const nextIndex = (activeDeviceIndex + 1) % videoDevices.length;
     setActiveDeviceIndex(nextIndex);
     await requestCameraAccess(nextIndex);
+  };
+
+  // Toggle flash (torch) on/off
+  const toggleFlash = async () => {
+    const nextFlash = !flashOn;
+    setFlashOn(nextFlash);
+    
+    const track = stream?.getVideoTracks()[0];
+    if (track) {
+      try {
+        const capabilities = (track.getCapabilities() as any);
+        if (capabilities.torch) {
+          await track.applyConstraints({
+            advanced: [{ torch: nextFlash }]
+          } as any);
+          console.log("Torch constraint applied successfully:", nextFlash);
+        } else {
+          console.warn("Torch/flash is not supported on this track.");
+        }
+      } catch (err) {
+        console.error("Failed to toggle flash constraint:", err);
+      }
+    }
+  };
+
+  // Trigger autofocus reset / focus sweep in the middle
+  const triggerRefocus = async () => {
+    const track = stream?.getVideoTracks()[0];
+    if (!track) return;
+    
+    try {
+      const capabilities = (track.getCapabilities() as any);
+      const constraints = track.getConstraints();
+      
+      if (capabilities.focusMode) {
+        console.log("Exposing focus mode capability:", capabilities.focusMode);
+        // Switch to single-shot manual focus to trigger sweep, then return to continuous
+        await track.applyConstraints({
+          ...constraints,
+          advanced: [
+            ...(constraints.advanced || []),
+            { focusMode: 'single-shot' }
+          ]
+        } as any);
+        
+        setTimeout(async () => {
+          await track.applyConstraints({
+            ...constraints,
+            advanced: [
+              ...(constraints.advanced || []),
+              { focusMode: 'continuous' }
+            ]
+          } as any);
+          console.log("Autofocus continuous re-enabled.");
+        }, 300);
+      } else {
+        // Fallback: re-apply the current video track constraints to force device auto-focus reset
+        await track.applyConstraints(constraints);
+        console.log("Autofocus triggered via constraints re-application");
+      }
+    } catch (err) {
+      console.warn("Failed to trigger refocus constraint:", err);
+    }
   };
 
   // useEffect block to ask for camera permissions
@@ -217,16 +285,58 @@ export default function CameraScreen({
         </button>
       )}
 
-      {/* Model loading status indicator */}
-      <div className="absolute top-4 right-4 z-30 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950/70 backdrop-blur-md border border-slate-800/60 text-xs font-medium text-slate-300 shadow-lg">
-        <span className={`w-2 h-2 rounded-full ${
-          modelStatus === 'ready' ? 'bg-[#10b981] animate-pulse shadow-[0_0_8px_#10b981]' :
-          modelStatus === 'loading' ? 'bg-amber-400 animate-spin border-t-transparent border-2' : 'bg-red-500'
-        }`} />
-        <span>
-          {modelStatus === 'ready' ? 'EndoX IA' :
-           modelStatus === 'loading' ? 'Cargando IA...' : 'Error de IA'}
-        </span>
+      {/* Top Header Controls (Menu, Model Status, Flash, Refocus, Fullscreen) */}
+      <div className={cameraStyles.topHeader}>
+        {/* Left Stack: Menu and Model Badge */}
+        <div className={`${cameraStyles.leftControls} flex items-center gap-3`}>
+          <button 
+            type="button" 
+            className={cameraStyles.iconButton}
+            aria-label="Menú principal"
+          >
+            <MenuIcon size={22} />
+          </button>
+          
+          <div className={cameraStyles.statusBadge}>
+            <span className={modelStatus === 'ready' ? cameraStyles.statusDot : "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"} />
+            <span>modelo: {modelStatus === 'ready' ? 'EndoX IA' : '---'}</span>
+          </div>
+        </div>
+
+        {/* Right Stack: Fullscreen, Flash, and Re-focus */}
+        <div className={cameraStyles.rightControls}>
+          <button 
+            type="button"
+            className={`${cameraStyles.iconButton} ${isFullscreen ? "bg-slate-800/80 border-slate-700" : ""}`}
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            aria-label="Alternar pantalla completa"
+            title="Alternar pantalla completa"
+          >
+            <ExpandIcon size={22} className={isFullscreen ? "rotate-45" : ""} />
+          </button>
+
+          <button 
+            type="button"
+            className={`${cameraStyles.iconButton} ${flashOn ? cameraStyles.flashActive : ""}`}
+            onClick={toggleFlash}
+            aria-label="Alternar flash"
+            title="Alternar flash"
+            disabled={!cameraAvailable}
+          >
+            <FlashIcon size={22} />
+          </button>
+
+          <button 
+            type="button"
+            className={cameraStyles.iconButton}
+            onClick={triggerRefocus}
+            aria-label="Reenfocar cámara"
+            title="Forzar autofoco"
+            disabled={!cameraAvailable}
+          >
+            <FocusIcon size={22} />
+          </button>
+        </div>
       </div>
 
       {/* Viewport / Cam Area */}

@@ -104,7 +104,7 @@ export const HistoryIcon: React.FC<IconProps> = ({ size = 24, className, ...prop
   </svg>
 );
 
-// 7. Checkmark Circle Icon (for Lima detectada card)
+// 8. Checkmark Circle Icon (for Lima detectada card)
 export const CheckCircleIcon: React.FC<IconProps> = ({ size = 24, className, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -118,5 +118,24 @@ export const CheckCircleIcon: React.FC<IconProps> = ({ size = 24, className, ...
     {...props}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+  </svg>
+);
+
+// 8. Focus Targeting Icon (crosshair / camera focus symbol)
+export const FocusIcon: React.FC<IconProps> = ({ size = 24, className, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    width={size}
+    height={size}
+    className={className}
+    {...props}
+  >
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="1" fill="currentColor" />
+    <path strokeLinecap="round" d="M12 2v3m0 14v3M2 12h3m14 0h3" />
   </svg>
 );
