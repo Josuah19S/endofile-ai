@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
-import { UploadIcon, CheckCircleIcon, HistoryIcon as SwitchCameraIcon, MenuIcon, ExpandIcon, FlashIcon, FocusIcon } from './icons';
+import { Menu, Zap, Focus, Maximize2, Upload, CheckCircle, RefreshCw } from 'lucide-react';
 import { useEndofileAi } from "@/app/components/endofile-model-context";
 import NextImage from "next/image";
 
@@ -294,7 +294,7 @@ export default function CameraScreen({
             className={cameraStyles.iconButton}
             aria-label="Menú principal"
           >
-            <MenuIcon size={22} />
+            <Menu size={22} />
           </button>
           
           <div className={cameraStyles.statusBadge}>
@@ -312,7 +312,7 @@ export default function CameraScreen({
             aria-label="Alternar pantalla completa"
             title="Alternar pantalla completa"
           >
-            <ExpandIcon size={22} className={isFullscreen ? "rotate-45" : ""} />
+            <Maximize2 size={22} className={isFullscreen ? "rotate-45" : ""} />
           </button>
 
           <button 
@@ -323,7 +323,7 @@ export default function CameraScreen({
             title="Alternar flash"
             disabled={!cameraAvailable}
           >
-            <FlashIcon size={22} />
+            <Zap size={22} />
           </button>
 
           <button 
@@ -334,7 +334,7 @@ export default function CameraScreen({
             title="Forzar autofoco"
             disabled={!cameraAvailable}
           >
-            <FocusIcon size={22} />
+            <Focus size={22} />
           </button>
         </div>
       </div>
@@ -404,7 +404,7 @@ export default function CameraScreen({
       <div className={cameraStyles.infoOverlayContainer}>
         <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-blue-500/50 bg-[#0e172a]/90' : 'border-slate-800/80'}`}>
           <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500 border-transparent'}`}>
-            <CheckCircleIcon size={14} className={limaDetected ? "animate-scale-in" : ""} />
+            <CheckCircle size={14} className={limaDetected ? "animate-scale-in" : ""} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 leading-none mb-1">
@@ -438,7 +438,7 @@ export default function CameraScreen({
           aria-label="Subir foto de lima"
           title="Cargar foto de lima local"
         >
-          <UploadIcon size={20} />
+          <Upload size={20} />
         </button>
 
         {/* Center: Shutter trigger - captures frame or resets view */}
@@ -461,7 +461,7 @@ export default function CameraScreen({
             aria-label="Cambiar cámara"
             title="Cambiar lente de cámara"
           >
-            <SwitchCameraIcon size={20} />
+            <RefreshCw size={20} />
           </button>
         ) : (
           <div className="w-12 h-12" />
