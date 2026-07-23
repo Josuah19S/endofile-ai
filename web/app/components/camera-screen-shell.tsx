@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { cameraStyles } from '../styles/camera-styles';
-import { Menu, Zap, Maximize, X, ListSortDescending, Upload, CheckCircle, RefreshCw } from 'lucide-react';
+import { Menu, Zap, X, FileText, ListSortDescending, Upload, CheckCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import NextImage from "next/image";
 
 export interface CameraScreenShellProps {
@@ -75,7 +75,7 @@ export default function CameraScreenShell({
           onClick={onBackToCamera}
           className="absolute top-4 left-4 z-30 flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-950/75 backdrop-blur-md border border-slate-800/80 text-xs font-semibold text-white shadow-lg cursor-pointer hover:bg-slate-900 active:scale-95 transition-all"
         >
-          <span className="text-base leading-none">←</span> Volver a Cámara
+          <ArrowLeft size={16} /> Volver a Cámara
         </button>
       )}
 
@@ -89,7 +89,7 @@ export default function CameraScreenShell({
           title="Mostrar controles"
         >
           <div className="relative flex items-center justify-center">
-            <Maximize size={20} />
+            <FileText size={20} className="text-blue-400" />
             <ListSortDescending size={12} className="absolute -bottom-0.5 -right-0.5 text-blue-400 bg-slate-950 rounded-full" />
           </div>
         </button>
@@ -124,8 +124,8 @@ export default function CameraScreenShell({
               title="Limpiar controles (Pantalla completa)"
             >
               <div className="relative flex items-center justify-center">
-                <Maximize size={20} />
-                <X size={12} className="absolute -bottom-0.5 -right-0.5 text-red-400 bg-slate-950 rounded-full" />
+                <FileText size={20} className="text-slate-300 opacity-60" />
+                <X size={14} className="absolute text-red-400 font-extrabold drop-shadow-[0_0_4px_rgba(0,0,0,0.9)]" />
               </div>
             </button>
 
