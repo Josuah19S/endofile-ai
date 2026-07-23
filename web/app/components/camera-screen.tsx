@@ -20,10 +20,11 @@ export default function CameraScreen({
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
   const [activeDeviceIndex, setActiveDeviceIndex] = useState<number>(0);
 
-  // Controls & Tap Focus states
+  // Controls, Sidebar & Tap Focus states
   const [flashOn, setFlashOn] = useState(false);
   const [controlsHidden, setControlsHidden] = useState(false);
   const [showTapFocus, setShowTapFocus] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const tapFocusTimer = useRef<NodeJS.Timeout | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -265,10 +266,12 @@ export default function CameraScreen({
       controlsHidden={controlsHidden}
       flashOn={flashOn}
       hasMultipleCameras={videoDevices.length > 1}
+      sidebarOpen={sidebarOpen}
       onViewportTap={handleViewportTap}
       onToggleControls={setControlsHidden}
       onToggleFlash={toggleFlash}
       onSwitchCamera={handleSwitchCamera}
+      onToggleSidebar={setSidebarOpen}
       onFileSelect={handleFileSelect}
       onCaptureOrReset={selectedPhotoUrl ? resetDetection : capturePhoto}
       onResetDetection={resetDetection}

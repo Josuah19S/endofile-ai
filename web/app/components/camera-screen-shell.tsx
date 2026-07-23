@@ -1,8 +1,9 @@
 "use client";
 import React from 'react';
 import { cameraStyles } from '../styles/camera-styles';
-import { Menu, Zap, X, FileText, ListSortDescending, Upload, CheckCircle, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Menu, Zap, X, ListSortDescending, Upload, CheckCircle, RefreshCw, ArrowLeft, Maximize, Scan } from 'lucide-react';
 import NextImage from "next/image";
+import Sidebar from './sidebar';
 
 export interface CameraScreenShellProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -19,11 +20,13 @@ export interface CameraScreenShellProps {
   controlsHidden: boolean;
   flashOn: boolean;
   hasMultipleCameras: boolean;
+  sidebarOpen: boolean;
 
   onViewportTap: () => void;
   onToggleControls: (hidden: boolean) => void;
   onToggleFlash: () => void;
   onSwitchCamera: () => void;
+  onToggleSidebar: (open: boolean) => void;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCaptureOrReset: () => void;
   onResetDetection: () => void;
@@ -43,10 +46,12 @@ export default function CameraScreenShell({
   controlsHidden,
   flashOn,
   hasMultipleCameras,
+  sidebarOpen,
   onViewportTap,
   onToggleControls,
   onToggleFlash,
   onSwitchCamera,
+  onToggleSidebar,
   onFileSelect,
   onCaptureOrReset,
   onResetDetection,
@@ -55,12 +60,12 @@ export default function CameraScreenShell({
   return (
     <div className={cameraStyles.screenContainer}>
       {/* Hidden file input for uploading custom photos */}
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={onFileSelect} 
-        accept="image/*" 
-        className="hidden" 
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={onFileSelect}
+        accept="image/*"
+        className="hidden"
       />
 
       {/* Screen flash effect overlay */}
@@ -81,7 +86,7 @@ export default function CameraScreenShell({
 
       {/* Floating Restore Controls Button (displayed when controls are cleared/hidden) */}
       {controlsHidden && (
-        <button 
+        <button
           type="button"
           className="absolute top-4 right-4 z-40 flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-950/80 backdrop-blur-md border border-slate-800 text-white shadow-2xl hover:bg-slate-900 active:scale-95 transition-all cursor-pointer"
           onClick={() => onToggleControls(false)}
@@ -89,8 +94,8 @@ export default function CameraScreenShell({
           title="Mostrar controles"
         >
           <div className="relative flex items-center justify-center">
-            <FileText size={20} className="text-blue-400" />
-            <ListSortDescending size={12} className="absolute -bottom-0.5 -right-0.5 text-blue-400 bg-slate-950 rounded-full" />
+            <Maximize size={20} className="text-blue-400" />
+            <ListSortDescending size={12} className="absolute text-blue-400 bg-slate-950 rounded-full" />
           </div>
         </button>
       )}
@@ -100,14 +105,15 @@ export default function CameraScreenShell({
         <div className={cameraStyles.topHeader}>
           {/* Left Stack: Menu and Model Badge */}
           <div className={`${cameraStyles.leftControls} flex items-center gap-3`}>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={cameraStyles.iconButton}
+              onClick={() => onToggleSidebar(true)}
               aria-label="Menú principal"
             >
               <Menu size={22} />
             </button>
-            
+
             <div className={cameraStyles.statusBadge}>
               <span className={modelStatus === 'ready' ? cameraStyles.statusDot : "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"} />
               <span>modelo: {modelStatus === 'ready' ? 'EndoX IA' : '---'}</span>
@@ -116,7 +122,7 @@ export default function CameraScreenShell({
 
           {/* Right Stack: Clear Controls and Flash */}
           <div className={cameraStyles.rightControls}>
-            <button 
+            <button
               type="button"
               className={cameraStyles.iconButton}
               onClick={() => onToggleControls(true)}
@@ -124,12 +130,12 @@ export default function CameraScreenShell({
               title="Limpiar controles (Pantalla completa)"
             >
               <div className="relative flex items-center justify-center">
-                <FileText size={20} className="text-slate-300 opacity-60" />
-                <X size={14} className="absolute text-red-400 font-extrabold drop-shadow-[0_0_4px_rgba(0,0,0,0.9)]" />
+                <Maximize size={20} className="text-slate-300 opacity-60" />
+                <X size={12} className="absolute text-red-400 font-extrabold drop-shadow-[0_0_4px_rgba(0,0,0,0.9)]" />
               </div>
             </button>
 
-            <button 
+            <button
               type="button"
               className={`${cameraStyles.iconButton} ${flashOn ? cameraStyles.flashActive : ""}`}
               onClick={onToggleFlash}
@@ -144,7 +150,7 @@ export default function CameraScreenShell({
       )}
 
       {/* Viewport / Cam Area */}
-      <div 
+      <div
         className={`${cameraStyles.viewportArea} cursor-pointer`}
         onClick={onViewportTap}
       >
@@ -158,10 +164,10 @@ export default function CameraScreenShell({
             alt="Foto de la lima"
           />
         ) : cameraAvailable ? (
-          <video 
+          <video
             ref={videoRef}
             id="camera-preview"
-            autoPlay 
+            autoPlay
             playsInline
             muted
             className={cameraStyles.videoPreview}
@@ -171,15 +177,13 @@ export default function CameraScreenShell({
           <div className="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden">
             {/* Animated medical grid background */}
             <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-size-[16px_16px]" />
-            
+
             {/* Glowing scanline effect */}
             <div className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-blue-500 to-transparent animate-[bounce_4s_infinite] opacity-40 top-1/4" />
-            
+
             {/* Visual representation of tooth being scanned */}
             <div className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-blue-500/10 bg-slate-900/40 backdrop-blur-sm">
-              <svg className="w-32 h-32 text-blue-500/20 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C10.5 2 9 3 8 4.5 7.2 3.8 6 3.5 5 4c-1.5.8-2 2.5-2 4 0 3.5 1.5 6 2.5 8 .8 1.6 1.5 3 2 4.5.3 1 1 1.5 2 1.5.8 0 1.5-.5 1.8-1.2.3-.7.7-1.3.7-1.8 0-.5.4-.7.7-.7s.7.2.7.7c0 .5.4 1.1.7 1.8.3.7 1 1.2 1.8 1.2 1 0 1.7-.5 2-1.5.5-1.5 1.2-2.9 2-4.5 1-2 2.5-4.5 2.5-8 0-1.5-.5-3.2-2-4-.9-.5-2.2-.2-3 .5C15 3 13.5 2 12 2z" />
-              </svg>
+              <Scan size={100} className="text-blue-500/20 animate-pulse" />
               <span className="text-xs text-slate-500 mt-4 tracking-wider text-center max-w-50">
                 Simulador de cámara activo. Apunte a la lima de endodoncia.
               </span>
@@ -204,7 +208,7 @@ export default function CameraScreenShell({
             <div className={`${cameraStyles.focusCornerTR} ${isAnalyzing ? 'border-blue-500' : 'border-white'}`} />
             <div className={`${cameraStyles.focusCornerBL} ${isAnalyzing ? 'border-blue-500' : 'border-white'}`} />
             <div className={`${cameraStyles.focusCornerBR} ${isAnalyzing ? 'border-blue-500' : 'border-white'}`} />
-            
+
             {/* Center target dot */}
             <div className={`${cameraStyles.focusCenterDot} ${isAnalyzing ? 'bg-blue-500 scale-150 animate-ping' : ''}`} />
 
@@ -228,15 +232,15 @@ export default function CameraScreenShell({
                 Detector de Limas
               </p>
               <p className={cameraStyles.infoText}>
-                {isAnalyzing 
-                  ? "Analizando lima..." 
+                {isAnalyzing
+                  ? "Analizando lima..."
                   : (limaDetected ? `Lima detectada: ${limaDetected}` : "Lima detectada: ---")
                 }
               </p>
             </div>
             {limaDetected && (
-              <button 
-                onClick={onResetDetection} 
+              <button
+                onClick={onResetDetection}
                 className="text-xs text-slate-500 hover:text-slate-300 font-medium px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
               >
                 Limpiar
@@ -250,7 +254,7 @@ export default function CameraScreenShell({
       {!controlsHidden && (
         <div className={cameraStyles.bottomActionBar}>
           {/* Left: Upload image */}
-          <button 
+          <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             className={cameraStyles.iconButton}
@@ -261,7 +265,7 @@ export default function CameraScreenShell({
           </button>
 
           {/* Center: Shutter trigger - captures frame or resets view */}
-          <button 
+          <button
             type="button"
             onClick={onCaptureOrReset}
             className={cameraStyles.shutterOuterRing}
@@ -273,7 +277,7 @@ export default function CameraScreenShell({
 
           {/* Right: Switch camera button or layout spacer */}
           {hasMultipleCameras ? (
-            <button 
+            <button
               type="button"
               onClick={onSwitchCamera}
               className={cameraStyles.iconButton}
@@ -287,6 +291,11 @@ export default function CameraScreenShell({
           )}
         </div>
       )}
+      {/* Sidebar Component */}
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => onToggleSidebar(false)} 
+      />
     </div>
   );
 }
