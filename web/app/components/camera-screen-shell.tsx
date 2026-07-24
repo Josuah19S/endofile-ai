@@ -232,10 +232,32 @@ export default function CameraScreenShell({
                 Detector de Limas
               </p>
               <p className={cameraStyles.infoText}>
-                {isAnalyzing
-                  ? "Analizando lima..."
-                  : (limaDetected ? `Lima detectada: ${limaDetected}` : "Lima detectada: ---")
-                }
+                {isAnalyzing ? (
+                  "Analizando lima..."
+                ) : limaDetected ? (
+                  (() => {
+                    const parts = limaDetected.split('_');
+                    if (parts.length >= 2) {
+                      const system = parts[0].replace(/-/g, ' ');
+                      const file = parts.slice(1).join(' ').replace(/-/g, ' ');
+                      return (
+                        <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                          <span className="text-slate-300 font-normal">Lima detectada:</span>
+                          <span className="text-xs font-medium text-slate-400">{system}</span>
+                          <span className="text-sm font-semibold text-slate-100">{file}</span>
+                        </span>
+                      );
+                    }
+                    return (
+                      <span>
+                        <span className="text-slate-300 font-normal">Lima detectada:</span>{' '}
+                        <span className="text-sm font-semibold text-slate-100">{limaDetected.replace(/-/g, ' ')}</span>
+                      </span>
+                    );
+                  })()
+                ) : (
+                  "Lima detectada: ---"
+                )}
               </p>
             </div>
             {limaDetected && (
