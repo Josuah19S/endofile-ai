@@ -64,13 +64,14 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         // Warm up the model (compiles WebGL shaders in the background to avoid first-click latency)
         console.log("Warming up model...");
         const dummyInput = tfjs.zeros([1, 384, 384, 3]);
-        const warmupPrediction = await loadedModel.executeAsync(dummyInput) as Tensor;
-        tfjs.dispose([dummyInput, warmupPrediction]);
+        const warmupPrediction = await loadedModel.executeAsync(dummyInput);
+        tfjs.dispose(dummyInput);
+        tfjs.dispose(warmupPrediction);
 
         if (!active) return;
         setModel(loadedModel);
         setModelStatus('ready');
-        console.log("EndoScan Graph Model loaded and warmed up successfully!");
+        console.log(`EndoScan Graph Model loaded and warmed up successfully! Active Tensors: ${tfjs.memory().numTensors}`);
       } catch (err) {
         console.error("Error initializing model:", err);
         if (active) setModelStatus('error');
@@ -88,22 +89,37 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
     setIsAnalyzing(true);
     setLimaDetected(null);
     try {
-      // Run prediction directly on the canvas element
-      const tensor = tf.browser.fromPixels(src);
-      const resized = tf.image.resizeBilinear(tensor, [384, 384]);
-      const casted = resized.cast('float32');
-      const expanded = casted.expandDims(0);
+      // Wrap intermediate preprocessing tensors in tf.tidy to prevent WebGL memory leaks
+      const inputTensor = tf.tidy(() => {
+        const tensor = tf.browser.fromPixels(src);
+        const resized = tf.image.resizeBilinear(tensor, [384, 384]);
+        const casted = resized.cast('float32');
+        const normalized = casted.div(255.0); // Normalize 0..255 -> 0..1
+        return normalized.expandDims(0);
+      });
 
-      const prediction = await model.executeAsync(expanded) as Tensor;
-      const probabilities = await prediction.data();
-      // console.log(probabilities)
-      const maxIdx = probabilities.indexOf(Math.max(...probabilities));
+      // Execute graph model asynchronously
+      const prediction = await model.executeAsync(inputTensor);
+
+      let probabilities: Float32Array;
+      if (Array.isArray(prediction)) {
+        probabilities = (await prediction[0].data()) as Float32Array;
+      } else {
+        probabilities = (await prediction.data()) as Float32Array;
+      }
+
+      const probArray = Array.from(probabilities);
+      const maxIdx = probArray.indexOf(Math.max(...probArray));
       const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
 
       setLimaDetected(predictedClass);
       setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
 
-      tf.dispose([tensor, resized, casted, expanded, prediction]);
+      // Clean up WebGL tensors completely after prediction
+      tf.dispose(inputTensor);
+      tf.dispose(prediction);
+
+      console.log(`[TF.js Memory] Active Tensors after prediction: ${tf.memory().numTensors}`);
     } catch (err) {
       console.error("Capture prediction error:", err);
       setLimaDetected("Error al analizar");
