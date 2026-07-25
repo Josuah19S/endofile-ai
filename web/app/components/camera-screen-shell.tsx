@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
 import { Menu, Zap, X, ListSortDescending, Upload, CheckCircle, RefreshCw, ArrowLeft, Maximize, Scan, History, ChevronDown } from 'lucide-react';
 import NextImage from "next/image";
 import Sidebar from './sidebar';
-import EFileDetectionCard from './efile-detection-card';
+import EFileDetectionCard from './endofile-detection-card';
 import { useEndofileAi } from './endofile-model-context';
 import { useCamera } from './camera-context';
 

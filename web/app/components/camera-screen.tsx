@@ -1,5 +1,4 @@
 "use client";
-import React from 'react';
 import { CameraContextProvider } from './camera-context';
 import CameraScreenShell from './camera-screen-shell';
 

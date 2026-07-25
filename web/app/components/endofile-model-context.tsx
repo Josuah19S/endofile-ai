@@ -1,6 +1,6 @@
 "use client"
 import React, { createContext, useContext, useState, useEffect } from "react"
-import type { GraphModel, Tensor } from "@tensorflow/tfjs"
+import type { GraphModel } from "@tensorflow/tfjs"
 type TensorFlow = typeof import("@tensorflow/tfjs")
 
 // Model classes as specified by the user

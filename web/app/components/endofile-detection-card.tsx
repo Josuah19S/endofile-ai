@@ -1,8 +1,7 @@
 "use client";
-import React from 'react';
 import NextImage from 'next/image';
 import { getEndoFileInfo } from '../constants/endofile-dataset';
-import { FileText, Gauge, Zap } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 export interface EFileDetectionCardProps {
   classId: string;
@@ -36,6 +35,7 @@ export default function EFileDetectionCard({
   const systemName = fileInfo?.sistema || fallbackSystem;
   const fileName = fileInfo?.nombre || (orderStr ? `${orderStr} ${fallbackFile}` : fallbackFile);
   const orderDisplay = fileInfo?.numero ? `${fileInfo.numero}°` : orderStr;
+  const date = new Date(timestamp!)
 
   return (
     <div
@@ -62,14 +62,18 @@ export default function EFileDetectionCard({
       <div className="flex-1 min-w-0 pr-1">
         {/* System Badge & Order */}
         <div className="flex items-center gap-1.5 mb-1">
-          {orderDisplay && (
-            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md bg-blue-500/15 border border-blue-500/30 text-[10px] font-bold text-blue-400 font-mono">
-              {orderDisplay}
-            </span>
-          )}
           <span className="text-[11px] uppercase font-bold tracking-wider text-slate-400 truncate">
             {systemName}
           </span>
+          {orderDisplay && (
+            <span className="
+              inline-flex items-center justify-center px-1.5 py-0.5
+              rounded-md bg-blue-500/15
+              border border-blue-500/30 text-[10px]
+              font-bold text-blue-400 font-mono">
+              {orderDisplay}
+            </span>
+          )}
         </div>
 
         {/* Main File Name */}
@@ -82,11 +86,15 @@ export default function EFileDetectionCard({
           <div className="flex items-center gap-2 mt-1.5 text-[10px] text-slate-400">
             <span className="flex items-center gap-1 bg-slate-950/60 px-2 py-0.5 rounded-md border border-slate-800/60">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-              ISO #{fileInfo.diametroApical}
+              {`${date.toLocaleDateString()} ${date.toLocaleTimeString()}`}
             </span>
-            <span className="flex items-center gap-1 bg-slate-950/60 px-2 py-0.5 rounded-md border border-slate-800/60">
-              Taper {(fileInfo.conicidad * 100).toFixed(0)}%
-            </span>
+            {/* <span className="flex items-center gap-1 bg-slate-950/60 px-2 py-0.5 rounded-md border border-slate-800/60"> */}
+            {/*   <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> */}
+            {/*   ISO #{fileInfo.diametroApical} */}
+            {/* </span> */}
+            {/* <span className="flex items-center gap-1 bg-slate-950/60 px-2 py-0.5 rounded-md border border-slate-800/60"> */}
+            {/*   Taper {(fileInfo.conicidad * 100).toFixed(0)}% */}
+            {/* </span> */}
           </div>
         )}
       </div>
