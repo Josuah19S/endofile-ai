@@ -70,14 +70,19 @@ export default function CameraScreenShell() {
       {controlsHidden && (
         <button
           type="button"
-          className="absolute top-4 right-4 z-40 flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-950/80 backdrop-blur-md border border-slate-800 text-white shadow-2xl hover:bg-slate-900 active:scale-95 transition-all cursor-pointer"
+          className="
+          absolute top-4 right-4 z-40 flex items-center justify-center
+          w-12 h-12 rounded-2xl bg-surface/80 backdrop-blur-md border
+          border-surface-variant text-white shadow-2xl hover:bg-surface-dim
+          active:scale-95 transition-all cursor-pointer"
           onClick={() => setControlsHidden(false)}
           aria-label="Mostrar controles"
           title="Mostrar controles"
         >
           <div className="relative flex items-center justify-center">
-            <Maximize size={20} className="text-blue-400" />
-            <ListSortDescending size={12} className="absolute -bottom-0.5 -right-0.5 text-blue-400 bg-slate-950 rounded-full" />
+            <Maximize size={20} className="text-on-surface" />
+            <ListSortDescending size={12} className="
+              absolute text-on-surface bg-transparent rounded-full" />
           </div>
         </button>
       )}
@@ -97,7 +102,7 @@ export default function CameraScreenShell() {
             </button>
 
             <div className={cameraStyles.statusBadge}>
-              <span className={modelStatus === 'ready' ? cameraStyles.statusDot : "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"} />
+              <span className={modelStatus === 'ready' ? cameraStyles.statusDot : "w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"} />
               <span>modelo: {modelStatus === 'ready' ? 'EndoX IA' : '---'}</span>
             </div>
           </div>
@@ -112,8 +117,8 @@ export default function CameraScreenShell() {
               title="Limpiar controles (Pantalla completa)"
             >
               <div className="relative flex items-center justify-center">
-                <Maximize size={20} className="text-slate-300 opacity-60" />
-                <X size={14} className="absolute text-red-400 font-extrabold drop-shadow-[0_0_4px_rgba(0,0,0,0.9)]" />
+                <Maximize size={20} className="text-on-surface opacity-60" />
+                <X size={12} className="absolute text-on-surface font-extrabold" />
               </div>
             </button>
 
@@ -125,7 +130,7 @@ export default function CameraScreenShell() {
               title="Alternar flash"
               disabled={!cameraAvailable}
             >
-              <Zap size={22} />
+              <Zap size={16} />
             </button>
           </div>
         </div>
@@ -145,7 +150,7 @@ export default function CameraScreenShell() {
             className="object-cover animate-[fadeIn_0.3s_ease-out]"
             alt="Foto de la lima"
           />
-        ) : cameraAvailable ? (
+        ) : cameraAvailable && (
           <video
             ref={videoRef}
             id="camera-preview"
@@ -154,49 +159,32 @@ export default function CameraScreenShell() {
             muted
             className={cameraStyles.videoPreview}
           />
-        ) : (
-          /* Premium Mock Viewfinder for previewing without physical hardware */
-          <div className="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden">
-            {/* Animated medical grid background */}
-            <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-size-[16px_16px]" />
-
-            {/* Glowing scanline effect */}
-            <div className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-blue-500 to-transparent animate-[bounce_4s_infinite] opacity-40 top-1/4" />
-
-            {/* Visual representation of tooth being scanned */}
-            <div className="relative flex flex-col items-center justify-center p-8 rounded-3xl border border-blue-500/10 bg-slate-900/40 backdrop-blur-sm">
-              <Scan size={100} className="text-blue-500/20 animate-pulse" />
-              <span className="text-xs text-slate-500 mt-4 tracking-wider text-center max-w-50">
-                Simulador de cámara activo. Apunte a la lima de endodoncia.
-              </span>
-            </div>
-          </div>
         )}
 
         {/* Tap to Focus square animation in middle of video tag */}
         {showTapFocus && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-            <div className="w-24 h-24 border-2 border-blue-400 rounded-2xl animate-[ping_0.8s_ease-out_1] flex items-center justify-center shadow-[0_0_20px_rgba(96,165,250,0.6)]">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa]" />
+            <div className="w-24 h-24 border-2 border-on-primary-container rounded-2xl animate-[ping_0.8s_ease-out_1] flex items-center justify-center shadow-[0_0_20px_rgba(96,165,250,0.6)]">
+              <div className="w-2.5 h-2.5 rounded-full bg-on-primary-container shadow-[0_0_8px_#60a5fa]" />
             </div>
           </div>
         )}
 
         {/* Focus square frame overlay */}
         <div className={cameraStyles.focusFrameContainer}>
-          <div className={`${cameraStyles.focusSquare} ${isAnalyzing ? 'border-blue-500/30' : ''}`}>
+          <div className={`${cameraStyles.focusSquare} ${isAnalyzing ? 'border-on-primary-container/30' : ''}`}>
             {/* Corner Markers */}
-            <div className={`${cameraStyles.focusCornerTL} ${isAnalyzing ? 'border-blue-500' : 'border-white'}`} />
-            <div className={`${cameraStyles.focusCornerTR} ${isAnalyzing ? 'border-blue-500' : 'border-white'}`} />
-            <div className={`${cameraStyles.focusCornerBL} ${isAnalyzing ? 'border-blue-500' : 'border-white'}`} />
-            <div className={`${cameraStyles.focusCornerBR} ${isAnalyzing ? 'border-blue-500' : 'border-white'}`} />
+            <div className={`${cameraStyles.focusCornerTL} ${isAnalyzing ? 'border-on-primary-container' : 'border-white'}`} />
+            <div className={`${cameraStyles.focusCornerTR} ${isAnalyzing ? 'border-on-primary-container' : 'border-white'}`} />
+            <div className={`${cameraStyles.focusCornerBL} ${isAnalyzing ? 'border-on-primary-container' : 'border-white'}`} />
+            <div className={`${cameraStyles.focusCornerBR} ${isAnalyzing ? 'border-on-primary-container' : 'border-white'}`} />
 
             {/* Center target dot */}
-            <div className={`${cameraStyles.focusCenterDot} ${isAnalyzing ? 'bg-blue-500 scale-150 animate-ping' : ''}`} />
+            <div className={`${cameraStyles.focusCenterDot} ${isAnalyzing ? 'bg-on-primary-container scale-150 animate-ping' : ''}`} />
 
             {/* Pulsing scanning overlay during analysis */}
             {isAnalyzing && (
-              <div className="absolute inset-x-2 h-1 bg-linear-to-r from-transparent via-blue-500 to-transparent animate-pan-vertical" />
+              <div className="absolute inset-x-2 h-1 bg-linear-to-r from-transparent via-on-primary-container to-transparent animate-pan-vertical" />
             )}
           </div>
         </div>
@@ -205,8 +193,8 @@ export default function CameraScreenShell() {
       {/* Info Card Overlay (Lima detectada) */}
       {!controlsHidden && (
         <div className={cameraStyles.infoOverlayContainer}>
-          <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-blue-500/50 bg-[#0e172a]/90' : 'border-slate-800/80'}`}>
-            <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-500 border-transparent'}`}>
+          <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-on-primary-container/50 bg-primary/90' : 'border-primary/80'}`}>
+            <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-on-primary-container/20 text-on-primary-container' : 'bg-primary text-slate-500 border-transparent'}`}>
               <CheckCircle size={14} className={limaDetected ? "animate-scale-in" : ""} />
             </div>
             <div className="flex-1 min-w-0">
@@ -269,9 +257,8 @@ export default function CameraScreenShell() {
       {/* Solid Dark Action Bar / Expandable Recents Drawer */}
       {!controlsHidden && (
         <div
-          className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
-            recentsExpanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
-          }`}
+          className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${recentsExpanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
+            }`}
         >
           {recentsExpanded ? (
             /* Expanded Drawer Content matching wireframe Recientes fotos.png */
