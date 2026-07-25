@@ -23,7 +23,7 @@ export default function EFileDetectionCard({
   const parts = classId.split('_');
   const fallbackSystem = parts[0]?.replace(/-/g, ' ') || 'Sistema desconocido';
   const fileRaw = parts.slice(1).join('_');
-  
+
   let orderStr: string | null = null;
   let fallbackFile = fileRaw.replace(/-/g, ' ');
 

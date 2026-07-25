@@ -1,77 +1,51 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
 import { Menu, Zap, X, ListSortDescending, Upload, CheckCircle, RefreshCw, ArrowLeft, Maximize, Scan, History, ChevronDown } from 'lucide-react';
 import NextImage from "next/image";
 import Sidebar from './sidebar';
 import EFileDetectionCard from './efile-detection-card';
-import { RecentScanItem } from './endofile-model-context';
+import { useEndofileAi } from './endofile-model-context';
+import { useCamera } from './camera-context';
 
-export interface CameraScreenShellProps {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  cameraAvailable: boolean;
-  selectedPhotoUrl: string | null;
-  showFlashOverlay: boolean;
-  showTapFocus: boolean;
+export default function CameraScreenShell() {
+  const {
+    videoRef,
+    fileInputRef,
+    cameraAvailable,
+    selectedPhotoUrl,
+    showFlashOverlay,
+    showTapFocus,
+    flashOn,
+    videoDevices,
+    handleViewportTap,
+    toggleFlash,
+    handleSwitchCamera,
+    handleFileSelect,
+    capturePhoto,
+    resetDetection,
+    setSelectedPhotoUrl,
+  } = useCamera();
 
-  modelStatus: 'loading' | 'ready' | 'error';
-  limaDetected: string | null;
-  isAnalyzing: boolean;
+  const {
+    modelStatus,
+    limaDetected,
+    isAnalyzing,
+    scanHistoryItems,
+  } = useEndofileAi();
 
-  controlsHidden: boolean;
-  flashOn: boolean;
-  hasMultipleCameras: boolean;
-  sidebarOpen: boolean;
-  recentsExpanded: boolean;
-  recentScans: RecentScanItem[];
+  // Local UI Presentation Toggles
+  const [controlsHidden, setControlsHidden] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [recentsExpanded, setRecentsExpanded] = useState(false);
 
-  onViewportTap: () => void;
-  onToggleControls: (hidden: boolean) => void;
-  onToggleFlash: () => void;
-  onSwitchCamera: () => void;
-  onToggleSidebar: (open: boolean) => void;
-  onToggleRecents: (expanded: boolean) => void;
-  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onCaptureOrReset: () => void;
-  onResetDetection: () => void;
-  onBackToCamera: () => void;
-}
-
-export default function CameraScreenShell({
-  videoRef,
-  fileInputRef,
-  cameraAvailable,
-  selectedPhotoUrl,
-  showFlashOverlay,
-  showTapFocus,
-  modelStatus,
-  limaDetected,
-  isAnalyzing,
-  controlsHidden,
-  flashOn,
-  hasMultipleCameras,
-  sidebarOpen,
-  recentsExpanded,
-  recentScans,
-  onViewportTap,
-  onToggleControls,
-  onToggleFlash,
-  onSwitchCamera,
-  onToggleSidebar,
-  onToggleRecents,
-  onFileSelect,
-  onCaptureOrReset,
-  onResetDetection,
-  onBackToCamera,
-}: CameraScreenShellProps) {
   return (
     <div className={cameraStyles.screenContainer}>
       {/* Hidden file input for uploading custom photos */}
       <input
         type="file"
         ref={fileInputRef}
-        onChange={onFileSelect}
+        onChange={handleFileSelect}
         accept="image/*"
         className="hidden"
       />
@@ -85,7 +59,7 @@ export default function CameraScreenShell({
       {selectedPhotoUrl && (
         <button
           type="button"
-          onClick={onBackToCamera}
+          onClick={() => setSelectedPhotoUrl(null)}
           className="absolute top-4 left-4 z-30 flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-950/75 backdrop-blur-md border border-slate-800/80 text-xs font-semibold text-white shadow-lg cursor-pointer hover:bg-slate-900 active:scale-95 transition-all"
         >
           <ArrowLeft size={16} /> Volver a Cámara
@@ -97,13 +71,13 @@ export default function CameraScreenShell({
         <button
           type="button"
           className="absolute top-4 right-4 z-40 flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-950/80 backdrop-blur-md border border-slate-800 text-white shadow-2xl hover:bg-slate-900 active:scale-95 transition-all cursor-pointer"
-          onClick={() => onToggleControls(false)}
+          onClick={() => setControlsHidden(false)}
           aria-label="Mostrar controles"
           title="Mostrar controles"
         >
           <div className="relative flex items-center justify-center">
             <Maximize size={20} className="text-blue-400" />
-            <ListSortDescending size={12} className="absolute text-blue-400 bg-slate-950 rounded-full" />
+            <ListSortDescending size={12} className="absolute -bottom-0.5 -right-0.5 text-blue-400 bg-slate-950 rounded-full" />
           </div>
         </button>
       )}
@@ -116,7 +90,7 @@ export default function CameraScreenShell({
             <button
               type="button"
               className={cameraStyles.iconButton}
-              onClick={() => onToggleSidebar(true)}
+              onClick={() => setSidebarOpen(true)}
               aria-label="Menú principal"
             >
               <Menu size={22} />
@@ -133,20 +107,20 @@ export default function CameraScreenShell({
             <button
               type="button"
               className={cameraStyles.iconButton}
-              onClick={() => onToggleControls(true)}
+              onClick={() => setControlsHidden(true)}
               aria-label="Limpiar controles"
               title="Limpiar controles (Pantalla completa)"
             >
               <div className="relative flex items-center justify-center">
                 <Maximize size={20} className="text-slate-300 opacity-60" />
-                <X size={12} className="absolute text-red-400 font-extrabold drop-shadow-[0_0_4px_rgba(0,0,0,0.9)]" />
+                <X size={14} className="absolute text-red-400 font-extrabold drop-shadow-[0_0_4px_rgba(0,0,0,0.9)]" />
               </div>
             </button>
 
             <button
               type="button"
               className={`${cameraStyles.iconButton} ${flashOn ? cameraStyles.flashActive : ""}`}
-              onClick={onToggleFlash}
+              onClick={toggleFlash}
               aria-label="Alternar flash"
               title="Alternar flash"
               disabled={!cameraAvailable}
@@ -160,7 +134,7 @@ export default function CameraScreenShell({
       {/* Viewport / Cam Area */}
       <div
         className={`${cameraStyles.viewportArea} cursor-pointer`}
-        onClick={onViewportTap}
+        onClick={handleViewportTap}
       >
         {selectedPhotoUrl ? (
           /* Show selected static endodontic file photo */
@@ -282,7 +256,7 @@ export default function CameraScreenShell({
             </div>
             {limaDetected && (
               <button
-                onClick={onResetDetection}
+                onClick={resetDetection}
                 className="text-xs text-slate-500 hover:text-slate-300 font-medium px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
               >
                 Limpiar
@@ -294,10 +268,9 @@ export default function CameraScreenShell({
 
       {/* Solid Dark Action Bar / Expandable Recents Drawer */}
       {!controlsHidden && (
-        <div 
-          className={`fixed bottom-0 left-0 right-0 z-40 bg-slate-950 border-t border-slate-800 transition-all duration-300 ease-in-out flex flex-col justify-between ${
-            recentsExpanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
-          }`}
+        <div
+          className={`fixed bottom-0 left-0 right-0 z-40 bg-slate-950 border-t border-slate-800 transition-all duration-300 ease-in-out flex flex-col justify-between ${recentsExpanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
+            }`}
         >
           {recentsExpanded ? (
             /* Expanded Drawer Content matching wireframe Recientes fotos.png */
@@ -306,7 +279,7 @@ export default function CameraScreenShell({
               <div className="flex justify-center pt-3 pb-2 border-b border-slate-900 shrink-0">
                 <button
                   type="button"
-                  onClick={() => onToggleRecents(false)}
+                  onClick={() => setRecentsExpanded(false)}
                   className="w-12 h-12 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-200 hover:text-white transition-all cursor-pointer shadow-lg active:scale-95"
                   aria-label="Cerrar recientes"
                   title="Cerrar recientes"
@@ -320,13 +293,13 @@ export default function CameraScreenShell({
                 <div className="max-w-4xl mx-auto">
                   <div className="flex items-center justify-between mb-3 px-1">
                     <h3 className="text-xs uppercase font-bold tracking-widest text-slate-400">
-                      Detecciones Recientes ({recentScans.length})
+                      Detecciones Recientes ({scanHistoryItems.length})
                     </h3>
                   </div>
 
-                  {recentScans.length > 0 ? (
+                  {scanHistoryItems.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-                      {recentScans.map((scan) => (
+                      {scanHistoryItems.map((scan) => (
                         <EFileDetectionCard
                           key={scan.id}
                           classId={scan.classId}
@@ -362,7 +335,7 @@ export default function CameraScreenShell({
               {/* Center: Shutter trigger - captures frame or resets view */}
               <button
                 type="button"
-                onClick={onCaptureOrReset}
+                onClick={selectedPhotoUrl ? resetDetection : capturePhoto}
                 className={cameraStyles.shutterOuterRing}
                 aria-label={selectedPhotoUrl ? "Volver a la cámara en vivo" : "Capturar foto de lima"}
                 disabled={isAnalyzing || modelStatus === 'loading'}
@@ -370,24 +343,38 @@ export default function CameraScreenShell({
                 <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : (selectedPhotoUrl ? "w-10 h-10 rounded-full bg-amber-500 scale-95 transition-all duration-300" : cameraStyles.shutterInnerCircle)} />
               </button>
 
-              {/* Right: Recents button */}
-              <button
-                type="button"
-                onClick={() => onToggleRecents(true)}
-                className={cameraStyles.iconButton}
-                aria-label="Detecciones recientes"
-                title="Ver detecciones recientes"
-              >
-                <History size={20} />
-              </button>
+              {/* Right: Recents button or Camera Switch */}
+              <div className="flex items-center gap-2">
+                {videoDevices.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleSwitchCamera}
+                    className={cameraStyles.iconButton}
+                    aria-label="Cambiar cámara"
+                    title="Cambiar lente de cámara"
+                  >
+                    <RefreshCw size={18} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setRecentsExpanded(true)}
+                  className={cameraStyles.iconButton}
+                  aria-label="Detecciones recientes"
+                  title="Ver detecciones recientes"
+                >
+                  <History size={20} />
+                </button>
+              </div>
             </div>
           )}
         </div>
       )}
+
       {/* Sidebar Component */}
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => onToggleSidebar(false)} 
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
     </div>
   );
