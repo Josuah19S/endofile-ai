@@ -1,9 +1,11 @@
 "use client";
 import React from 'react';
 import { cameraStyles } from '../styles/camera-styles';
-import { Menu, Zap, X, ListSortDescending, Upload, CheckCircle, RefreshCw, ArrowLeft, Maximize, Scan } from 'lucide-react';
+import { Menu, Zap, X, ListSortDescending, Upload, CheckCircle, RefreshCw, ArrowLeft, Maximize, Scan, History, ChevronDown } from 'lucide-react';
 import NextImage from "next/image";
 import Sidebar from './sidebar';
+import EFileDetectionCard from './efile-detection-card';
+import { RecentScanItem } from './endofile-model-context';
 
 export interface CameraScreenShellProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -21,12 +23,15 @@ export interface CameraScreenShellProps {
   flashOn: boolean;
   hasMultipleCameras: boolean;
   sidebarOpen: boolean;
+  recentsExpanded: boolean;
+  recentScans: RecentScanItem[];
 
   onViewportTap: () => void;
   onToggleControls: (hidden: boolean) => void;
   onToggleFlash: () => void;
   onSwitchCamera: () => void;
   onToggleSidebar: (open: boolean) => void;
+  onToggleRecents: (expanded: boolean) => void;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCaptureOrReset: () => void;
   onResetDetection: () => void;
@@ -47,11 +52,14 @@ export default function CameraScreenShell({
   flashOn,
   hasMultipleCameras,
   sidebarOpen,
+  recentsExpanded,
+  recentScans,
   onViewportTap,
   onToggleControls,
   onToggleFlash,
   onSwitchCamera,
   onToggleSidebar,
+  onToggleRecents,
   onFileSelect,
   onCaptureOrReset,
   onResetDetection,
@@ -284,44 +292,95 @@ export default function CameraScreenShell({
         </div>
       )}
 
-      {/* Solid Dark Action Bar */}
+      {/* Solid Dark Action Bar / Expandable Recents Drawer */}
       {!controlsHidden && (
-        <div className={cameraStyles.bottomActionBar}>
-          {/* Left: Upload image */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className={cameraStyles.iconButton}
-            aria-label="Subir foto de lima"
-            title="Cargar foto de lima local"
-          >
-            <Upload size={20} />
-          </button>
+        <div 
+          className={`fixed bottom-0 left-0 right-0 z-40 bg-slate-950 border-t border-slate-800 transition-all duration-300 ease-in-out flex flex-col justify-between ${
+            recentsExpanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
+          }`}
+        >
+          {recentsExpanded ? (
+            /* Expanded Drawer Content matching wireframe Recientes fotos.png */
+            <div className="flex flex-col h-full overflow-hidden">
+              {/* Collapse Chevron Button at Top Center */}
+              <div className="flex justify-center pt-3 pb-2 border-b border-slate-900 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onToggleRecents(false)}
+                  className="w-12 h-12 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-200 hover:text-white transition-all cursor-pointer shadow-lg active:scale-95"
+                  aria-label="Cerrar recientes"
+                  title="Cerrar recientes"
+                >
+                  <ChevronDown size={28} />
+                </button>
+              </div>
 
-          {/* Center: Shutter trigger - captures frame or resets view */}
-          <button
-            type="button"
-            onClick={onCaptureOrReset}
-            className={cameraStyles.shutterOuterRing}
-            aria-label={selectedPhotoUrl ? "Volver a la cámara en vivo" : "Capturar foto de lima"}
-            disabled={isAnalyzing || modelStatus === 'loading'}
-          >
-            <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : (selectedPhotoUrl ? "w-10 h-10 rounded-full bg-amber-500 scale-95 transition-all duration-300" : cameraStyles.shutterInnerCircle)} />
-          </button>
+              {/* Scrollable Recents Grid */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="max-w-4xl mx-auto">
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <h3 className="text-xs uppercase font-bold tracking-widest text-slate-400">
+                      Detecciones Recientes ({recentScans.length})
+                    </h3>
+                  </div>
 
-          {/* Right: Switch camera button or layout spacer */}
-          {hasMultipleCameras ? (
-            <button
-              type="button"
-              onClick={onSwitchCamera}
-              className={cameraStyles.iconButton}
-              aria-label="Cambiar cámara"
-              title="Cambiar lente de cámara"
-            >
-              <RefreshCw size={20} />
-            </button>
+                  {recentScans.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+                      {recentScans.map((scan) => (
+                        <EFileDetectionCard
+                          key={scan.id}
+                          classId={scan.classId}
+                          photoUrl={scan.photoUrl}
+                          timestamp={scan.timestamp}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-slate-500 text-center">
+                      <History size={40} className="mb-3 text-slate-600 opacity-60" />
+                      <p className="text-sm font-medium text-slate-400">No hay detecciones recientes todavía.</p>
+                      <span className="text-xs text-slate-500 mt-1">Tome una foto de lima para ver los resultados aquí.</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           ) : (
-            <div className="w-12 h-12" />
+            /* Standard Compact Action Bar */
+            <div className="flex items-center justify-around h-full px-6 max-w-xl mx-auto w-full">
+              {/* Left: Upload image */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={cameraStyles.iconButton}
+                aria-label="Subir foto de lima"
+                title="Cargar foto de lima local"
+              >
+                <Upload size={20} />
+              </button>
+
+              {/* Center: Shutter trigger - captures frame or resets view */}
+              <button
+                type="button"
+                onClick={onCaptureOrReset}
+                className={cameraStyles.shutterOuterRing}
+                aria-label={selectedPhotoUrl ? "Volver a la cámara en vivo" : "Capturar foto de lima"}
+                disabled={isAnalyzing || modelStatus === 'loading'}
+              >
+                <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : (selectedPhotoUrl ? "w-10 h-10 rounded-full bg-amber-500 scale-95 transition-all duration-300" : cameraStyles.shutterInnerCircle)} />
+              </button>
+
+              {/* Right: Recents button */}
+              <button
+                type="button"
+                onClick={() => onToggleRecents(true)}
+                className={cameraStyles.iconButton}
+                aria-label="Detecciones recientes"
+                title="Ver detecciones recientes"
+              >
+                <History size={20} />
+              </button>
+            </div>
           )}
         </div>
       )}

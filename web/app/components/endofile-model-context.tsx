@@ -25,6 +25,13 @@ export interface TopPrediction {
   confidence: number; // Decimal e.g., 0.948 = 94.8%
 }
 
+export interface RecentScanItem {
+  id: string;
+  classId: string;
+  photoUrl?: string | null;
+  timestamp: number;
+}
+
 type PredictionSource = HTMLCanvasElement | HTMLImageElement | HTMLVideoElement | ImageData | ImageBitmap;
 
 export interface EndofileAiContextType {
@@ -35,6 +42,8 @@ export interface EndofileAiContextType {
   predict: (canvas: PredictionSource) => Promise<TopPrediction[]>;
   limaDetected: string | null;
   topPredictions: TopPrediction[];
+  scanHistoryItems: RecentScanItem[];
+  addScanHistoryItem: (item: RecentScanItem) => void;
   setLimaDetected: React.Dispatch<React.SetStateAction<string | null>>;
   scanHistory: string[];
   isAnalyzing: boolean;
@@ -45,8 +54,13 @@ const EndofileAiContext = createContext<EndofileAiContextType | null>(null);
 export function EndofileContextProvider({ children }: { children: React.ReactNode }) {
   const [limaDetected, setLimaDetected] = useState<string | null>(null);
   const [topPredictions, setTopPredictions] = useState<TopPrediction[]>([]);
+  const [scanHistoryItems, setScanHistoryItems] = useState<RecentScanItem[]>([]);
   const [scanHistory, setScanHistory] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const addScanHistoryItem = (item: RecentScanItem) => {
+    setScanHistoryItems(prev => [item, ...prev.slice(0, 19)]);
+  };
 
   // TensorFlow States
   const [tf, setTf] = useState<TensorFlow | null>(null);
@@ -161,6 +175,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       predict,
       limaDetected,
       topPredictions,
+      scanHistoryItems,
+      addScanHistoryItem,
       setLimaDetected,
       scanHistory,
       isAnalyzing,

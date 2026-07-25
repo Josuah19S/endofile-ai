@@ -25,12 +25,13 @@ export default function CameraScreen({
   const [controlsHidden, setControlsHidden] = useState(false);
   const [showTapFocus, setShowTapFocus] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [recentsExpanded, setRecentsExpanded] = useState(false);
   const tapFocusTimer = useRef<NodeJS.Timeout | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { predict, modelStatus, limaDetected, isAnalyzing, setLimaDetected } = useEndofileAi();
+  const { predict, modelStatus, limaDetected, isAnalyzing, setLimaDetected, addScanHistoryItem, scanHistoryItems } = useEndofileAi();
 
   // Enumerate all video inputs to allow switching between lenses
   const enumerateCameras = async () => {
@@ -226,7 +227,15 @@ export default function CameraScreen({
         ctx.drawImage(videoElement, sx, sy, cropSize, cropSize, 0, 0, 384, 384);
         const capturedDataUrl = canvas.toDataURL('image/jpeg');
         setSelectedPhotoUrl(capturedDataUrl);
-        await predict(canvas);
+        const top3 = await predict(canvas);
+        if (top3 && top3.length > 0) {
+          addScanHistoryItem({
+            id: `scan-${Date.now()}`,
+            classId: top3[0].classId,
+            photoUrl: capturedDataUrl,
+            timestamp: Date.now(),
+          });
+        }
       }
     } else {
       setLimaDetected('mg3-blue_1-sv');
@@ -257,7 +266,15 @@ export default function CameraScreen({
               ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, 384, 384);
               const croppedDataUrl = canvas.toDataURL('image/jpeg');
               setSelectedPhotoUrl(croppedDataUrl);
-              await predict(canvas);
+              const top3 = await predict(canvas);
+              if (top3 && top3.length > 0) {
+                addScanHistoryItem({
+                  id: `scan-${Date.now()}`,
+                  classId: top3[0].classId,
+                  photoUrl: croppedDataUrl,
+                  timestamp: Date.now(),
+                });
+              }
             }
           } catch (err) {
             console.error("Uploaded file prediction error:", err);
@@ -289,11 +306,14 @@ export default function CameraScreen({
       flashOn={flashOn}
       hasMultipleCameras={videoDevices.length > 1}
       sidebarOpen={sidebarOpen}
+      recentsExpanded={recentsExpanded}
+      recentScans={scanHistoryItems}
       onViewportTap={handleViewportTap}
       onToggleControls={setControlsHidden}
       onToggleFlash={toggleFlash}
       onSwitchCamera={handleSwitchCamera}
       onToggleSidebar={setSidebarOpen}
+      onToggleRecents={setRecentsExpanded}
       onFileSelect={handleFileSelect}
       onCaptureOrReset={selectedPhotoUrl ? resetDetection : capturePhoto}
       onResetDetection={resetDetection}
