@@ -15,7 +15,7 @@ const FILE_CLASSES = [
   'micromega-one-curve-mini-assorted_3-n25-0.6', 'micromega-one-curve-mini-assorted_4-n25-0.4',
   'micromega-remover_1-n30', 'rc-blue_1-r25', 'rc-blue_2-r40', 'rc-blue_3-r50',
   're-treaty_1-bully', 're-treaty_2-skinny', 're-treaty_3-shapy1', 're-treaty_4-shapy2', 're-treaty_5-shapy3',
-  'slim-shaper_10', 'slim-shaper_zs1', 'slim-shaper_zs3',
+  'slim-shaper_zs2', 'slim-shaper_zs1', 'slim-shaper_zs3',
   'super-files-iii_1-sx', 'super-files-iii_2-s1', 'super-files-iii_3-s2',
   'super-files-iii_4-f1', 'super-files-iii_5-f2', 'super-files-iii_6-f3'
 ];
