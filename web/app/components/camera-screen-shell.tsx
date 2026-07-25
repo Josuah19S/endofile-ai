@@ -239,12 +239,24 @@ export default function CameraScreenShell({
                     const parts = limaDetected.split('_');
                     if (parts.length >= 2) {
                       const system = parts[0].replace(/-/g, ' ');
-                      const file = parts.slice(1).join(' ').replace(/-/g, ' ');
+                      const fileRaw = parts.slice(1).join('_');
+
+                      let orderStr: string | null = null;
+                      let fileName = fileRaw.replace(/-/g, ' ');
+
+                      if (fileRaw.includes('-')) {
+                        const dashParts = fileRaw.split('-');
+                        orderStr = `${dashParts[0]}°`;
+                        fileName = dashParts.slice(1).join(' ').replace(/-/g, ' ');
+                      }
+
                       return (
                         <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
                           <span className="text-slate-300 font-normal">Lima detectada:</span>
                           <span className="text-xs font-medium text-slate-400">{system}</span>
-                          <span className="text-sm font-semibold text-slate-100">{file}</span>
+                          <span className="text-sm font-semibold text-slate-100">
+                            {orderStr ? `${orderStr} ${fileName}` : fileName}
+                          </span>
                         </span>
                       );
                     }
