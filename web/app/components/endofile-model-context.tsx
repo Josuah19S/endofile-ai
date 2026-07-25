@@ -94,8 +94,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         const tensor = tf.browser.fromPixels(src);
         const resized = tf.image.resizeBilinear(tensor, [384, 384]);
         const casted = resized.cast('float32');
-        const normalized = casted.div(255.0); // Normalize 0..255 -> 0..1
-        return normalized.expandDims(0);
+        return casted.expandDims(0);
       });
 
       // Execute graph model asynchronously
