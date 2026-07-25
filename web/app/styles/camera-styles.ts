@@ -21,7 +21,7 @@ export const cameraStyles = {
   statusBadge: "pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container-lowest/80 backdrop-blur-md border border-outline/80 text-sm font-medium text-on-surface-variant shadow-lg",
 
   // Active dot
-  statusDot: "w-2.5 h-2.5 rounded-full bg-tertiary-fixed animate-pulse shadow-[0_0_8px_var(--tertiary)]",
+  statusDot: "w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse shadow-[0_0_8px_var(--tertiary)]",
 
   // Flash button variation when active
   flashActive: "bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30",
