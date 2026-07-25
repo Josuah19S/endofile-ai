@@ -20,24 +20,31 @@ const FILE_CLASSES = [
   'super-files-iii_4-f1', 'super-files-iii_5-f2', 'super-files-iii_6-f3'
 ];
 
-type PredictionSource = HTMLCanvasElement | HTMLImageElement | HTMLVideoElement | ImageData | ImageBitmap
+export interface TopPrediction {
+  classId: string;
+  confidence: number; // Decimal e.g., 0.948 = 94.8%
+}
+
+type PredictionSource = HTMLCanvasElement | HTMLImageElement | HTMLVideoElement | ImageData | ImageBitmap;
 
 export interface EndofileAiContextType {
   tf: TensorFlow | null;
   model: GraphModel | null;
   modelLoaded: boolean;
   modelStatus: 'loading' | 'ready' | 'error';
-  predict: (canvas: PredictionSource) => Promise<void>;
+  predict: (canvas: PredictionSource) => Promise<TopPrediction[]>;
   limaDetected: string | null;
+  topPredictions: TopPrediction[];
   setLimaDetected: React.Dispatch<React.SetStateAction<string | null>>;
   scanHistory: string[];
   isAnalyzing: boolean;
 }
 
-const EndofileAiContext = createContext<EndofileAiContextType | null>(null)
+const EndofileAiContext = createContext<EndofileAiContextType | null>(null);
 
 export function EndofileContextProvider({ children }: { children: React.ReactNode }) {
   const [limaDetected, setLimaDetected] = useState<string | null>(null);
+  const [topPredictions, setTopPredictions] = useState<TopPrediction[]>([]);
   const [scanHistory, setScanHistory] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -84,8 +91,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
   }, []);
 
 
-  const predict = async (src: PredictionSource) => {
-    if (isAnalyzing || !tf || !model) return;
+  const predict = async (src: PredictionSource): Promise<TopPrediction[]> => {
+    if (isAnalyzing || !tf || !model) return [];
     setIsAnalyzing(true);
     setLimaDetected(null);
     try {
@@ -100,32 +107,50 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       // Execute graph model asynchronously
       const prediction = await model.executeAsync(inputTensor);
 
-      let probabilities: Float32Array;
+      let rawOutput: Float32Array;
       if (Array.isArray(prediction)) {
-        probabilities = (await prediction[0].data()) as Float32Array;
+        rawOutput = (await prediction[0].data()) as Float32Array;
       } else {
-        probabilities = (await prediction.data()) as Float32Array;
+        rawOutput = (await prediction.data()) as Float32Array;
       }
 
-      const probArray = Array.from(probabilities);
-      const maxIdx = probArray.indexOf(Math.max(...probArray));
-      const predictedClass = FILE_CLASSES[maxIdx] || 'Clase desconocida';
+      const rawArray = Array.from(rawOutput);
 
-      setLimaDetected(predictedClass);
-      setScanHistory(prev => [predictedClass, ...prev.slice(0, 9)]);
+      // Numerically stable Softmax calculation
+      const maxVal = Math.max(...rawArray);
+      const expArray = rawArray.map(v => Math.exp(v - maxVal));
+      const expSum = expArray.reduce((a, b) => a + b, 0);
+      const probabilities = expArray.map(v => v / (expSum || 1));
+
+      // Rank all classes by confidence score
+      const ranked = FILE_CLASSES.map((className, idx) => ({
+        classId: className,
+        confidence: probabilities[idx] || 0,
+      })).sort((a, b) => b.confidence - a.confidence);
+
+      const top3 = ranked.slice(0, 3);
+      setTopPredictions(top3);
+
+      const bestOption = top3[0]?.classId || 'Clase desconocida';
+      setLimaDetected(bestOption);
+      setScanHistory(prev => [bestOption, ...prev.slice(0, 9)]);
 
       // Clean up WebGL tensors completely after prediction
       tf.dispose(inputTensor);
       tf.dispose(prediction);
 
+      console.log(`[TF.js Top 3 Predictions]:\n` + top3.map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
       console.log(`[TF.js Memory] Active Tensors after prediction: ${tf.memory().numTensors}`);
+
+      return top3;
     } catch (err) {
       console.error("Capture prediction error:", err);
       setLimaDetected("Error al analizar");
+      return [];
     } finally {
       setIsAnalyzing(false);
     }
-  }
+  };
 
   return (
     <EndofileAiContext.Provider value={{
@@ -135,6 +160,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       modelStatus,
       predict,
       limaDetected,
+      topPredictions,
       setLimaDetected,
       scanHistory,
       isAnalyzing,
