@@ -11,17 +11,17 @@ export default function CameraDetectionBadge() {
 
   return (
     <div className={cameraStyles.infoOverlayContainer}>
-      <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-on-primary-container/50 bg-primary/90' : 'border-primary/80'}`}>
-        <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-on-primary-container/20 text-on-primary-container' : 'bg-primary text-slate-500 border-transparent'}`}>
+      <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)]' : 'border-outline/80'}`}>
+        <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50' : 'bg-surface-variant text-on-surface-variant border-transparent'}`}>
           <CheckCircle size={14} className={limaDetected ? "animate-scale-in" : ""} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 leading-none mb-1">
+          <p className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant leading-none mb-1">
             Detector de Limas
           </p>
           <p className={cameraStyles.infoText}>
             {isAnalyzing ? (
-              "Analizando lima..."
+              <span className="text-on-surface-variant font-medium">Analizando lima...</span>
             ) : limaDetected ? (
               (() => {
                 const parts = limaDetected.split('_');
@@ -40,9 +40,9 @@ export default function CameraDetectionBadge() {
 
                   return (
                     <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
-                      <span className="text-slate-300 font-normal">Lima detectada:</span>
-                      <span className="text-xs font-medium text-slate-400">{system}</span>
-                      <span className="text-sm font-semibold text-slate-100">
+                      <span className="text-on-surface-variant font-normal">Lima detectada:</span>
+                      <span className="text-xs font-medium text-on-surface-variant/80">{system}</span>
+                      <span className="text-sm font-semibold text-on-surface">
                         {orderStr ? `${orderStr} ${fileName}` : fileName}
                       </span>
                     </span>
@@ -50,20 +50,20 @@ export default function CameraDetectionBadge() {
                 }
                 return (
                   <span>
-                    <span className="text-slate-300 font-normal">Lima detectada:</span>{' '}
-                    <span className="text-sm font-semibold text-slate-100">{limaDetected.replace(/-/g, ' ')}</span>
+                    <span className="text-on-surface-variant font-normal">Lima detectada:</span>{' '}
+                    <span className="text-sm font-semibold text-on-surface">{limaDetected.replace(/-/g, ' ')}</span>
                   </span>
                 );
               })()
             ) : (
-              "Lima detectada: ---"
+              <span className="text-on-surface-variant/70 font-normal">Lima detectada: ---</span>
             )}
           </p>
         </div>
         {limaDetected && (
           <button
             onClick={resetDetection}
-            className="text-xs text-slate-500 hover:text-slate-300 font-medium px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
+            className="text-xs text-on-surface-variant hover:text-on-surface font-medium px-2.5 py-1 rounded-lg hover:bg-surface-variant/50 transition-colors cursor-pointer"
           >
             Limpiar
           </button>
