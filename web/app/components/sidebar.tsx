@@ -20,17 +20,17 @@ export default function Sidebar({ isOpen, onClose, onSelectNav }: SidebarProps) 
       />
 
       {/* Sidebar Panel sliding from left */}
-      <div className="relative w-80 max-w-[85vw] h-full bg-slate-900 border-r border-slate-800 text-white p-6 flex flex-col justify-between z-10 shadow-2xl animate-[slideRight_0.25s_ease-out]">
+      <div className="relative w-80 max-w-[85vw] h-full bg-surface-container-high border-r border-outline text-on-surface p-6 flex flex-col justify-between z-10 shadow-2xl animate-[slideRight_0.25s_ease-out]">
         
         {/* Top Header */}
         <div>
-          <div className="flex justify-between items-center pb-6 border-b border-slate-800">
-            <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-              <span className="text-blue-400">Endofile</span>AI
+          <div className="flex justify-between items-center pb-6 border-b border-outline">
+            <h2 className="text-xl font-bold tracking-tight text-on-surface flex items-center gap-2">
+              <span className="text-on-primary-container">Endofile</span>AI
             </h2>
             <button 
               onClick={onClose}
-              className="w-10 h-10 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-surface-container-lowest/80 hover:bg-surface-container border border-outline/60 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"
               aria-label="Cerrar menú"
             >
               <ChevronLeft size={20} />
@@ -44,9 +44,9 @@ export default function Sidebar({ isOpen, onClose, onSelectNav }: SidebarProps) 
                 onSelectNav?.('inicio');
                 onClose();
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-800/70 hover:bg-slate-800 text-white font-medium text-sm transition-all cursor-pointer border border-slate-700/40"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary-container/40 hover:bg-primary-container/70 text-on-surface font-medium text-sm transition-all cursor-pointer border border-primary-container/60"
             >
-              <Home size={18} className="text-blue-400" />
+              <Home size={18} className="text-on-primary-container" />
               <span>Inicio</span>
             </button>
 
@@ -55,9 +55,9 @@ export default function Sidebar({ isOpen, onClose, onSelectNav }: SidebarProps) 
                 onSelectNav?.('historial');
                 onClose();
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-950/40 hover:bg-slate-800/60 text-slate-300 hover:text-white font-medium text-sm transition-all cursor-pointer border border-slate-800/40"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-container-lowest/50 hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-medium text-sm transition-all cursor-pointer border border-outline/40"
             >
-              <History size={18} className="text-slate-400" />
+              <History size={18} className="text-on-surface-variant" />
               <span>Historial de fotos</span>
             </button>
 
@@ -66,29 +66,29 @@ export default function Sidebar({ isOpen, onClose, onSelectNav }: SidebarProps) 
                 onSelectNav?.('catalogo');
                 onClose();
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-950/40 hover:bg-slate-800/60 text-slate-300 hover:text-white font-medium text-sm transition-all cursor-pointer border border-slate-800/40"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-container-lowest/50 hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-medium text-sm transition-all cursor-pointer border border-outline/40"
             >
-              <BookOpen size={18} className="text-slate-400" />
+              <BookOpen size={18} className="text-on-surface-variant" />
               <span>Catálogo de limas</span>
             </button>
           </nav>
 
           {/* Help Section */}
-          <div className="mt-8 p-4 rounded-2xl bg-slate-950/60 border border-slate-800/60">
-            <div className="flex items-center gap-2 mb-2 text-slate-200 font-semibold text-xs uppercase tracking-wider">
-              <Info size={14} className="text-blue-400" />
+          <div className="mt-8 p-4 rounded-2xl bg-surface-container-lowest/60 border border-outline/60">
+            <div className="flex items-center gap-2 mb-2 text-on-surface font-semibold text-xs uppercase tracking-wider">
+              <Info size={14} className="text-on-primary-container" />
               <span>Cómo usar la app</span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-on-surface-variant leading-relaxed">
               Posicione la lima de endodoncia centrada en el visor. Asegúrese de contar con buen contraste sobre el fondo para obtener la mejor clasificación con inteligencia artificial.
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="pt-4 border-t border-slate-800/80 flex justify-between items-center text-xs text-slate-400">
+        <div className="pt-4 border-t border-outline flex justify-between items-center text-xs text-on-surface-variant">
           <span>Versión</span>
-          <span className="font-mono bg-slate-800 px-2 py-0.5 rounded-md text-slate-300 font-semibold">0.1.0</span>
+          <span className="font-mono bg-surface-container px-2 py-0.5 rounded-md text-on-surface font-semibold">0.1.0</span>
         </div>
       </div>
     </div>
