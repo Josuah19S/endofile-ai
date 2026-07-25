@@ -209,17 +209,25 @@ export default function CameraScreen({
 
     if (videoRef.current && cameraAvailable) {
       const videoElement = videoRef.current;
+      const vw = videoElement.videoWidth || 640;
+      const vh = videoElement.videoHeight || 480;
+
+      // Crop exact 1:1 center square matching the viewfinder reticle
+      const cropSize = Math.min(vw, vh);
+      const sx = (vw - cropSize) / 2;
+      const sy = (vh - cropSize) / 2;
+
       const canvas = document.createElement('canvas');
-      canvas.width = videoElement.videoWidth || 640;
-      canvas.height = videoElement.videoHeight || 480;
+      canvas.width = 384;
+      canvas.height = 384;
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(videoElement, sx, sy, cropSize, cropSize, 0, 0, 384, 384);
         const capturedDataUrl = canvas.toDataURL('image/jpeg');
         setSelectedPhotoUrl(capturedDataUrl);
+        await predict(canvas);
       }
-      await predict(videoElement);
     } else {
       setLimaDetected('mg3-blue_1-sv');
     }
@@ -235,8 +243,22 @@ export default function CameraScreen({
         img.src = reader.result as string;
         img.onload = async () => {
           try {
-            setSelectedPhotoUrl(img.src);
-            await predict(img);
+            const iw = img.naturalWidth || img.width;
+            const ih = img.naturalHeight || img.height;
+            const cropSize = Math.min(iw, ih);
+            const sx = (iw - cropSize) / 2;
+            const sy = (ih - cropSize) / 2;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 384;
+            canvas.height = 384;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, 384, 384);
+              const croppedDataUrl = canvas.toDataURL('image/jpeg');
+              setSelectedPhotoUrl(croppedDataUrl);
+              await predict(canvas);
+            }
           } catch (err) {
             console.error("Uploaded file prediction error:", err);
           }
