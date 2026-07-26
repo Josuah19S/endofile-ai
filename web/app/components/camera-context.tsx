@@ -24,6 +24,9 @@ export interface CameraContextType {
   handleFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resetDetection: () => void;
   setSelectedPhotoUrl: React.Dispatch<React.SetStateAction<string | null>>;
+
+  recentsExpanded: boolean;
+  setRecentsExpanded: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const CameraContext = createContext<CameraContextType | null>(null);
@@ -47,6 +50,8 @@ export function CameraContextProvider({
   const [flashOn, setFlashOn] = useState(false);
   const [showTapFocus, setShowTapFocus] = useState(false);
   const tapFocusTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const [recentsExpanded, setRecentsExpanded] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -112,7 +117,7 @@ export function CameraContextProvider({
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        videoRef.current.play().catch(() => {});
+        videoRef.current.play().catch(() => { });
       }
     } catch (error) {
       console.warn('Physical camera access failed:', error);
@@ -212,7 +217,7 @@ export function CameraContextProvider({
   useEffect(() => {
     if (cameraAvailable && stream && videoRef.current && !selectedPhotoUrl) {
       videoRef.current.srcObject = stream;
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().catch(() => { });
     }
   }, [cameraAvailable, stream, selectedPhotoUrl]);
 
@@ -325,6 +330,8 @@ export function CameraContextProvider({
       handleFileSelect,
       resetDetection,
       setSelectedPhotoUrl,
+      recentsExpanded,
+      setRecentsExpanded
     }}>
       {children}
     </CameraContext.Provider>
