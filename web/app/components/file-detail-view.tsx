@@ -68,7 +68,7 @@ export default function FileDetailView({
         {/* Top Header & Photo Container */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
           {/* Larger Image Display Box */}
-          <div className="relative w-full h-52 md:h-56 rounded-2xl bg-surface-container-lowest border border-outline/80 overflow-hidden flex items-center justify-center shadow-inner">
+          <div className="relative w-9/10 h-52 md:h-56 m-auto rounded-2xl bg-surface-container-lowest border border-outline/80 overflow-hidden flex items-center justify-center shadow-inner">
             {photoUrl ? (
               <NextImage
                 src={photoUrl}
@@ -85,88 +85,73 @@ export default function FileDetailView({
           </div>
 
           {/* System & Title Meta Card */}
-          <div className="flex flex-col justify-between p-4 rounded-2xl bg-surface-container-high/80 border border-outline/80 shadow-md">
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs uppercase font-bold tracking-wider text-on-surface-variant">
-                  {systemName}
+          <div className="flex flex-col justify-between shadow-md">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xs uppercase font-bold tracking-wider text-on-surface-variant">
+                {systemName}
+              </span>
+              {orderDisplay && (
+                <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-primary-container/30 border border-primary-container/50 text-xs font-bold text-on-primary-container font-mono">
+                  {orderDisplay}
                 </span>
-                {orderDisplay && (
-                  <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-primary-container/30 border border-primary-container/50 text-xs font-bold text-on-primary-container font-mono">
-                    {orderDisplay}
-                  </span>
-                )}
-              </div>
-
-              <h2 className="text-2xl font-bold tracking-tight text-on-surface">
-                {fileName}
-              </h2>
+              )}
             </div>
 
-            {/* ISO Size & Taper Pills */}
-            <div className="grid grid-cols-2 gap-2.5 mt-4 pt-3 border-t border-outline/50 text-xs">
-              <div className="bg-surface-container-lowest p-2.5 rounded-xl border border-outline/50">
-                <span className="text-[10px] uppercase font-semibold text-on-surface-variant block mb-0.5">Diámetro Apical</span>
-                <span className="font-bold text-on-surface text-sm">
-                  {fileInfo ? `ISO #${fileInfo.diametroApical} (${(fileInfo.diametroApical / 100).toFixed(2)}mm)` : 'N/D'}
-                </span>
-              </div>
-
-              <div className="bg-surface-container-lowest p-2.5 rounded-xl border border-outline/50">
-                <span className="text-[10px] uppercase font-semibold text-on-surface-variant block mb-0.5">Conicidad (Taper)</span>
-                <span className="font-bold text-on-surface text-sm">
-                  {fileInfo ? `${(fileInfo.conicidad * 100).toFixed(0)}% (${fileInfo.conicidad})` : 'N/D'}
-                </span>
-              </div>
-            </div>
+            <h2 className="text-2xl font-bold tracking-tight text-on-surface">
+              {fileName}
+            </h2>
           </div>
         </div>
 
         {/* Technical Specs Parameters */}
         <div>
           <h3 className="text-xs uppercase font-bold tracking-wider text-on-surface-variant mb-2.5 flex items-center gap-1.5">
-            <Activity size={14} className="text-on-primary-container" />
-            Especificaciones Técnicas (Dataset)
+            Especificaciones Técnicas
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* Longitud */}
-            <div className="p-3.5 rounded-2xl bg-surface-container-high/60 border border-outline/60">
+          <div className="grid grid-cols-1 gap-1">
+            <div className="p-2">
               <div className="flex items-center gap-2 mb-1 text-on-surface-variant">
-                <Ruler size={15} className="text-on-primary-container" />
+                <span className="text-xs uppercase font-semibold text-on-surface-variant">Diámetro Apical</span>
+                <span className="font-bold text-on-surface text-sm">
+                  {fileInfo ? `ISO #${fileInfo.diametroApical} (${(fileInfo.diametroApical / 100).toFixed(2)}mm)` : 'N/D'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-on-surface-varient">
+                <span className="text-xs uppercase font-semibold text-on-surface-variant">Conicidad (Taper)</span>
+                <span className="font-bold text-on-surface text-sm">
+                  {fileInfo ? `${(fileInfo.conicidad * 100).toFixed(0)}% (${fileInfo.conicidad})` : 'N/D'}
+                </span>
+              </div>
+
+              {/* Longitud */}
+              <div className="flex items-center gap-2 mb-1 text-on-surface-variant">
                 <span className="text-xs font-semibold uppercase tracking-wider">Longitud</span>
+                <span className="text-base font-bold text-on-surface">
+                  {fileInfo?.longitud ? `${fileInfo.longitud} mm` : '25 mm'}
+                </span>
+                {fileInfo?.longitudesAdicionales && fileInfo.longitudesAdicionales.length > 0 && (
+                  <span className="text-xs ml-2 text-on-surface-variant/90">
+                    Alt: {fileInfo.longitudesAdicionales.join(', ')} mm
+                  </span>
+                )}
               </div>
-              <p className="text-base font-bold text-on-surface">
-                {fileInfo?.longitud ? `${fileInfo.longitud} mm` : '25 mm'}
-              </p>
-              {fileInfo?.longitudesAdicionales && fileInfo.longitudesAdicionales.length > 0 && (
-                <p className="text-[11px] text-on-surface-variant/90 mt-1">
-                  Alt: {fileInfo.longitudesAdicionales.join(', ')} mm
-                </p>
-              )}
-            </div>
-
-            {/* Velocidad / RPM */}
-            <div className="p-3.5 rounded-2xl bg-surface-container-high/60 border border-outline/60">
+              {/* Velocidad */}
               <div className="flex items-center gap-2 mb-1 text-on-surface-variant">
-                <Zap size={15} className="text-amber-400" />
                 <span className="text-xs font-semibold uppercase tracking-wider">Velocidad</span>
+                <span className="text-base font-bold text-on-surface">
+                  {velocityDisplay}
+                </span>
               </div>
-              <p className="text-base font-bold text-on-surface">
-                {velocityDisplay}
-              </p>
+              {/* Torque */}
+              <div className="flex items-center gap-2 mb-1 text-on-surface-variant">
+                <span className="text-xs font-semibold uppercase tracking-wider">Torque</span>
+                <span className="text-base font-bold text-on-surface">
+                  {fileInfo?.torque !== undefined ? `${fileInfo.torque} Ncm` : '2.0 Ncm'}
+                </span>
+              </div>
             </div>
 
-            {/* Torque */}
-            <div className="p-3.5 rounded-2xl bg-surface-container-high/60 border border-outline/60">
-              <div className="flex items-center gap-2 mb-1 text-on-surface-variant">
-                <Gauge size={15} className="text-emerald-400" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Torque Máximo</span>
-              </div>
-              <p className="text-base font-bold text-on-surface">
-                {fileInfo?.torque !== undefined ? `${fileInfo.torque} Ncm` : '2.0 Ncm'}
-              </p>
-            </div>
           </div>
         </div>
       </div>
