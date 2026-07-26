@@ -1,8 +1,7 @@
 "use client";
-import React from 'react';
 import NextImage from 'next/image';
 import { getEndoFileInfo } from '../constants/endofile-dataset';
-import { FileText, Gauge, Zap, Ruler, ArrowLeft, Activity, Info, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FileDetailViewProps {
   classId: string;
@@ -82,11 +81,10 @@ export default function FileDetailView({
                 type="button"
                 onClick={onNewer}
                 disabled={!hasNewer}
-                className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${
-                  hasNewer
+                className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${hasNewer
                     ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline text-on-surface hover:scale-105 active:scale-95 shadow-md'
                     : 'opacity-30 border-transparent text-on-surface-variant cursor-not-allowed'
-                }`}
+                  }`}
                 aria-label="Foto más reciente"
                 title="Foto más reciente"
               >
@@ -116,11 +114,10 @@ export default function FileDetailView({
                 type="button"
                 onClick={onOlder}
                 disabled={!hasOlder}
-                className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${
-                  hasOlder
+                className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${hasOlder
                     ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline text-on-surface hover:scale-105 active:scale-95 shadow-md'
                     : 'opacity-30 border-transparent text-on-surface-variant cursor-not-allowed'
-                }`}
+                  }`}
                 aria-label="Foto anterior"
                 title="Foto anterior"
               >
