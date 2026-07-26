@@ -4,7 +4,11 @@ import { History } from 'lucide-react';
 import EFileDetectionCard from './efile-detection-card';
 import { useEndofileAi } from './endofile-model-context';
 
-export default function RecentDetectionsView() {
+interface RecentDetectionsViewProps {
+  onSelectCard?: (classId: string, photoUrl?: string | null) => void;
+}
+
+export default function RecentDetectionsView({ onSelectCard }: RecentDetectionsViewProps) {
   const { scanHistoryItems } = useEndofileAi();
 
   return (
@@ -24,6 +28,7 @@ export default function RecentDetectionsView() {
                 classId={scan.classId}
                 photoUrl={scan.photoUrl}
                 timestamp={scan.timestamp}
+                onClick={() => onSelectCard?.(scan.classId, scan.photoUrl)}
               />
             ))}
           </div>

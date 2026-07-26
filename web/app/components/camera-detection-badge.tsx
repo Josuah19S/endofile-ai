@@ -5,17 +5,28 @@ import { cameraStyles } from '../styles/camera-styles';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';
 
-export default function CameraDetectionBadge() {
+interface CameraDetectionBadgeProps {
+  onOpenDetail?: (classId: string) => void;
+}
+
+export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBadgeProps) {
   const { resetDetection } = useCamera();
   const { limaDetected, isAnalyzing } = useEndofileAi();
 
   return (
     <div className={cameraStyles.infoOverlayContainer}>
-      <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)]' : 'border-outline/80'}`}>
+      <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)] cursor-pointer hover:border-primary' : 'border-outline/80'}`}>
         <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50' : 'bg-surface-variant text-on-surface-variant border-transparent'}`}>
           <CheckCircle size={14} className={limaDetected ? "animate-scale-in" : ""} />
         </div>
-        <div className="flex-1 min-w-0">
+        <div 
+          className="flex-1 min-w-0"
+          onClick={() => {
+            if (limaDetected && onOpenDetail) {
+              onOpenDetail(limaDetected);
+            }
+          }}
+        >
           <p className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant leading-none mb-1">
             Detector de Limas
           </p>
