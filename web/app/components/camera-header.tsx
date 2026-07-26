@@ -18,27 +18,14 @@ export default function CameraHeader({
 }: CameraHeaderProps) {
   const {
     cameraAvailable,
-    selectedPhotoUrl,
     flashOn,
     toggleFlash,
-    setSelectedPhotoUrl,
   } = useCamera();
 
   const { modelStatus } = useEndofileAi();
 
   return (
     <>
-      {/* Float Back to Live Camera button when viewing a static photo */}
-      {selectedPhotoUrl && (
-        <button
-          type="button"
-          onClick={() => setSelectedPhotoUrl(null)}
-          className="absolute top-4 left-4 z-30 flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-surface/80 backdrop-blur-md border border-outline/80 text-xs font-semibold text-on-surface shadow-lg cursor-pointer hover:bg-surface-container-high active:scale-95 transition-all"
-        >
-          <ArrowLeft size={16} /> Volver a Cámara
-        </button>
-      )}
-
       {/* Floating Restore Controls Button (displayed when controls are cleared/hidden) */}
       {controlsHidden && (
         <button

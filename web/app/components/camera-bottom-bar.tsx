@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { Upload, RefreshCw, History, ChevronDown } from 'lucide-react';
+import { Upload, RefreshCw, History, ChevronDown, RotateCcw } from 'lucide-react';
 import { cameraStyles } from '../styles/camera-styles';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';
@@ -34,9 +34,8 @@ export default function CameraBottomBar({
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
-        expanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
-      }`}
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${expanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
+        }`}
     >
       {expanded ? (
         /* Expanded Drawer Container holding children views */
@@ -79,7 +78,13 @@ export default function CameraBottomBar({
             aria-label={selectedPhotoUrl ? "Volver a la cámara en vivo" : "Capturar foto de lima"}
             disabled={isAnalyzing || modelStatus === 'loading'}
           >
-            <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : (selectedPhotoUrl ? "w-10 h-10 rounded-full bg-amber-500 scale-95 transition-all duration-300" : cameraStyles.shutterInnerCircle)} />
+            <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : cameraStyles.shutterInnerCircle} >
+              {
+                selectedPhotoUrl && (
+                  <RotateCcw className={cameraStyles.shutterReloadIcon} />
+                )
+              }
+            </div>
           </button>
 
           {/* Right: Recents button or Camera Switch */}

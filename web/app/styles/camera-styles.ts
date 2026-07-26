@@ -64,6 +64,7 @@ export const cameraStyles = {
 
   // Camera shutter button (center action)
   shutterOuterRing: "flex items-center justify-center w-20 h-20 rounded-full border-4 border-on-surface bg-transparent transition-all duration-300 active:scale-90 cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.2)]",
-  shutterInnerCircle: "w-16 h-16 rounded-full bg-on-surface border border-transparent shadow-inner transition-colors duration-200 hover:bg-surface-variant active:bg-surface-dim",
-  shutterInnerCircleLoading: "w-16 h-16 rounded-full bg-transparent border-4 border-outline border-t-on-surface animate-spin",
+  shutterInnerCircle: "w-16 h-16 p-1 rounded-full bg-on-surface border border-transparent shadow-inner transition-colors duration-200 hover:bg-surface-variant active:bg-surface-dim",
+  shutterInnerCircleLoading: "w-16 h-16 p-4 rounded-full bg-transparent border-4 border-outline border-t-on-surface animate-spin",
+  shutterReloadIcon: "w-full h-full text-outline-variant hover:text-on-surface bg-transparent border border-transparent shadow-inner transition-colors duration-200",
 };
