@@ -2,18 +2,21 @@
 import React from 'react';
 import { Upload, RefreshCw, History, ChevronDown } from 'lucide-react';
 import { cameraStyles } from '../styles/camera-styles';
-import EFileDetectionCard from './efile-detection-card';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';
 
 interface CameraBottomBarProps {
-  recentsExpanded: boolean;
-  setRecentsExpanded: (expanded: boolean) => void;
+  expanded: boolean;
+  onClose: () => void;
+  onOpenRecents: () => void;
+  children?: React.ReactNode;
 }
 
 export default function CameraBottomBar({
-  recentsExpanded,
-  setRecentsExpanded,
+  expanded,
+  onClose,
+  onOpenRecents,
+  children,
 }: CameraBottomBarProps) {
   const {
     fileInputRef,
@@ -27,60 +30,32 @@ export default function CameraBottomBar({
   const {
     modelStatus,
     isAnalyzing,
-    scanHistoryItems,
   } = useEndofileAi();
 
   return (
     <div
       className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
-        recentsExpanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
+        expanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
       }`}
     >
-      {recentsExpanded ? (
-        /* Expanded Drawer Content matching wireframe Recientes fotos.png */
+      {expanded ? (
+        /* Expanded Drawer Container holding children views */
         <div className="flex flex-col h-full overflow-hidden">
           {/* Collapse Chevron Button at Top Center */}
           <div className="flex justify-center pt-3 pb-2 border-b border-outline/60 shrink-0">
             <button
               type="button"
-              onClick={() => setRecentsExpanded(false)}
+              onClick={onClose}
               className="w-12 h-12 rounded-full bg-surface-container-high hover:bg-surface-container-highest border border-outline flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all cursor-pointer shadow-lg active:scale-95"
-              aria-label="Cerrar recientes"
-              title="Cerrar recientes"
+              aria-label="Cerrar panel"
+              title="Cerrar panel"
             >
               <ChevronDown size={28} />
             </button>
           </div>
 
-          {/* Scrollable Recents Grid */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center justify-between mb-3 px-1">
-                <h3 className="text-xs uppercase font-bold tracking-widest text-on-surface-variant">
-                  Detecciones Recientes ({scanHistoryItems.length})
-                </h3>
-              </div>
-
-              {scanHistoryItems.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-                  {scanHistoryItems.map((scan) => (
-                    <EFileDetectionCard
-                      key={scan.id}
-                      classId={scan.classId}
-                      photoUrl={scan.photoUrl}
-                      timestamp={scan.timestamp}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-on-surface-variant text-center">
-                  <History size={40} className="mb-3 opacity-60" />
-                  <p className="text-sm font-medium text-on-surface-variant">No hay detecciones recientes todavía.</p>
-                  <span className="text-xs text-on-surface-variant/80 mt-1">Tome una foto de lima para ver los resultados aquí.</span>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Drawer Children Content */}
+          {children}
         </div>
       ) : (
         /* Standard Compact Action Bar */
@@ -122,7 +97,7 @@ export default function CameraBottomBar({
             )}
             <button
               type="button"
-              onClick={() => setRecentsExpanded(true)}
+              onClick={onOpenRecents}
               className={cameraStyles.iconButton}
               aria-label="Detecciones recientes"
               title="Ver detecciones recientes"
