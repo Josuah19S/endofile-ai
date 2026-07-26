@@ -7,6 +7,7 @@ import { useEndofileAi } from './endofile-model-context';
 
 interface CameraBottomBarProps {
   expanded: boolean;
+  controlsHidden?: boolean;
   onClose: () => void;
   onOpenRecents: () => void;
   children?: React.ReactNode;
@@ -14,6 +15,7 @@ interface CameraBottomBarProps {
 
 export default function CameraBottomBar({
   expanded,
+  controlsHidden = false,
   onClose,
   onOpenRecents,
   children,
@@ -34,8 +36,9 @@ export default function CameraBottomBar({
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${expanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
-        }`}
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
+        expanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
+      }`}
     >
       {expanded ? (
         /* Expanded Drawer Container holding children views */
@@ -59,18 +62,22 @@ export default function CameraBottomBar({
       ) : (
         /* Standard Compact Action Bar */
         <div className="flex items-center justify-around h-full px-6 max-w-xl mx-auto w-full">
-          {/* Left: Upload image */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className={cameraStyles.iconButton}
-            aria-label="Subir foto de lima"
-            title="Cargar foto de lima local"
-          >
-            <Upload size={20} />
-          </button>
+          {/* Left: Upload image (hidden when controlsHidden) */}
+          {!controlsHidden ? (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={cameraStyles.iconButton}
+              aria-label="Subir foto de lima"
+              title="Cargar foto de lima local"
+            >
+              <Upload size={20} />
+            </button>
+          ) : (
+            <div className="w-12 h-12" />
+          )}
 
-          {/* Center: Shutter trigger - captures frame or resets view */}
+          {/* Center: Shutter trigger - always visible */}
           <button
             type="button"
             onClick={selectedPhotoUrl ? resetDetection : capturePhoto}
@@ -78,38 +85,40 @@ export default function CameraBottomBar({
             aria-label={selectedPhotoUrl ? "Volver a la cámara en vivo" : "Capturar foto de lima"}
             disabled={isAnalyzing || modelStatus === 'loading'}
           >
-            <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : cameraStyles.shutterInnerCircle} >
-              {
-                selectedPhotoUrl && (
-                  <RotateCcw className={cameraStyles.shutterReloadIcon} />
-                )
-              }
+            <div className={isAnalyzing ? cameraStyles.shutterInnerCircleLoading : cameraStyles.shutterInnerCircle}>
+              {selectedPhotoUrl && (
+                <RotateCcw className={cameraStyles.shutterReloadIcon} />
+              )}
             </div>
           </button>
 
-          {/* Right: Recents button or Camera Switch */}
-          <div className="flex items-center gap-2">
-            {videoDevices.length > 1 && (
+          {/* Right: Recents button or Camera Switch (hidden when controlsHidden) */}
+          {!controlsHidden ? (
+            <div className="flex items-center gap-2">
+              {videoDevices.length > 1 && (
+                <button
+                  type="button"
+                  onClick={handleSwitchCamera}
+                  className={cameraStyles.iconButton}
+                  aria-label="Cambiar cámara"
+                  title="Cambiar lente de cámara"
+                >
+                  <RefreshCw size={18} />
+                </button>
+              )}
               <button
                 type="button"
-                onClick={handleSwitchCamera}
+                onClick={onOpenRecents}
                 className={cameraStyles.iconButton}
-                aria-label="Cambiar cámara"
-                title="Cambiar lente de cámara"
+                aria-label="Detecciones recientes"
+                title="Ver detecciones recientes"
               >
-                <RefreshCw size={18} />
+                <History size={20} />
               </button>
-            )}
-            <button
-              type="button"
-              onClick={onOpenRecents}
-              className={cameraStyles.iconButton}
-              aria-label="Detecciones recientes"
-              title="Ver detecciones recientes"
-            >
-              <History size={20} />
-            </button>
-          </div>
+            </div>
+          ) : (
+            <div className="w-12 h-12" />
+          )}
         </div>
       )}
     </div>

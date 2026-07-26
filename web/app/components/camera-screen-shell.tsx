@@ -106,29 +106,28 @@ export default function CameraScreenShell() {
       )}
 
       {/* Bottom Action Bar & Abstracted Drawer */}
-      {!controlsHidden && (
-        <CameraBottomBar
-          expanded={activeDrawerView !== null}
-          onClose={() => setActiveDrawerView(null)}
-          onOpenRecents={() => setActiveDrawerView('recents')}
-        >
-          {activeDrawerView === 'recents' && (
-            <RecentDetectionsView onSelectCard={handleOpenDetail} />
-          )}
-          {activeDrawerView === 'catalog' && <FileCatalogView />}
-          {activeDrawerView === 'detail' && activeClassId && (
-            <FileDetailView
-              classId={activeClassId}
-              photoUrl={activePhotoUrl}
-              onBack={() => setActiveDrawerView(prevDrawerView || 'recents')}
-              onNewer={handleNewerDetail}
-              onOlder={handleOlderDetail}
-              hasNewer={hasNewerDetail}
-              hasOlder={hasOlderDetail}
-            />
-          )}
-        </CameraBottomBar>
-      )}
+      <CameraBottomBar
+        expanded={activeDrawerView !== null}
+        controlsHidden={controlsHidden}
+        onClose={() => setActiveDrawerView(null)}
+        onOpenRecents={() => setActiveDrawerView('recents')}
+      >
+        {activeDrawerView === 'recents' && (
+          <RecentDetectionsView onSelectCard={handleOpenDetail} />
+        )}
+        {activeDrawerView === 'catalog' && <FileCatalogView />}
+        {activeDrawerView === 'detail' && activeClassId && (
+          <FileDetailView
+            classId={activeClassId}
+            photoUrl={activePhotoUrl}
+            onBack={() => setActiveDrawerView(prevDrawerView || 'recents')}
+            onNewer={handleNewerDetail}
+            onOlder={handleOlderDetail}
+            hasNewer={hasNewerDetail}
+            hasOlder={hasOlderDetail}
+          />
+        )}
+      </CameraBottomBar>
 
       {/* Sidebar Component */}
       <Sidebar
