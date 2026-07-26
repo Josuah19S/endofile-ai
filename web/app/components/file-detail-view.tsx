@@ -2,18 +2,26 @@
 import React from 'react';
 import NextImage from 'next/image';
 import { getEndoFileInfo } from '../constants/endofile-dataset';
-import { FileText, Gauge, Zap, Ruler, ArrowLeft, Activity, Info } from 'lucide-react';
+import { FileText, Gauge, Zap, Ruler, ArrowLeft, Activity, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FileDetailViewProps {
   classId: string;
   photoUrl?: string | null;
   onBack?: () => void;
+  onNewer?: () => void;
+  onOlder?: () => void;
+  hasNewer?: boolean;
+  hasOlder?: boolean;
 }
 
 export default function FileDetailView({
   classId,
   photoUrl,
   onBack,
+  onNewer,
+  onOlder,
+  hasNewer,
+  hasOlder,
 }: FileDetailViewProps) {
   const fileInfo = getEndoFileInfo(classId);
 
@@ -65,22 +73,59 @@ export default function FileDetailView({
           </button>
         )}
 
-        {/* Top Header & Photo Container */}
+        {/* Top Header & Photo Container with Lateral Camera Gallery Nav Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-          {/* Larger Image Display Box */}
-          <div className="relative w-9/10 h-52 md:h-56 m-auto rounded-2xl bg-surface-container-lowest border border-outline/80 overflow-hidden flex items-center justify-center shadow-inner">
-            {photoUrl ? (
-              <NextImage
-                src={photoUrl}
-                alt={fileName}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center text-on-surface-variant/40">
-                <FileText size={48} />
-                <span className="text-xs mt-2 font-medium">Sin foto previa</span>
-              </div>
+          {/* Image Box with Lateral Navigation Controls */}
+          <div className="flex items-center gap-2 w-full">
+            {onNewer && (
+              <button
+                type="button"
+                onClick={onNewer}
+                disabled={!hasNewer}
+                className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${
+                  hasNewer
+                    ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline text-on-surface hover:scale-105 active:scale-95 shadow-md'
+                    : 'opacity-30 border-transparent text-on-surface-variant cursor-not-allowed'
+                }`}
+                aria-label="Foto más reciente"
+                title="Foto más reciente"
+              >
+                <ChevronLeft size={20} />
+              </button>
+            )}
+
+            {/* Image Display Box */}
+            <div className="relative flex-1 h-52 md:h-56 rounded-2xl bg-surface-container-lowest border border-outline/80 overflow-hidden flex items-center justify-center shadow-inner">
+              {photoUrl ? (
+                <NextImage
+                  src={photoUrl}
+                  alt={fileName}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center text-on-surface-variant/40">
+                  <FileText size={48} />
+                  <span className="text-xs mt-2 font-medium">Sin foto previa</span>
+                </div>
+              )}
+            </div>
+
+            {onOlder && (
+              <button
+                type="button"
+                onClick={onOlder}
+                disabled={!hasOlder}
+                className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${
+                  hasOlder
+                    ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline text-on-surface hover:scale-105 active:scale-95 shadow-md'
+                    : 'opacity-30 border-transparent text-on-surface-variant cursor-not-allowed'
+                }`}
+                aria-label="Foto anterior"
+                title="Foto anterior"
+              >
+                <ChevronRight size={20} />
+              </button>
             )}
           </div>
 
