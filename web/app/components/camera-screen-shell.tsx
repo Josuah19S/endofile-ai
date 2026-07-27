@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { cameraStyles } from '../styles/camera-styles';
 import Sidebar from './sidebar';
 import CameraHeader from './camera-header';
@@ -13,20 +13,33 @@ import { useCamera } from './camera-context';
 
 import { useEndofileAi } from './endofile-model-context';
 
+type DrawerView = 'recents' | 'catalog' | 'detail';
+
+/**
+ * What the detail view is showing. A history detail is tracked by index so the lateral
+ * arrows can walk the scan list; a catalog detail is tracked by class id alone, with no
+ * photo and no arrows.
+ */
+type DetailTarget =
+  | { origin: 'history'; index: number }
+  | { origin: 'catalog'; classId: string };
+
 export default function CameraScreenShell() {
-  const { fileInputRef, handleFileSelect, showFlashOverlay, selectedPhotoUrl } = useCamera();
+  const { fileInputRef, handleFileSelect, showFlashOverlay } = useCamera();
   const { scanHistoryItems } = useEndofileAi();
 
   // Local UI Presentation Toggles & Drawer View State
   const [controlsHidden, setControlsHidden] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeDrawerView, setActiveDrawerView] = useState<'recents' | 'catalog' | 'detail' | null>(null);
+  const [activeDrawerView, setActiveDrawerView] = useState<DrawerView | null>(null);
 
-  // File detail view state & history index tracking
-  const [detailClassId, setDetailClassId] = useState<string | null>(null);
-  const [detailPhotoUrl, setDetailPhotoUrl] = useState<string | null>(null);
-  const [detailIndex, setDetailIndex] = useState<number>(-1);
-  const [prevDrawerView, setPrevDrawerView] = useState<'recents' | 'catalog' | null>(null);
+  // File detail view state & the drawer to return to when leaving it
+  const [detailTarget, setDetailTarget] = useState<DetailTarget | null>(null);
+  const [prevDrawerView, setPrevDrawerView] = useState<'recents' | 'catalog'>('recents');
+
+  // Catalog browsing state, lifted so it survives a round trip to the detail view
+  const [catalogQuery, setCatalogQuery] = useState('');
+  const catalogScrollTop = useRef(0);
 
   const handleSelectNav = (nav: 'inicio' | 'historial' | 'catalogo') => {
     if (nav === 'inicio') {
@@ -38,38 +51,57 @@ export default function CameraScreenShell() {
     }
   };
 
+  // Remember where the detail view was opened from, unless we are already inside it
+  const rememberDrawerOrigin = () => {
+    if (activeDrawerView !== 'detail') {
+      setPrevDrawerView(activeDrawerView === 'catalog' ? 'catalog' : 'recents');
+    }
+  };
+
+  // Opened from the scan history or from the detection badge
   const handleOpenDetail = (classId: string, photoUrl?: string | null) => {
     const idx = scanHistoryItems.findIndex(
       item => item.classId === classId && (photoUrl ? item.photoUrl === photoUrl : true)
     );
-    if (idx !== -1) {
-      setDetailIndex(idx);
-    } else {
-      setDetailIndex(0);
-    }
-    setDetailClassId(classId);
-    setDetailPhotoUrl(photoUrl || selectedPhotoUrl);
-    setPrevDrawerView(activeDrawerView === 'detail' ? prevDrawerView : activeDrawerView);
+    // No matching scan: show the requested class on its own rather than falling back to
+    // the most recent scan, which would display a different file altogether.
+    setDetailTarget(idx !== -1 ? { origin: 'history', index: idx } : { origin: 'catalog', classId });
+    rememberDrawerOrigin();
     setActiveDrawerView('detail');
   };
 
-  const currentScan = detailIndex >= 0 && detailIndex < scanHistoryItems.length ? scanHistoryItems[detailIndex] : null;
-  const activeClassId = currentScan ? currentScan.classId : detailClassId;
-  const activePhotoUrl = currentScan ? currentScan.photoUrl : detailPhotoUrl;
+  // Opened from the catalog: no photo, no lateral navigation
+  const handleOpenCatalogFile = (classId: string) => {
+    setDetailTarget({ origin: 'catalog', classId });
+    rememberDrawerOrigin();
+    setActiveDrawerView('detail');
+  };
 
-  const hasNewerDetail = detailIndex > 0; // newer item (towards index 0)
-  const hasOlderDetail = detailIndex >= 0 && detailIndex < scanHistoryItems.length - 1; // older item
+  const historyIndex = detailTarget?.origin === 'history' ? detailTarget.index : -1;
+  const historyScan = historyIndex >= 0 ? scanHistoryItems[historyIndex] ?? null : null;
+
+  const activeClassId = detailTarget === null
+    ? null
+    : detailTarget.origin === 'catalog'
+      ? detailTarget.classId
+      : historyScan?.classId ?? null;
+  const activePhotoUrl = historyScan?.photoUrl ?? null;
+
+  const hasNewerDetail = historyIndex > 0; // newer item (towards index 0)
+  const hasOlderDetail = historyIndex >= 0 && historyIndex < scanHistoryItems.length - 1; // older item
 
   const handleNewerDetail = () => {
-    if (hasNewerDetail) {
-      setDetailIndex(prev => prev - 1);
-    }
+    setDetailTarget(prev =>
+      prev?.origin === 'history' && prev.index > 0 ? { origin: 'history', index: prev.index - 1 } : prev
+    );
   };
 
   const handleOlderDetail = () => {
-    if (hasOlderDetail) {
-      setDetailIndex(prev => prev + 1);
-    }
+    setDetailTarget(prev =>
+      prev?.origin === 'history' && prev.index < scanHistoryItems.length - 1
+        ? { origin: 'history', index: prev.index + 1 }
+        : prev
+    );
   };
 
   return (
@@ -115,14 +147,22 @@ export default function CameraScreenShell() {
         {activeDrawerView === 'recents' && (
           <RecentDetectionsView onSelectCard={handleOpenDetail} />
         )}
-        {activeDrawerView === 'catalog' && <FileCatalogView />}
+        {activeDrawerView === 'catalog' && (
+          <FileCatalogView
+            query={catalogQuery}
+            onQueryChange={setCatalogQuery}
+            scrollTopRef={catalogScrollTop}
+            onSelectFile={handleOpenCatalogFile}
+          />
+        )}
         {activeDrawerView === 'detail' && activeClassId && (
           <FileDetailView
             classId={activeClassId}
             photoUrl={activePhotoUrl}
-            onBack={() => setActiveDrawerView(prevDrawerView || 'recents')}
-            onNewer={handleNewerDetail}
-            onOlder={handleOlderDetail}
+            backLabel={prevDrawerView === 'catalog' ? 'Volver al catálogo' : 'Volver a Detecciones Recientes'}
+            onBack={() => setActiveDrawerView(prevDrawerView)}
+            onNewer={historyIndex >= 0 ? handleNewerDetail : undefined}
+            onOlder={historyIndex >= 0 ? handleOlderDetail : undefined}
             hasNewer={hasNewerDetail}
             hasOlder={hasOlderDetail}
           />

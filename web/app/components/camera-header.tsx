@@ -1,5 +1,5 @@
 "use client";
-import { Menu, Zap, Maximize, ListSortDescending, X, ArrowLeft, FileText } from 'lucide-react';
+import { Menu, Zap, Maximize, ListSortDescending, X } from 'lucide-react';
 import { cameraStyles } from '../styles/camera-styles';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';

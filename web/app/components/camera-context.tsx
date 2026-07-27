@@ -2,6 +2,24 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useEndofileAi } from './endofile-model-context';
 
+/**
+ * Torch and focus control are MediaTrack extensions that lib.dom does not declare yet,
+ * so the standard types are widened here instead of casting call sites to `any`.
+ */
+interface ExtendedMediaTrackCapabilities extends MediaTrackCapabilities {
+  torch?: boolean;
+  focusMode?: string[];
+}
+
+interface ExtendedMediaTrackConstraintSet extends MediaTrackConstraintSet {
+  torch?: boolean;
+  focusMode?: string;
+}
+
+interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
+  advanced?: ExtendedMediaTrackConstraintSet[];
+}
+
 export interface CameraContextType {
   cameraAvailable: boolean;
   stream: MediaStream | null;
@@ -55,6 +73,8 @@ export function CameraContextProvider({
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // Latest stream, so teardown never acts on a stale render-time closure
+  const streamRef = useRef<MediaStream | null>(initialStream);
 
   const { predict, isAnalyzing, setLimaDetected, addScanHistoryItem } = useEndofileAi();
 
@@ -142,11 +162,11 @@ export function CameraContextProvider({
     const track = stream?.getVideoTracks()[0];
     if (track) {
       try {
-        const capabilities = (track.getCapabilities() as any);
+        const capabilities = track.getCapabilities() as ExtendedMediaTrackCapabilities;
         if (capabilities.torch) {
           await track.applyConstraints({
             advanced: [{ torch: nextFlash }]
-          } as any);
+          } as ExtendedMediaTrackConstraints);
         }
       } catch (err) {
         console.error("Failed to toggle flash constraint:", err);
@@ -160,8 +180,8 @@ export function CameraContextProvider({
     if (!track) return;
 
     try {
-      const capabilities = (track.getCapabilities() as any);
-      const constraints = track.getConstraints();
+      const capabilities = track.getCapabilities() as ExtendedMediaTrackCapabilities;
+      const constraints = track.getConstraints() as ExtendedMediaTrackConstraints;
 
       if (capabilities.focusMode) {
         await track.applyConstraints({
@@ -170,7 +190,7 @@ export function CameraContextProvider({
             ...(constraints.advanced || []),
             { focusMode: 'single-shot' }
           ]
-        } as any);
+        } as ExtendedMediaTrackConstraints);
 
         setTimeout(async () => {
           await track.applyConstraints({
@@ -179,7 +199,7 @@ export function CameraContextProvider({
               ...(constraints.advanced || []),
               { focusMode: 'continuous' }
             ]
-          } as any);
+          } as ExtendedMediaTrackConstraints);
         }, 300);
       } else {
         await track.applyConstraints(constraints);
@@ -201,15 +221,33 @@ export function CameraContextProvider({
     }, 1000);
   };
 
-  // Ask for camera permission on mount if needed
+  // Latest acquisition callback, kept out of the lifecycle effect's dependency list
+  const requestCameraAccessRef = useRef(requestCameraAccess);
+
+  // Keep the refs in sync with the current stream and acquisition callback. Pinning the
+  // callback here lets the lifecycle effect below depend on `cameraAvailable` alone:
+  // depending on the function itself would re-run it on every render, and its teardown
+  // would stop the camera it had just acquired.
   useEffect(() => {
-    if (!stream && cameraAvailable) {
-      requestCameraAccess();
+    streamRef.current = stream;
+    requestCameraAccessRef.current = requestCameraAccess;
+  });
+
+  // Own the camera for as long as the provider stays mounted
+  useEffect(() => {
+    if (!cameraAvailable) return;
+
+    // StrictMode remounts this effect in development, running the teardown below between
+    // both mounts and ending the tracks handed over by the loading screen. Gating on the
+    // track state instead of `stream !== null` makes the second mount re-acquire the
+    // camera rather than hold a dead stream, which rendered as a black viewport in dev.
+    const hasLiveStream = streamRef.current?.getTracks().some(track => track.readyState === 'live') ?? false;
+    if (!hasLiveStream) {
+      requestCameraAccessRef.current();
     }
+
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+      streamRef.current?.getTracks().forEach(track => track.stop());
     };
   }, [cameraAvailable]);
 

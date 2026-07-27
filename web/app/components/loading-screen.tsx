@@ -27,13 +27,16 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
       // Explicitly trigger the browser's permission prompt
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       onPermissionGranted(stream);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Camera permission error:", err);
       setStatus('error');
-      
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+
+      // getUserMedia rejects with a DOMException whose `name` identifies the failure
+      const errorName = err instanceof DOMException ? err.name : '';
+
+      if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError') {
         setErrorMsg("Permiso denegado. Habilite el acceso a la cámara en la configuración del navegador.");
-      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+      } else if (errorName === 'NotFoundError' || errorName === 'DevicesNotFoundError') {
         setErrorMsg("No se detectó ninguna cámara en este dispositivo.");
       } else {
         setErrorMsg("Error al acceder a la cámara. Intente de nuevo o use el simulador.");

@@ -1,3 +1,5 @@
+import { FILE_CLASSES } from './endofile-classes';
+
 export interface EndoFileDetails {
   id: string;
   sistema: string;
@@ -672,10 +674,106 @@ export function getEndoFileInfo(classId: string | null): EndoFileDetails | null 
   // Fallback: search by replacing hyphens/underscores
   const normalizedKey = key.replace(/[-_]/g, '');
   const matchKey = Object.keys(ENDOFILE_DICTIONARY).find(k => k.replace(/[-_]/g, '') === normalizedKey);
-  
+
   if (matchKey) {
     return ENDOFILE_DICTIONARY[matchKey];
   }
 
   return null;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Catalog view                                                              */
+/* ------------------------------------------------------------------------- */
+
+/** A single catalog row: a model class plus its dictionary entry, when there is one. */
+export interface CatalogEntry {
+  classId: string;
+  /** `null` when the class has no dictionary entry; callers fall back to parsing `classId`. */
+  info: EndoFileDetails | null;
+}
+
+export interface EndoFileSystemGroup {
+  sistema: string;
+  limas: CatalogEntry[];
+}
+
+/** Strips case and diacritics so searches match regardless of accents. */
+function normalizeSearchText(value: string): string {
+  return value.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+}
+
+/** System label for classes missing a dictionary entry, derived from the class id. */
+function fallbackSystemName(classId: string): string {
+  return classId.split('_')[0]?.replace(/-/g, ' ') || 'Sistema desconocido';
+}
+
+/** Sequence order within a system. Entries without a dictionary hit sink to the bottom. */
+function compareCatalogEntries(a: CatalogEntry, b: CatalogEntry): number {
+  if (a.info && b.info) return a.info.numero - b.info.numero;
+  if (a.info) return -1;
+  if (b.info) return 1;
+  return a.classId.localeCompare(b.classId, 'es');
+}
+
+function buildCatalogSystems(): EndoFileSystemGroup[] {
+  const groups = new Map<string, CatalogEntry[]>();
+
+  // The catalog is derived from the model classes, never from the dictionary keys: that
+  // keeps it aligned with what the app can actually recognise, and sidesteps the alias
+  // entries the dictionary holds for some systems.
+  for (const classId of FILE_CLASSES) {
+    const info = getEndoFileInfo(classId);
+    if (!info) {
+      console.warn(`[Catálogo] La clase "${classId}" no tiene ficha en ENDOFILE_DICTIONARY.`);
+    }
+
+    const sistema = info?.sistema || fallbackSystemName(classId);
+    const bucket = groups.get(sistema);
+    if (bucket) {
+      bucket.push({ classId, info });
+    } else {
+      groups.set(sistema, [{ classId, info }]);
+    }
+  }
+
+  return Array.from(groups, ([sistema, limas]) => ({
+    sistema,
+    limas: limas.sort(compareCatalogEntries),
+  })).sort((a, b) => a.sistema.localeCompare(b.sistema, 'es'));
+}
+
+// Static data: build once so the console warning above cannot spam on re-render.
+let catalogCache: EndoFileSystemGroup[] | null = null;
+
+/**
+ * Catalog derived from FILE_CLASSES: every class resolved against the dictionary,
+ * grouped by system (A→Z) and ordered by `numero` asc within each group.
+ */
+export function getCatalogSystems(): EndoFileSystemGroup[] {
+  if (!catalogCache) {
+    catalogCache = buildCatalogSystems();
+  }
+  return catalogCache;
+}
+
+function matchesSearchTerm(entry: CatalogEntry, sistema: string, term: string): boolean {
+  const haystack = [sistema, entry.info?.nombre ?? entry.classId];
+  if (entry.info) {
+    haystack.push(String(entry.info.diametroApical));
+  }
+  return haystack.some(value => normalizeSearchText(value).includes(term));
+}
+
+/** Filters by name, system or apical diameter. An empty query returns the full catalog. */
+export function searchEndoFiles(query: string): EndoFileSystemGroup[] {
+  const term = normalizeSearchText(query.trim());
+  if (!term) return getCatalogSystems();
+
+  return getCatalogSystems()
+    .map(group => ({
+      sistema: group.sistema,
+      limas: group.limas.filter(entry => matchesSearchTerm(entry, group.sistema, term)),
+    }))
+    .filter(group => group.limas.length > 0);
 }
