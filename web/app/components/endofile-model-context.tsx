@@ -2,6 +2,14 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
 import type { GraphModel } from "@tensorflow/tfjs"
 import { FILE_CLASSES } from "@/app/constants/endofile-classes"
+import {
+  MAX_HISTORY_ITEMS,
+  clearScanHistory,
+  isHistoryStorageAvailable,
+  loadScanHistory,
+  saveScanItem,
+} from "@/app/lib/history-store"
+import type { RecentScanItem } from "@/app/lib/history-store"
 type TensorFlow = typeof import("@tensorflow/tfjs")
 
 export interface TopPrediction {
@@ -9,12 +17,8 @@ export interface TopPrediction {
   confidence: number; // Decimal e.g., 0.948 = 94.8%
 }
 
-export interface RecentScanItem {
-  id: string;
-  classId: string;
-  photoUrl?: string | null;
-  timestamp: number;
-}
+// Re-exported from the store so existing imports keep working
+export type { RecentScanItem };
 
 type PredictionSource = HTMLCanvasElement | HTMLImageElement | HTMLVideoElement | ImageData | ImageBitmap;
 
@@ -28,8 +32,12 @@ export interface EndofileAiContextType {
   topPredictions: TopPrediction[];
   scanHistoryItems: RecentScanItem[];
   addScanHistoryItem: (item: RecentScanItem) => void;
+  clearHistory: () => Promise<void>;
+  /** `false` until the persisted history has been read on the client. */
+  historyHydrated: boolean;
+  /** `false` when the history lives in memory only, e.g. private browsing. */
+  historyPersisted: boolean;
   setLimaDetected: React.Dispatch<React.SetStateAction<string | null>>;
-  scanHistory: string[];
   isAnalyzing: boolean;
 }
 
@@ -39,11 +47,35 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
   const [limaDetected, setLimaDetected] = useState<string | null>(null);
   const [topPredictions, setTopPredictions] = useState<TopPrediction[]>([]);
   const [scanHistoryItems, setScanHistoryItems] = useState<RecentScanItem[]>([]);
-  const [scanHistory, setScanHistory] = useState<string[]>([]);
+  const [historyHydrated, setHistoryHydrated] = useState(false);
+  const [historyPersisted, setHistoryPersisted] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
+  // Read the persisted history after mounting on the client. Starting from an empty array
+  // keeps the server and the first client render identical, so no hydration mismatch.
+  useEffect(() => {
+    let active = true;
+    loadScanHistory().then(items => {
+      if (!active) return;
+      setScanHistoryItems(items);
+      // Checked after the open attempt, so a failed open reports as "not persisted"
+      setHistoryPersisted(isHistoryStorageAvailable());
+      setHistoryHydrated(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const addScanHistoryItem = (item: RecentScanItem) => {
-    setScanHistoryItems(prev => [item, ...prev.slice(0, 19)]);
+    setScanHistoryItems(prev => [item, ...prev].slice(0, MAX_HISTORY_ITEMS));
+    // Fire and forget: saveScanItem never rejects, so a failed write cannot block capture
+    void saveScanItem(item);
+  };
+
+  const clearHistory = async () => {
+    setScanHistoryItems([]);
+    await clearScanHistory();
   };
 
   // TensorFlow States
@@ -131,7 +163,6 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
       const bestOption = top3[0]?.classId || 'Clase desconocida';
       setLimaDetected(bestOption);
-      setScanHistory(prev => [bestOption, ...prev.slice(0, 9)]);
 
       // Clean up WebGL tensors completely after prediction
       tf.dispose(inputTensor);
@@ -161,8 +192,10 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       topPredictions,
       scanHistoryItems,
       addScanHistoryItem,
+      clearHistory,
+      historyHydrated,
+      historyPersisted,
       setLimaDetected,
-      scanHistory,
       isAnalyzing,
     }}>
       {children}

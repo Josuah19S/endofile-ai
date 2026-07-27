@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useEndofileAi } from './endofile-model-context';
+import { createScanId } from '@/app/lib/history-store';
 
 /**
  * Torch and focus control are MediaTrack extensions that lib.dom does not declare yet,
@@ -287,7 +288,7 @@ export function CameraContextProvider({
         const top3 = await predict(canvas);
         if (top3 && top3.length > 0) {
           addScanHistoryItem({
-            id: `scan-${Date.now()}`,
+            id: createScanId(),
             classId: top3[0].classId,
             photoUrl: capturedDataUrl,
             timestamp: Date.now(),
@@ -326,7 +327,7 @@ export function CameraContextProvider({
               const top3 = await predict(canvas);
               if (top3 && top3.length > 0) {
                 addScanHistoryItem({
-                  id: `scan-${Date.now()}`,
+                  id: createScanId(),
                   classId: top3[0].classId,
                   photoUrl: croppedDataUrl,
                   timestamp: Date.now(),
