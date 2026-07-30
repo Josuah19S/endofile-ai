@@ -306,7 +306,23 @@ export function CameraContextProvider({
     }
   }, [cameraAvailable, stream, selectedPhotoUrl]);
 
-  // Capture frame from camera stream with 1:1 center-square crop
+  // Calculate 3:4 aspect ratio crop bounds centered on source dimensions
+  const get3by4CropBounds = (width: number, height: number) => {
+    let cropW = width;
+    let cropH = width * (4 / 3);
+
+    if (cropH > height) {
+      cropH = height;
+      cropW = height * (3 / 4);
+    }
+
+    const sx = (width - cropW) / 2;
+    const sy = (height - cropH) / 2;
+
+    return { sx, sy, cropW, cropH };
+  };
+
+  // Capture frame from camera stream with 3:4 crop before resizing to 384x384
   const capturePhoto = async () => {
     if (isAnalyzing) return;
 
@@ -318,9 +334,7 @@ export function CameraContextProvider({
       const vw = videoElement.videoWidth || 640;
       const vh = videoElement.videoHeight || 480;
 
-      const cropSize = Math.min(vw, vh);
-      const sx = (vw - cropSize) / 2;
-      const sy = (vh - cropSize) / 2;
+      const { sx, sy, cropW, cropH } = get3by4CropBounds(vw, vh);
 
       const canvas = document.createElement('canvas');
       canvas.width = 384;
@@ -328,7 +342,7 @@ export function CameraContextProvider({
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.drawImage(videoElement, sx, sy, cropSize, cropSize, 0, 0, 384, 384);
+        ctx.drawImage(videoElement, sx, sy, cropW, cropH, 0, 0, 384, 384);
         const capturedDataUrl = canvas.toDataURL('image/jpeg');
         setSelectedPhotoUrl(capturedDataUrl);
         const top3 = await predict(canvas);
@@ -346,7 +360,7 @@ export function CameraContextProvider({
     }
   };
 
-  // Predict on uploaded custom image file
+  // Predict on uploaded custom image file with 3:4 crop
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -358,16 +372,15 @@ export function CameraContextProvider({
           try {
             const iw = img.naturalWidth || img.width;
             const ih = img.naturalHeight || img.height;
-            const cropSize = Math.min(iw, ih);
-            const sx = (iw - cropSize) / 2;
-            const sy = (ih - cropSize) / 2;
+
+            const { sx, sy, cropW, cropH } = get3by4CropBounds(iw, ih);
 
             const canvas = document.createElement('canvas');
             canvas.width = 384;
             canvas.height = 384;
             const ctx = canvas.getContext('2d');
             if (ctx) {
-              ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, 384, 384);
+              ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, 384, 384);
               const croppedDataUrl = canvas.toDataURL('image/jpeg');
               setSelectedPhotoUrl(croppedDataUrl);
               const top3 = await predict(canvas);

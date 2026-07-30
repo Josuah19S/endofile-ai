@@ -26,8 +26,8 @@ export const cameraStyles = {
   // Flash button variation when active
   flashActive: "bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30",
 
-  // Camera viewport area - centered, rounded square box for both desktop and mobile
-  viewportArea: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] max-w-[420px] max-h-[420px] z-10 flex items-center justify-center bg-surface-container-lowest rounded-2xl border border-outline/80 shadow-[0_16px_40px_rgba(0,0,0,0.6)] overflow-hidden",
+  // Camera viewport area - centered 3:4 aspect ratio frame for both desktop and mobile
+  viewportArea: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[82vw] max-w-[350px] aspect-[3/4] z-10 flex items-center justify-center bg-surface-container-lowest rounded-2xl border border-outline/80 shadow-[0_16px_40px_rgba(0,0,0,0.6)] overflow-hidden",
 
   // The interactive video stream
   videoPreview: "w-full h-full object-cover",
