@@ -1,10 +1,16 @@
+interface NavigatorWithUA extends Navigator {
+  userAgentData?: {
+    mobile: boolean;
+  };
+}
+
 /**
  * Detect if the current device is mobile/touchscreen.
  * Uses multiple methods for maximum compatibility.
  */
 export function isMobileDevice(): boolean {
   // Method 1: Check navigator.userAgentData (modern browsers)
-  if (typeof navigator !== 'undefined' && navigator.userAgentData?.mobile) {
+  if (typeof navigator !== 'undefined' && (navigator as NavigatorWithUA).userAgentData?.mobile) {
     return true;
   }
 
