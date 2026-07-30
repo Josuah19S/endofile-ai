@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useEndofileAi } from './endofile-model-context';
 import { createScanId } from '@/app/lib/history-store';
+import { isMobileDevice } from '@/app/lib/device-detection';
 
 /**
  * Torch and focus control are MediaTrack extensions that lib.dom does not declare yet,
@@ -30,6 +31,7 @@ export interface CameraContextType {
   flashOn: boolean;
   showFlashOverlay: boolean;
   showTapFocus: boolean;
+  isCameraPaused: boolean;
 
   videoRef: React.RefObject<HTMLVideoElement | null>;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
@@ -43,6 +45,7 @@ export interface CameraContextType {
   handleFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resetDetection: () => void;
   setSelectedPhotoUrl: React.Dispatch<React.SetStateAction<string | null>>;
+  toggleCameraPause: () => void;
 
   recentsExpanded: boolean;
   setRecentsExpanded: React.Dispatch<React.SetStateAction<boolean>>
@@ -68,6 +71,7 @@ export function CameraContextProvider({
 
   const [flashOn, setFlashOn] = useState(false);
   const [showTapFocus, setShowTapFocus] = useState(false);
+  const [isCameraPaused, setIsCameraPaused] = useState(false);
   const tapFocusTimer = useRef<NodeJS.Timeout | null>(null);
 
   const [recentsExpanded, setRecentsExpanded] = useState(false);
@@ -222,6 +226,48 @@ export function CameraContextProvider({
     }, 1000);
   };
 
+  // Toggle camera pause/resume with hybrid strategy
+  const toggleCameraPause = async () => {
+    const isMobile = isMobileDevice();
+
+    if (isCameraPaused) {
+      // Resuming camera
+      if (isMobile) {
+        // Mobile: Quick resume using pause/play
+        if (videoRef.current && stream) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => { });
+        }
+      } else {
+        // Desktop: Full stream restart for reliability
+        try {
+          await requestCameraAccess(activeDeviceIndex);
+        } catch (err) {
+          console.warn('Failed to resume camera:', err);
+        }
+      }
+    } else {
+      // Pausing camera
+      if (isMobile) {
+        // Mobile: Just pause video
+        if (videoRef.current) {
+          videoRef.current.pause();
+        }
+      } else {
+        // Desktop: Stop stream completely to free resources
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+          setStream(null);
+        }
+        if (videoRef.current) {
+          videoRef.current.srcObject = null;
+        }
+      }
+    }
+
+    setIsCameraPaused(!isCameraPaused);
+  };
+
   // Latest acquisition callback, kept out of the lifecycle effect's dependency list
   const requestCameraAccessRef = useRef(requestCameraAccess);
 
@@ -358,6 +404,7 @@ export function CameraContextProvider({
       flashOn,
       showFlashOverlay,
       showTapFocus,
+      isCameraPaused,
       videoRef,
       fileInputRef,
       requestCameraAccess,
@@ -369,6 +416,7 @@ export function CameraContextProvider({
       handleFileSelect,
       resetDetection,
       setSelectedPhotoUrl,
+      toggleCameraPause,
       recentsExpanded,
       setRecentsExpanded
     }}>

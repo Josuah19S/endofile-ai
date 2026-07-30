@@ -1,5 +1,5 @@
 "use client";
-import { Menu, Zap, Maximize, ListSortDescending, X } from 'lucide-react';
+import { Menu, Zap, Maximize, ListSortDescending, X, Pause, Play } from 'lucide-react';
 import { cameraStyles } from '../styles/camera-styles';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';
@@ -19,6 +19,8 @@ export default function CameraHeader({
     cameraAvailable,
     flashOn,
     toggleFlash,
+    isCameraPaused,
+    toggleCameraPause,
   } = useCamera();
 
   const { modelStatus } = useEndofileAi();
@@ -85,6 +87,17 @@ export default function CameraHeader({
               disabled={!cameraAvailable}
             >
               <Zap size={16} />
+            </button>
+
+            <button
+              type="button"
+              className={`${cameraStyles.iconButton} ${isCameraPaused ? "bg-error/20 text-error" : ""}`}
+              onClick={toggleCameraPause}
+              aria-label={isCameraPaused ? "Reanudar cámara" : "Pausar cámara"}
+              title={isCameraPaused ? "Reanudar cámara" : "Pausar cámara"}
+              disabled={!cameraAvailable}
+            >
+              {isCameraPaused ? <Play size={16} /> : <Pause size={16} />}
             </button>
           </div>
         </div>

@@ -55,7 +55,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
         
         {/* Title */}
         <h1 className={loadingStyles.brandTitle}>
-          EndoScan AI
+          Endofile AI
         </h1>
 
         {/* Request permission button */}

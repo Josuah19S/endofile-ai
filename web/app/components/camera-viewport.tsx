@@ -13,6 +13,7 @@ export default function CameraViewport() {
     selectedPhotoUrl,
     showTapFocus,
     handleViewportTap,
+    isCameraPaused,
   } = useCamera();
 
   const { isAnalyzing } = useEndofileAi();
@@ -22,7 +23,10 @@ export default function CameraViewport() {
       className={`${cameraStyles.viewportArea} cursor-pointer`}
       onClick={handleViewportTap}
     >
-      {selectedPhotoUrl ? (
+      {isCameraPaused ? (
+        /* Black screen when camera is paused */
+        <div className="w-full h-full bg-black" />
+      ) : selectedPhotoUrl ? (
         /* Static endodontic file photo preview */
         <NextImage
           id="selected-file-preview"
