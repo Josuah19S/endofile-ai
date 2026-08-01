@@ -1,6 +1,7 @@
 "use client";
 import NextImage from 'next/image';
 import { getEndoFileInfo } from '../constants/endofile-dataset';
+import { getFilePhoto } from '../constants/endofile-photos';
 import { FileText, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FileDetailViewProps {
@@ -80,9 +81,13 @@ export default function FileDetailView({
     { label: 'Torque', value: fileInfo?.torque !== undefined ? `${fileInfo.torque} Ncm` : 'N/D' },
   ];
 
-  // There is no reference photography for the files yet, so the media box only earns its
-  // space when there is an actual capture (or a scan gallery to walk through)
+  // The media box holds the *capture*, so it only earns its space when there is one (or a
+  // scan gallery to walk through). The reference photograph below is a different thing: it
+  // belongs to the file itself and only some of them have been photographed.
   const showMedia = Boolean(photoUrl) || Boolean(onNewer) || Boolean(onOlder);
+  // Detections arrive with the model's class id, the catalog with the dictionary key; for
+  // the aliased systems those differ, so try both before giving up on a photo.
+  const referencePhoto = getFilePhoto(classId) ?? getFilePhoto(fileInfo?.id);
 
   const fileHeader = (
     <div className="flex flex-col justify-end min-w-0">
@@ -100,6 +105,24 @@ export default function FileDetailView({
       <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-on-surface break-words">
         {fileName}
       </h2>
+
+      {referencePhoto && (
+        <figure className="mt-3 w-full max-w-[420px]">
+          <div className="rounded-xl overflow-hidden border border-outline/70 bg-surface-container-lowest">
+            <NextImage
+              src={referencePhoto.src}
+              alt={`Fotografía de referencia de ${fileName}`}
+              width={referencePhoto.width}
+              height={referencePhoto.height}
+              sizes="(min-width: 768px) 420px, 100vw"
+              className="w-full h-auto"
+            />
+          </div>
+          <figcaption className="mt-1.5 text-[11px] text-on-surface-variant/80">
+            Imagen de referencia del fabricante
+          </figcaption>
+        </figure>
+      )}
     </div>
   );
 

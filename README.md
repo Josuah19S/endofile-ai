@@ -33,7 +33,7 @@ blíster o de su secuencia— es lento y propenso a error, y ese es el problema 
    detecciones recientes.
 
 Además del flujo de cámara, el **catálogo** es una entrada independiente: permite consultar
-la ficha de cualquiera de las 38 limas sin haberla fotografiado, agrupadas por sistema y con
+la ficha de cualquiera de las 47 limas sin haberla fotografiado, agrupadas por sistema y con
 búsqueda por nombre, sistema o calibre.
 
 ### Modelo
@@ -61,8 +61,12 @@ indexada por el identificador de clase del modelo (`re-treaty_1-bully`, `rc-blue
 
 La lista de clases vive aparte, en `web/app/constants/endofile-classes.ts`. **Su orden es el
 contrato con el modelo**: cada índice es una posición del tensor de salida, así que no puede
-reordenarse ni filtrarse sin reentrenar. El catálogo se construye recorriendo esa lista y
-resolviendo cada clase contra el diccionario, no al revés.
+reordenarse ni filtrarse sin reentrenar.
+
+El catálogo no usa esa lista: se construye recorriendo `CATALOG_FILE_IDS` —las 43 limas del
+CSV en su mismo orden, más las 4 de `Blue-Shaper`— y resolviendo cada una contra el
+diccionario. Contiene las 38 clases del modelo y 9 limas más que el modelo no predice, así
+que cada entrada lleva una marca `detectable` según esté o no entre las clases.
 
 Las tres listas todavía no coinciden:
 
@@ -76,8 +80,30 @@ Las diferencias son conocidas: el diccionario añade el sistema `Blue-Shaper` (4
 no está en el CSV pero que el modelo sí predice, mientras que `MG3-Blue` y `S-Blue` están en
 CSV y diccionario pero **no** entre las clases del modelo; y las tres limas de `3D-Files`
 figuran en el diccionario bajo dos claves cada una, como alias. Al añadir sistemas hay que
-revisar los tres sitios. El esquema del CSV, sus convenciones e incidencias conocidas están
+revisar los tres sitios.
+
+Un detalle a resolver al reconciliarlas: las cuatro fichas de `Blue-Shaper` (Z1–Z4) son
+idénticas campo por campo a las cuatro primeras de `MG3-Blue` (SV, PX, G1, G2X), en el mismo
+orden de secuencia. Si se confirma que son las mismas limas con otro nombre, sobran cuatro
+entradas del diccionario y un sistema entero del catálogo. El esquema del CSV, sus convenciones e incidencias conocidas están
 documentados en [`dataset/README.md`](dataset/README.md).
+
+### Fotografías de referencia
+
+Las imágenes de las limas viven en `web/public/file_photos/`, un PNG por lima cuyo nombre
+es exactamente su identificador de clase (`re-treaty_1-bully.png`). Hoy hay **17 de 47**,
+correspondientes a `Re-Treaty`, `MG3-Blue`, `S-Blue` y `RC-Blue`.
+
+Qué limas tienen foto se resuelve contra un manifiesto generado, no probando la red: tras
+añadir o quitar imágenes hay que regenerarlo.
+
+```bash
+cd web
+pnpm photos:manifest   # reescribe app/constants/endofile-photos.ts
+```
+
+El script lee el tamaño real de cada PNG —así el hueco se reserva antes de que cargue y el
+diseño no salta— y avisa si un archivo no corresponde a ninguna lima del catálogo.
 
 ## Puesta en marcha
 
@@ -123,10 +149,13 @@ Todo lo demás vive en un cajón inferior que sube desde la barra de acciones.
 
 **Catálogo de limas**
 
-- las 38 limas detectables, agrupadas en 10 sistemas con encabezados fijos al hacer scroll;
+- las 47 limas —las 43 del dataset más `Blue-Shaper`—, agrupadas en 12 sistemas con
+  encabezados fijos al hacer scroll;
 - búsqueda por nombre, sistema o diámetro apical, sin distinguir mayúsculas ni acentos;
-- solo aparecen limas que el modelo reconoce: listar las que no puede detectar prometería
-  algo que la aplicación no cumple.
+- las 9 limas sin clase en el modelo (`MG3-Blue` y `S-Blue`) aparecen marcadas como «solo
+  consulta»: se pueden abrir, pero la cámara nunca las devolverá;
+- cada lima fotografiada muestra su imagen de referencia bajo el nombre; las que no tienen
+  foto no dibujan el recuadro.
 
 **Historial de detecciones**
 
@@ -141,8 +170,9 @@ Todo lo demás vive en un cajón inferior que sube desde la barra de acciones.
   torque;
 - abierta desde el historial, muestra la foto y permite navegar lateralmente entre
   detecciones (izquierda = más reciente);
-- abierta desde el catálogo, ocupa todo el ancho: no hay fotografías de referencia de las
-  limas, así que no se reserva espacio para una imagen que no existe.
+- imagen de referencia del fabricante bajo el nombre, cuando la lima tiene fotografía;
+- abierta desde el catálogo ocupa todo el ancho, sin reservar espacio para la foto de la
+  captura, que ahí no existe.
 
 ## Estado
 

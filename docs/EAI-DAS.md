@@ -33,7 +33,7 @@ Aplicación web modular con rutas independientes:
 | **Resultado** | Muestra predicción tras clasificación | React, Tailwind |
 | **Ficha Técnica** | Detalles de la lima (RPM, torque, etc.) | React Context, Tailwind |
 | **Historial** | Rejilla de 20 últimas detecciones | IndexedDB, React hooks |
-| **Catálogo** | Listado de 38 limas con búsqueda | Diccionario tipado, Fuse.js (si aplica) |
+| **Catálogo** | Listado de 47 limas con búsqueda | Diccionario tipado, Fuse.js (si aplica) |
 
 **Rutas principales:**
 - `/` — Pantalla de cámara (entry point)
@@ -166,9 +166,11 @@ Historial actualizado
 ```
 Usuario abre "Catálogo"
   ↓
-Recorrer ENDOFILE_CLASSES (38 clases)
+Recorrer CATALOG_FILE_IDS (47 limas: dataset + Blue-Shaper)
   ↓
-Resolver cada clase contra ENDOFILE_DICTIONARY
+Resolver cada lima contra ENDOFILE_DICTIONARY
+  ↓
+Marcar como "solo consulta" las que no están en FILE_CLASSES
   ↓
 Mostrar rejilla agrupada por sistema
   ↓

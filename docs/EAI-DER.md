@@ -71,7 +71,8 @@ Muestra especificaciones técnicas de la lima clasificada.
 
 **Comportamiento:**
 - Desde historial: muestra foto capturada + navegación lateral entre detecciones
-- Desde catálogo: ficha a ancho completo (sin imagen)
+- Desde catálogo: ficha a ancho completo (sin foto de captura)
+- Imagen de referencia del fabricante bajo el nombre, si la lima está fotografiada
 
 ---
 
@@ -101,11 +102,12 @@ Interfaz de las detecciones guardadas.
 
 ### 2.6 RF-06: Catálogo de Limas
 
-Consulta independiente del catálogo de 38 limas detectables.
+Consulta independiente del catálogo de 47 limas: el dataset completo.
 
-- Agrupadas por 10 sistemas con encabezados fijos al scroll
+- Agrupadas por 12 sistemas con encabezados fijos al scroll
 - **Búsqueda:** por nombre, sistema o diámetro (case-insensitive, sin acentos)
-- Solo muestra limas que el modelo reconoce
+- Las 9 limas sin clase en el modelo (`MG3-Blue`, `S-Blue`) se marcan «solo consulta»
+- Miniatura de referencia en cada lima fotografiada; sin recuadro si no hay foto
 - Acceso a ficha técnica desde cada lima
 
 ---

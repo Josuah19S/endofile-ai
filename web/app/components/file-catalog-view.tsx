@@ -126,7 +126,7 @@ export default function FileCatalogView({
               <BookOpen size={44} className="mb-3 opacity-60 text-on-primary-container" />
               <p className="text-base font-semibold text-on-surface">El catálogo está vacío.</p>
               <span className="text-xs text-on-surface-variant/80 mt-1 max-w-sm">
-                No hay ninguna lima registrada para las clases del modelo.
+                No hay ninguna lima registrada en el dataset.
               </span>
             </div>
           )}
