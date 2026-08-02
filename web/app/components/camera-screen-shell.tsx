@@ -135,12 +135,7 @@ export default function CameraScreenShell() {
       {/* Center Viewport & Reticle Area */}
       <CameraViewport />
 
-      {/* Validation Warning Banners (Desenfoque, Oscuridad, Lima lejana) */}
-      {!controlsHidden && (
-        <div className="absolute top-20 left-0 right-0 z-30 px-4 pointer-events-none">
-          <ImageValidationBanner results={validationResults} />
-        </div>
-      )}
+
 
       {/* Info Card Overlay (Lima detectada) */}
       {!controlsHidden && (

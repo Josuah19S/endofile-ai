@@ -47,13 +47,19 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
 
         {/* Sliders Form */}
         <div className="space-y-4 text-sm">
-          {/* 1. Umbral Desenfoque (Laplacian Variance) */}
+          {/* 1. Sensibilidad de Enfoque */}
           <div className="space-y-1.5 p-3 rounded-xl bg-surface-container-low border border-outline/60">
             <div className="flex items-center justify-between">
               <label className="font-semibold flex items-center gap-1.5 text-xs uppercase tracking-wider text-on-surface-variant">
-                <Focus size={15} className="text-amber-400" /> Umbral Desenfoque (Varianza Laplacian)
+                <Focus size={15} className="text-amber-400" /> Sensibilidad de Enfoque
               </label>
-              <span className="font-mono text-xs font-bold text-primary">{config.thresholdBlur}</span>
+              <span className="text-xs font-bold text-primary">
+                {config.thresholdBlur < 50
+                  ? 'Permisivo'
+                  : config.thresholdBlur <= 120
+                  ? 'Estándar'
+                  : 'Alta precisión'}
+              </span>
             </div>
             <input
               type="range"
@@ -64,18 +70,26 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
               onChange={(e) => updateConfig({ thresholdBlur: parseFloat(e.target.value) })}
               className="w-full accent-primary cursor-pointer"
             />
-            <p className="text-[11px] text-on-surface-variant/80">
-              Valores por debajo de este umbral marcan la imagen como desenfocada.
-            </p>
+            <div className="flex justify-between text-[10px] text-on-surface-variant/70 font-medium">
+              <span>Permisivo</span>
+              <span>Estándar</span>
+              <span>Exigente</span>
+            </div>
           </div>
 
-          {/* 2. Umbral Oscuridad (Grayscale Mean) */}
+          {/* 2. Nivel de Iluminación */}
           <div className="space-y-1.5 p-3 rounded-xl bg-surface-container-low border border-outline/60">
             <div className="flex items-center justify-between">
               <label className="font-semibold flex items-center gap-1.5 text-xs uppercase tracking-wider text-on-surface-variant">
-                <Moon size={15} className="text-blue-400" /> Umbral Oscuridad (Brillo Promedio 0-255)
+                <Moon size={15} className="text-blue-400" /> Nivel de Iluminación Mínimo
               </label>
-              <span className="font-mono text-xs font-bold text-primary">{config.thresholdBrightness}</span>
+              <span className="text-xs font-bold text-primary">
+                {config.thresholdBrightness < 35
+                  ? 'Tenue'
+                  : config.thresholdBrightness <= 70
+                  ? 'Natural'
+                  : 'Brillante'}
+              </span>
             </div>
             <input
               type="range"
@@ -86,21 +100,29 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
               onChange={(e) => updateConfig({ thresholdBrightness: parseFloat(e.target.value) })}
               className="w-full accent-primary cursor-pointer"
             />
-            <p className="text-[11px] text-on-surface-variant/80">
-              Valores por debajo de este brillo promedio marcan la imagen como muy oscura.
-            </p>
+            <div className="flex justify-between text-[10px] text-on-surface-variant/70 font-medium">
+              <span>Tenue</span>
+              <span>Natural</span>
+              <span>Brillante</span>
+            </div>
           </div>
 
-          {/* 3. Umbral Distancia (Contour Area & Height Percent) */}
-          <div className="space-y-2 p-3 rounded-xl bg-surface-container-low border border-outline/60">
+          {/* 3. Encuadre y Distancia */}
+          <div className="space-y-2.5 p-3 rounded-xl bg-surface-container-low border border-outline/60">
             <label className="font-semibold flex items-center gap-1.5 text-xs uppercase tracking-wider text-on-surface-variant">
-              <ZoomIn size={15} className="text-rose-400" /> Umbrales Lima Lejana (OpenCV Contornos)
+              <ZoomIn size={15} className="text-rose-400" /> Distancia y Encuadre de Lima
             </label>
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span>Área Mínima del Contorno (%):</span>
-                <span className="font-mono font-bold text-primary">{config.thresholdMinAreaPercent}%</span>
+                <span>Tamaño Mínimo de Lima:</span>
+                <span className="font-bold text-primary">
+                  {config.thresholdMinAreaPercent < 1.0
+                    ? 'Pequeño'
+                    : config.thresholdMinAreaPercent <= 3.0
+                    ? 'Estándar'
+                    : 'Grande'}
+                </span>
               </div>
               <input
                 type="range"
@@ -115,8 +137,14 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
 
             <div className="space-y-1 pt-1">
               <div className="flex justify-between text-xs">
-                <span>Altura Mínima (% de la imagen):</span>
-                <span className="font-mono font-bold text-primary">{config.thresholdMinHeightPercent}%</span>
+                <span>Altura Mínima en Pantalla:</span>
+                <span className="font-bold text-primary">
+                  {config.thresholdMinHeightPercent < 15
+                    ? 'Flexible'
+                    : config.thresholdMinHeightPercent <= 30
+                    ? 'Estándar'
+                    : 'Cercana'}
+                </span>
               </div>
               <input
                 type="range"

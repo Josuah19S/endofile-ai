@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Camera, Focus, Moon, ZoomIn } from 'lucide-react';
 import { cameraStyles } from '../styles/camera-styles';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';
@@ -10,16 +10,54 @@ interface CameraDetectionBadgeProps {
 }
 
 export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBadgeProps) {
-  const { resetDetection } = useCamera();
+  const { resetDetection, validationResults, selectedPhotoUrl } = useCamera();
   const { limaDetected, isAnalyzing } = useEndofileAi();
+
+  const hasValidationErrors = validationResults?.hasErrors;
+  const blurError = validationResults?.blur.isBlurry;
+  const darkError = validationResults?.dark.isDark;
+  const tooFarError = validationResults?.tooFar.isTooFar;
 
   return (
     <div className={cameraStyles.infoOverlayContainer}>
-      <div className={`${cameraStyles.infoCard} ${limaDetected ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)] cursor-pointer hover:border-primary' : 'border-outline/80'}`}>
-        <div className={`${cameraStyles.infoIconContainer} ${limaDetected ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50' : 'bg-surface-variant text-on-surface-variant border-transparent'}`}>
-          <CheckCircle size={14} className={limaDetected ? "animate-scale-in" : ""} />
+      <div
+        className={`${cameraStyles.infoCard} ${
+          limaDetected
+            ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)] cursor-pointer hover:border-primary'
+            : hasValidationErrors
+            ? 'border-amber-500/60 bg-surface-container-low shadow-[0_10px_25px_rgba(245,158,11,0.15)]'
+            : 'border-outline/80'
+        }`}
+      >
+        {/* State Icon */}
+        <div
+          className={`${cameraStyles.infoIconContainer} ${
+            limaDetected
+              ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50'
+              : hasValidationErrors
+              ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+              : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+          }`}
+        >
+          {isAnalyzing ? (
+            <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          ) : limaDetected ? (
+            <CheckCircle size={14} className="animate-scale-in" />
+          ) : hasValidationErrors ? (
+            blurError ? (
+              <Focus size={14} className="animate-pulse" />
+            ) : darkError ? (
+              <Moon size={14} />
+            ) : (
+              <ZoomIn size={14} />
+            )
+          ) : (
+            <Camera size={14} />
+          )}
         </div>
-        <div 
+
+        {/* Text Content */}
+        <div
           className="flex-1 min-w-0"
           onClick={() => {
             if (limaDetected && onOpenDetail) {
@@ -28,11 +66,19 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
           }}
         >
           <p className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant leading-none mb-1">
-            Detector de Limas
+            {hasValidationErrors ? 'Validación de Imagen' : 'Detector de Limas'}
           </p>
           <p className={cameraStyles.infoText}>
             {isAnalyzing ? (
               <span className="text-on-surface-variant font-medium">Analizando lima...</span>
+            ) : hasValidationErrors ? (
+              <span className="text-amber-300 font-medium text-xs">
+                {blurError
+                  ? 'Imagen desenfocada. Mantenga la cámara firme.'
+                  : darkError
+                  ? 'Imagen muy oscura. Encienda la luz o el flash.'
+                  : 'Lima muy lejos. Acerque la cámara a la lima.'}
+              </span>
             ) : limaDetected ? (
               (() => {
                 const parts = limaDetected.split('_');
@@ -67,11 +113,14 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
                 );
               })()
             ) : (
-              <span className="text-on-surface-variant/70 font-normal">Lima detectada: ---</span>
+              <span className="text-emerald-400 font-medium text-xs flex items-center gap-1">
+                Lista para tomar foto
+              </span>
             )}
           </p>
         </div>
-        {limaDetected && (
+
+        {(limaDetected || selectedPhotoUrl || hasValidationErrors) && (
           <button
             onClick={resetDetection}
             className="text-xs text-on-surface-variant hover:text-on-surface font-medium px-2.5 py-1 rounded-lg hover:bg-surface-variant/50 transition-colors cursor-pointer"
