@@ -1,7 +1,7 @@
 /**
  * Local persistence for the scan history, on top of IndexedDB.
  *
- * Photos are kept as the data URL strings the capture pipeline already produces (384x384
+ * Photos are kept as the data URL strings the capture pipeline already produces (480x480
  * JPEG, roughly 35-65 KB each once base64-encoded). At MAX_HISTORY_ITEMS that is about
  * 1 MB, which IndexedDB holds comfortably and which rules out localStorage: its ~5 MB
  * budget is too close, and its synchronous API would block the main thread on every save.

@@ -322,7 +322,7 @@ export function CameraContextProvider({
     return { sx, sy, cropW, cropH };
   };
 
-  // Capture frame from camera stream with 3:4 crop before resizing to 384x384
+  // Capture frame from camera stream with 3:4 crop before resizing to 480x480
   const capturePhoto = async () => {
     if (isAnalyzing) return;
 
@@ -337,12 +337,12 @@ export function CameraContextProvider({
       const { sx, sy, cropW, cropH } = get3by4CropBounds(vw, vh);
 
       const canvas = document.createElement('canvas');
-      canvas.width = 384;
-      canvas.height = 384;
+      canvas.width = 480;
+      canvas.height = 480;
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.drawImage(videoElement, sx, sy, cropW, cropH, 0, 0, 384, 384);
+        ctx.drawImage(videoElement, sx, sy, cropW, cropH, 0, 0, 480, 480);
         const capturedDataUrl = canvas.toDataURL('image/jpeg');
         setSelectedPhotoUrl(capturedDataUrl);
         const top3 = await predict(canvas);
@@ -376,11 +376,11 @@ export function CameraContextProvider({
             const { sx, sy, cropW, cropH } = get3by4CropBounds(iw, ih);
 
             const canvas = document.createElement('canvas');
-            canvas.width = 384;
-            canvas.height = 384;
+            canvas.width = 480;
+            canvas.height = 480;
             const ctx = canvas.getContext('2d');
             if (ctx) {
-              ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, 384, 384);
+              ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, 480, 480);
               const croppedDataUrl = canvas.toDataURL('image/jpeg');
               setSelectedPhotoUrl(croppedDataUrl);
               const top3 = await predict(canvas);

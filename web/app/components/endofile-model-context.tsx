@@ -100,7 +100,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
         // Warm up the model (compiles WebGL shaders in the background to avoid first-click latency)
         console.log("Warming up model...");
-        const dummyInput = tfjs.zeros([1, 384, 384, 3]);
+        const dummyInput = tfjs.zeros([1, 480, 480, 3]);
         const warmupPrediction = await loadedModel.executeAsync(dummyInput);
         tfjs.dispose(dummyInput);
         tfjs.dispose(warmupPrediction);
@@ -129,7 +129,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       // Wrap intermediate preprocessing tensors in tf.tidy to prevent WebGL memory leaks
       const inputTensor = tf.tidy(() => {
         const tensor = tf.browser.fromPixels(src);
-        const resized = tf.image.resizeBilinear(tensor, [384, 384]);
+        const resized = tf.image.resizeBilinear(tensor, [480, 480]);
         const casted = resized.cast('float32');
         return casted.expandDims(0);
       });
