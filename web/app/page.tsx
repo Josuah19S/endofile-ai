@@ -3,6 +3,7 @@ import { useState } from 'react';
 import LoadingScreen from "@/app/components/loading-screen";
 import CameraScreen from "@/app/components/camera-screen";
 import { EndofileContextProvider } from "@/app/components/endofile-model-context";
+import { ImageValidationProvider } from './components/image-validation-context';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +29,7 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className={`w-full h-full overflow-hidden transition-opacity duration-300 ${fadeAway ? 'opacity-0' : 'opacity-100'}`}>
-        <LoadingScreen 
+        <LoadingScreen
           onPermissionGranted={handlePermissionGranted}
         />
       </div>
@@ -38,10 +39,12 @@ export default function Home() {
   return (
     <div className="w-full h-screen overflow-hidden animate-fade-in">
       <EndofileContextProvider>
-        <CameraScreen
-          initialStream={cameraStream}
-          initialCameraAvailable={cameraAvailable}
-        />
+        <ImageValidationProvider>
+          <CameraScreen
+            initialStream={cameraStream}
+            initialCameraAvailable={cameraAvailable}
+          />
+        </ImageValidationProvider>
       </EndofileContextProvider>
     </div>
   );

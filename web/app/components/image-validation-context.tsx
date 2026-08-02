@@ -40,25 +40,43 @@ export function ImageValidationProvider({ children }: { children: React.ReactNod
   const [isOpenCvLoading, setIsOpenCvLoading] = useState<boolean>(true);
   const [lastResults, setLastResults] = useState<ImageValidationResults | null>(null);
 
-  // Initialize OpenCV.js on provider mount
+  // Initialize OpenCV.js on provider mount with active polling sync
   useEffect(() => {
     let active = true;
+
+    if (isOpenCVReady()) {
+      setIsOpenCvReadyState(true);
+      setIsOpenCvLoading(false);
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      if (active && isOpenCVReady()) {
+        setIsOpenCvReadyState(true);
+        setIsOpenCvLoading(false);
+        clearInterval(intervalId);
+      }
+    }, 150);
+
     loadOpenCV()
       .then(() => {
         if (active) {
           setIsOpenCvReadyState(true);
           setIsOpenCvLoading(false);
+          clearInterval(intervalId);
         }
       })
       .catch((err) => {
         console.warn("Could not preload OpenCV.js:", err);
         if (active) {
           setIsOpenCvLoading(false);
+          clearInterval(intervalId);
         }
       });
 
     return () => {
       active = false;
+      clearInterval(intervalId);
     };
   }, []);
 

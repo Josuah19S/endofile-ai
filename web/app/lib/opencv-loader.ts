@@ -9,12 +9,16 @@ declare global {
 
 let openCvPromise: Promise<any> | null = null;
 
+export function isOpenCVReady(): boolean {
+  return typeof window !== 'undefined' && Boolean(window.cv && window.cv.Mat && typeof window.cv.Mat === 'function');
+}
+
 export function loadOpenCV(): Promise<any> {
   if (typeof window === 'undefined') {
     return Promise.reject(new Error("OpenCV.js can only be loaded in the browser environment."));
   }
 
-  if (window.cv && window.cv.Mat) {
+  if (isOpenCVReady()) {
     return Promise.resolve(window.cv);
   }
 
@@ -23,43 +27,73 @@ export function loadOpenCV(): Promise<any> {
   }
 
   openCvPromise = new Promise((resolve, reject) => {
-    // Set Module callbacks before loading script
+    let resolved = false;
+
+    const checkReady = () => {
+      if (!resolved && isOpenCVReady()) {
+        resolved = true;
+        console.log("[OpenCV.js] Engine ready and cv.Mat available!");
+        resolve(window.cv);
+        return true;
+      }
+      return false;
+    };
+
+    if (checkReady()) return;
+
+    // Hook Module runtime callback
     window.Module = window.Module || {};
+    const originalOnRuntimeInitialized = window.Module.onRuntimeInitialized;
     window.Module.onRuntimeInitialized = () => {
-      console.log("OpenCV.js runtime initialized successfully!");
-      resolve(window.cv);
+      if (originalOnRuntimeInitialized) originalOnRuntimeInitialized();
+      checkReady();
     };
 
-    // Check if script element already exists
-    const existingScript = document.getElementById('opencv-script');
-    if (existingScript) {
-      if (window.cv && window.cv.Mat) {
-        resolve(window.cv);
+    // Polling interval fallback for Emscripten initialization
+    const intervalId = setInterval(() => {
+      if (checkReady()) {
+        clearInterval(intervalId);
       }
-      return;
+    }, 100);
+
+    // Timeout after 15 seconds if loading fails
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId);
+      if (!resolved && !isOpenCVReady()) {
+        console.warn("[OpenCV.js] Timed out waiting for full WASM initialization, fallback will be used.");
+        // We do not hard-reject so the app can gracefully use Canvas 2D fallback
+        resolve(window.cv || null);
+      }
+    }, 15000);
+
+    // Inject script if not already present
+    let script = document.getElementById('opencv-script') as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.id = 'opencv-script';
+      script.src = '/js/opencv.js';
+      script.async = true;
+      script.onload = () => {
+        // If cv is a factory function returning a Promise
+        if (typeof window.cv === 'function') {
+          try {
+            window.cv().then((cvInstance: any) => {
+              window.cv = cvInstance;
+              checkReady();
+            }).catch(() => { });
+          } catch (e) { }
+        }
+        checkReady();
+      };
+      script.onerror = (err) => {
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+        openCvPromise = null;
+        reject(new Error(`Failed to load OpenCV.js script from /js/opencv.js: ${err}`));
+      };
+      document.body.appendChild(script);
     }
-
-    const script = document.createElement('script');
-    script.id = 'opencv-script';
-    script.src = '/js/opencv.js';
-    script.async = true;
-    script.onload = () => {
-      // If cv.Mat is available immediately or via Module callback
-      if (window.cv && window.cv.Mat) {
-        resolve(window.cv);
-      }
-    };
-    script.onerror = (err) => {
-      openCvPromise = null;
-      reject(new Error(`Failed to load OpenCV.js script from /js/opencv.js: ${err}`));
-    };
-
-    document.body.appendChild(script);
   });
 
   return openCvPromise;
-}
-
-export function isOpenCVReady(): boolean {
-  return typeof window !== 'undefined' && Boolean(window.cv && window.cv.Mat);
 }

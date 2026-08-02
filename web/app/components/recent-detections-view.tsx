@@ -1,5 +1,4 @@
 "use client";
-import React from 'react';
 import { History, Loader2, Trash2, TriangleAlert } from 'lucide-react';
 import EFileDetectionCard from './efile-detection-card';
 import { useEndofileAi } from './endofile-model-context';

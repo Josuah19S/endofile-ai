@@ -1,6 +1,5 @@
 "use client";
 
-import React from 'react';
 import { Sliders, RotateCcw, X, Focus, Moon, ZoomIn, Check } from 'lucide-react';
 import { useImageValidation } from './image-validation-context';
 
