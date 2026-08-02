@@ -317,13 +317,11 @@ export function CameraContextProvider({
         const valResults = await validateAllImages(canvas, validationConfig);
         setValidationResults(valResults);
 
-        // 2. If any validation failed, STOP execution before predict!
         if (valResults.hasErrors) {
-          console.warn("[Validation Gate] Photo failed quality checks, skipping model prediction:", valResults.warnings);
-          return;
+          console.warn("[Validation Gate] Photo has quality warnings:", valResults.warnings);
         }
 
-        // 3. Validations passed -> send to model for prediction
+        // 2. Proceed with model prediction
         const top3 = await predict(canvas);
         if (top3 && top3.length > 0) {
           addScanHistoryItem({
@@ -367,13 +365,11 @@ export function CameraContextProvider({
               const valResults = await validateAllImages(canvas, validationConfig);
               setValidationResults(valResults);
 
-              // 2. If any validation failed, STOP execution before predict!
               if (valResults.hasErrors) {
-                console.warn("[Validation Gate] Uploaded file failed quality checks, skipping model prediction:", valResults.warnings);
-                return;
+                console.warn("[Validation Gate] Uploaded file has quality warnings:", valResults.warnings);
               }
 
-              // 3. Validations passed -> send to model for prediction
+              // 2. Proceed with model prediction
               const top3 = await predict(canvas);
               if (top3 && top3.length > 0) {
                 addScanHistoryItem({

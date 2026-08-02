@@ -16,11 +16,11 @@ export interface ValidationConfig {
 }
 
 export const DEFAULT_VALIDATION_CONFIG: ValidationConfig = {
-  thresholdBlur: 80,
-  thresholdBrightness: 45,
-  thresholdMinAreaPercent: 1.5,
-  thresholdMinHeightPercent: 20.0,
-  binaryThreshold: 200,
+  thresholdBlur: 35,
+  thresholdBrightness: 30,
+  thresholdMinAreaPercent: 0.15,
+  thresholdMinHeightPercent: 8.0,
+  binaryThreshold: 195,
 };
 
 export interface BlurValidationResult {
