@@ -91,8 +91,12 @@ documentados en [`dataset/README.md`](dataset/README.md).
 ### Fotografías de referencia
 
 Las imágenes de las limas viven en `web/public/file_photos/`, un PNG por lima cuyo nombre
-es exactamente su identificador de clase (`re-treaty_1-bully.png`). Hoy hay **17 de 47**,
-correspondientes a `Re-Treaty`, `MG3-Blue`, `S-Blue` y `RC-Blue`.
+es exactamente su identificador de clase (`re-treaty_1-bully.png`). Hoy hay **34 de 47**:
+faltan las de `Micromega-Remover`, `Rising`, `Slim-Shaper` y `Micromega One Curve mini`.
+
+El nombre debe coincidir con el id de clase del modelo, que en `3D-Files` no sigue el orden
+de secuencia del CSV (`3d-files_1-s30`, `3d-files_2-f25`, `3d-files_3-f30`). Un PNG cuyo
+nombre no esté en `CATALOG_FILE_IDS` se avisa como huérfano al regenerar y no se muestra.
 
 Qué limas tienen foto se resuelve contra un manifiesto generado, no probando la red: tras
 añadir o quitar imágenes hay que regenerarlo.
