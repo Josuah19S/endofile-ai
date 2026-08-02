@@ -9,6 +9,7 @@ import CameraBottomBar from './camera-bottom-bar';
 import RecentDetectionsView from './recent-detections-view';
 import FileCatalogView from './file-catalog-view';
 import FileDetailView from './file-detail-view';
+import UserGuideModal from './user-guide-modal';
 import { useCamera } from './camera-context';
 
 import { useEndofileAi } from './endofile-model-context';
@@ -28,7 +29,7 @@ type DetailTarget =
   | { origin: 'catalog'; classId: string };
 
 export default function CameraScreenShell() {
-  const { fileInputRef, handleFileSelect, showFlashOverlay, validationResults } = useCamera();
+  const { fileInputRef, handleFileSelect, showFlashOverlay, validationResults, showUserGuide, setShowUserGuide } = useCamera();
   const { scanHistoryItems } = useEndofileAi();
 
   // Local UI Presentation Toggles & Drawer View State
@@ -181,6 +182,13 @@ export default function CameraScreenShell() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onSelectNav={handleSelectNav}
+        onOpenGuide={() => setShowUserGuide(true)}
+      />
+
+      {/* User Guide Modal */}
+      <UserGuideModal
+        isOpen={showUserGuide}
+        onClose={() => setShowUserGuide(false)}
       />
 
       {/* Threshold Settings Modal */}

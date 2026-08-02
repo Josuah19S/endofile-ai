@@ -59,6 +59,9 @@ export interface CameraContextType {
   validationResults: ImageValidationResults | null;
   validationConfig: ValidationConfig;
   setValidationConfig: React.Dispatch<React.SetStateAction<ValidationConfig>>;
+
+  showUserGuide: boolean;
+  setShowUserGuide: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CameraContext = createContext<CameraContextType | null>(null);
@@ -87,6 +90,7 @@ export function CameraContextProvider({
   const [recentsExpanded, setRecentsExpanded] = useState(false);
   const [validationResults, setValidationResults] = useState<ImageValidationResults | null>(null);
   const [validationConfig, setValidationConfig] = useState<ValidationConfig>(DEFAULT_VALIDATION_CONFIG);
+  const [showUserGuide, setShowUserGuide] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -134,6 +138,7 @@ export function CameraContextProvider({
       setStream(newStream);
       setCameraAvailable(true);
       setActiveDeviceIndex(deviceIndex);
+      setShowUserGuide(true);
 
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
@@ -423,6 +428,8 @@ export function CameraContextProvider({
       validationResults,
       validationConfig,
       setValidationConfig,
+      showUserGuide,
+      setShowUserGuide,
     }}>
       {children}
     </CameraContext.Provider>

@@ -6,9 +6,10 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectNav?: (nav: 'inicio' | 'historial' | 'catalogo') => void;
+  onOpenGuide?: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose, onSelectNav }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onSelectNav, onOpenGuide }: SidebarProps) {
   if (!isOpen) return null;
 
   return (
@@ -71,13 +72,24 @@ export default function Sidebar({ isOpen, onClose, onSelectNav }: SidebarProps) 
               <BookOpen size={18} className="text-on-surface-variant" />
               <span>Catálogo de limas</span>
             </button>
+
+            <button
+              onClick={() => {
+                onOpenGuide?.();
+                onClose();
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-container-lowest/50 hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-medium text-sm transition-all cursor-pointer border border-outline/40"
+            >
+              <Info size={18} className="text-on-surface-variant" />
+              <span>Guía de usuario</span>
+            </button>
           </nav>
 
           {/* Help Section */}
           <div className="mt-8 p-4 rounded-2xl bg-surface-container-lowest/60 border border-outline/60">
             <div className="flex items-center gap-2 mb-2 text-on-surface font-semibold text-xs uppercase tracking-wider">
               <Info size={14} className="text-on-primary-container" />
-              <span>Cómo usar la app</span>
+              <span>Consejos rápidos</span>
             </div>
             <p className="text-xs text-on-surface-variant leading-relaxed">
               Posicione la lima de endodoncia centrada en el visor.
