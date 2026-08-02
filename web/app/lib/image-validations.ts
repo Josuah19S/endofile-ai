@@ -281,7 +281,51 @@ export async function validateTooFar(
     };
   }
 
-  // Ensure OpenCV.js is loaded
+  // If OpenCV is not ready yet, execute instant 2D Canvas threshold fallback
+  if (!isOpenCVReady()) {
+    const imageData = getImageDataFromSource(source);
+    if (imageData) {
+      const { data, width: w, height: h } = imageData;
+      let minX = w;
+      let minY = h;
+      let maxX = 0;
+      let maxY = 0;
+      let foregroundPixels = 0;
+
+      for (let y = 0; y < h; y += 2) {
+        for (let x = 0; x < w; x += 2) {
+          const idx = (y * w + x) * 4;
+          const gray = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+          if (gray < config.binaryThreshold) {
+            foregroundPixels += 4; // Sample step factor
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+
+      const totalArea = w * h;
+      const areaPercent = totalArea > 0 ? Math.round((foregroundPixels / totalArea) * 10000) / 100 : 0;
+      const boundingHeight = maxY >= minY ? maxY - minY : 0;
+      const heightPercent = h > 0 ? Math.round((boundingHeight / h) * 10000) / 100 : 0;
+
+      const isTooFar = areaPercent < thresholdMinAreaPercent || heightPercent < thresholdMinHeightPercent;
+
+      return {
+        isTooFar,
+        areaPercent,
+        heightPercent,
+        thresholdMinAreaPercent,
+        thresholdMinHeightPercent,
+        maxContourArea: foregroundPixels,
+        boundingRect: foregroundPixels > 0 ? { x: minX, y: minY, width: maxX - minX, height: boundingHeight } : null,
+      };
+    }
+  }
+
+  // Ensure OpenCV.js is loaded for exact contour analysis
   const cv = await loadOpenCV();
 
   try {

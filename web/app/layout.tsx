@@ -27,6 +27,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preload" href="/js/opencv.js" as="script" />
+      </head>
       <body className="h-full w-full overflow-hidden flex flex-col">{children}</body>
     </html>
   );
