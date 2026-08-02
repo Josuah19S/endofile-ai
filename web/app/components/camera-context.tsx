@@ -3,6 +3,12 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { useEndofileAi } from './endofile-model-context';
 import { createScanId } from '@/app/lib/history-store';
 import { isMobileDevice } from '@/app/lib/device-detection';
+import {
+  validateAllImages,
+  ImageValidationResults,
+  DEFAULT_VALIDATION_CONFIG,
+  ValidationConfig,
+} from '@/app/lib/image-validations';
 
 /**
  * Torch and focus control are MediaTrack extensions that lib.dom does not declare yet,
@@ -48,7 +54,11 @@ export interface CameraContextType {
   toggleCameraPause: () => void;
 
   recentsExpanded: boolean;
-  setRecentsExpanded: React.Dispatch<React.SetStateAction<boolean>>
+  setRecentsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+
+  validationResults: ImageValidationResults | null;
+  validationConfig: ValidationConfig;
+  setValidationConfig: React.Dispatch<React.SetStateAction<ValidationConfig>>;
 }
 
 const CameraContext = createContext<CameraContextType | null>(null);
@@ -75,6 +85,8 @@ export function CameraContextProvider({
   const tapFocusTimer = useRef<NodeJS.Timeout | null>(null);
 
   const [recentsExpanded, setRecentsExpanded] = useState(false);
+  const [validationResults, setValidationResults] = useState<ImageValidationResults | null>(null);
+  const [validationConfig, setValidationConfig] = useState<ValidationConfig>(DEFAULT_VALIDATION_CONFIG);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -89,125 +101,97 @@ export function CameraContextProvider({
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoInputs = devices.filter(device => device.kind === 'videoinput');
       setVideoDevices(videoInputs);
-
-      // Default to rear camera lens if available
-      const backCamIdx = videoInputs.findIndex(device =>
-        device.label.toLowerCase().includes('back') ||
-        device.label.toLowerCase().includes('entorno') ||
-        device.label.toLowerCase().includes('0.5x') ||
-        device.label.toLowerCase().includes('ultra')
-      );
-      if (backCamIdx !== -1) {
-        setActiveDeviceIndex(backCamIdx);
-      }
     } catch (err) {
-      console.warn("Failed to enumerate camera devices:", err);
+      console.warn("Could not enumerate camera devices:", err);
     }
   };
 
-  // Request camera access
-  const requestCameraAccess = async (deviceIndex = activeDeviceIndex) => {
+  useEffect(() => {
+    enumerateCameras();
+  }, []);
+
+  // Request user camera stream with specific device index
+  const requestCameraAccess = async (deviceIndex: number = 0) => {
     try {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
 
-      const isPortrait = typeof window !== 'undefined' && window.innerHeight > window.innerWidth;
-      const idealWidth = isPortrait ? 1080 : 1920;
-      const idealHeight = isPortrait ? 1920 : 1080;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoInputs = devices.filter(device => device.kind === 'videoinput');
+      setVideoDevices(videoInputs);
 
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: 'environment',
-          width: { ideal: idealWidth },
-          height: { ideal: idealHeight }
-        }
-      };
+      const targetDevice = videoInputs[deviceIndex];
+      const videoConstraints: MediaTrackConstraints = targetDevice?.deviceId
+        ? { deviceId: { exact: targetDevice.deviceId } }
+        : { facingMode: 'environment' };
 
-      if (videoDevices.length > 0 && videoDevices[deviceIndex]) {
-        constraints.video = {
-          deviceId: { exact: videoDevices[deviceIndex].deviceId },
-          width: { ideal: idealWidth },
-          height: { ideal: idealHeight }
-        };
-      }
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: videoConstraints,
+        audio: false,
+      });
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      setStream(mediaStream);
+      setStream(newStream);
       setCameraAvailable(true);
-
-      if (videoDevices.length === 0) {
-        await enumerateCameras();
-      }
+      setActiveDeviceIndex(deviceIndex);
 
       if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
+        videoRef.current.srcObject = newStream;
         videoRef.current.play().catch(() => { });
       }
-    } catch (error) {
-      console.warn('Physical camera access failed:', error);
+    } catch (err) {
+      console.warn("Camera access denied or failed:", err);
       setCameraAvailable(false);
-      setStream(null);
     }
   };
 
-  // Switch camera lens
+  // Cycle to next available camera lens
   const handleSwitchCamera = async () => {
     if (videoDevices.length <= 1) return;
     const nextIndex = (activeDeviceIndex + 1) % videoDevices.length;
-    setActiveDeviceIndex(nextIndex);
     await requestCameraAccess(nextIndex);
   };
 
-  // Toggle flash (torch)
+  // Toggle flash/torch on environment camera
   const toggleFlash = async () => {
-    const nextFlash = !flashOn;
-    setFlashOn(nextFlash);
-
-    const track = stream?.getVideoTracks()[0];
-    if (track) {
-      try {
-        const capabilities = track.getCapabilities() as ExtendedMediaTrackCapabilities;
-        if (capabilities.torch) {
-          await track.applyConstraints({
-            advanced: [{ torch: nextFlash }]
-          } as ExtendedMediaTrackConstraints);
-        }
-      } catch (err) {
-        console.error("Failed to toggle flash constraint:", err);
-      }
-    }
-  };
-
-  // Trigger autofocus reset
-  const triggerRefocus = async () => {
-    const track = stream?.getVideoTracks()[0];
+    if (!stream) return;
+    const track = stream.getVideoTracks()[0];
     if (!track) return;
 
     try {
       const capabilities = track.getCapabilities() as ExtendedMediaTrackCapabilities;
-      const constraints = track.getConstraints() as ExtendedMediaTrackConstraints;
-
-      if (capabilities.focusMode) {
+      if (capabilities.torch) {
+        const nextState = !flashOn;
         await track.applyConstraints({
-          ...constraints,
-          advanced: [
-            ...(constraints.advanced || []),
-            { focusMode: 'single-shot' }
-          ]
+          advanced: [{ torch: nextState }]
         } as ExtendedMediaTrackConstraints);
-
-        setTimeout(async () => {
-          await track.applyConstraints({
-            ...constraints,
-            advanced: [
-              ...(constraints.advanced || []),
-              { focusMode: 'continuous' }
-            ]
-          } as ExtendedMediaTrackConstraints);
-        }, 300);
+        setFlashOn(nextState);
       } else {
-        await track.applyConstraints(constraints);
+        console.warn("Torch capability is not supported on this device track.");
+      }
+    } catch (err) {
+      console.warn("Failed to toggle torch:", err);
+    }
+  };
+
+  // Programmatic refocus call
+  const triggerRefocus = async () => {
+    if (!stream) return;
+    const track = stream.getVideoTracks()[0];
+    if (!track) return;
+
+    try {
+      const capabilities = track.getCapabilities() as ExtendedMediaTrackCapabilities;
+      if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
+        const constraints = { advanced: [{ focusMode: 'continuous' }] } as ExtendedMediaTrackConstraints;
+        if (capabilities.focusMode.includes('single-shot')) {
+          await track.applyConstraints({ advanced: [{ focusMode: 'single-shot' }] } as ExtendedMediaTrackConstraints);
+          setTimeout(async () => {
+            await track.applyConstraints(constraints);
+          }, 300);
+        } else {
+          await track.applyConstraints(constraints);
+        }
       }
     } catch (err) {
       console.warn("Failed to trigger refocus constraint:", err);
@@ -231,15 +215,12 @@ export function CameraContextProvider({
     const isMobile = isMobileDevice();
 
     if (isCameraPaused) {
-      // Resuming camera
       if (isMobile) {
-        // Mobile: Quick resume using pause/play
         if (videoRef.current && stream) {
           videoRef.current.srcObject = stream;
           videoRef.current.play().catch(() => { });
         }
       } else {
-        // Desktop: Full stream restart for reliability
         try {
           await requestCameraAccess(activeDeviceIndex);
         } catch (err) {
@@ -247,14 +228,11 @@ export function CameraContextProvider({
         }
       }
     } else {
-      // Pausing camera
       if (isMobile) {
-        // Mobile: Just pause video
         if (videoRef.current) {
           videoRef.current.pause();
         }
       } else {
-        // Desktop: Stop stream completely to free resources
         if (stream) {
           stream.getTracks().forEach(track => track.stop());
           setStream(null);
@@ -268,26 +246,16 @@ export function CameraContextProvider({
     setIsCameraPaused(!isCameraPaused);
   };
 
-  // Latest acquisition callback, kept out of the lifecycle effect's dependency list
   const requestCameraAccessRef = useRef(requestCameraAccess);
 
-  // Keep the refs in sync with the current stream and acquisition callback. Pinning the
-  // callback here lets the lifecycle effect below depend on `cameraAvailable` alone:
-  // depending on the function itself would re-run it on every render, and its teardown
-  // would stop the camera it had just acquired.
   useEffect(() => {
     streamRef.current = stream;
     requestCameraAccessRef.current = requestCameraAccess;
   });
 
-  // Own the camera for as long as the provider stays mounted
   useEffect(() => {
     if (!cameraAvailable) return;
 
-    // StrictMode remounts this effect in development, running the teardown below between
-    // both mounts and ending the tracks handed over by the loading screen. Gating on the
-    // track state instead of `stream !== null` makes the second mount re-acquire the
-    // camera rather than hold a dead stream, which rendered as a black viewport in dev.
     const hasLiveStream = streamRef.current?.getTracks().some(track => track.readyState === 'live') ?? false;
     if (!hasLiveStream) {
       requestCameraAccessRef.current();
@@ -298,7 +266,6 @@ export function CameraContextProvider({
     };
   }, [cameraAvailable]);
 
-  // Sync video element with stream
   useEffect(() => {
     if (cameraAvailable && stream && videoRef.current && !selectedPhotoUrl) {
       videoRef.current.srcObject = stream;
@@ -322,7 +289,7 @@ export function CameraContextProvider({
     return { sx, sy, cropW, cropH };
   };
 
-  // Capture frame from camera stream with 3:4 crop before resizing to 480x480
+  // Capture frame from camera stream, VALIDATE, then predict
   const capturePhoto = async () => {
     if (isAnalyzing) return;
 
@@ -345,6 +312,18 @@ export function CameraContextProvider({
         ctx.drawImage(videoElement, sx, sy, cropW, cropH, 0, 0, 480, 480);
         const capturedDataUrl = canvas.toDataURL('image/jpeg');
         setSelectedPhotoUrl(capturedDataUrl);
+
+        // 1. Run independent validations BEFORE sending to model
+        const valResults = await validateAllImages(canvas, validationConfig);
+        setValidationResults(valResults);
+
+        // 2. If any validation failed, STOP execution before predict!
+        if (valResults.hasErrors) {
+          console.warn("[Validation Gate] Photo failed quality checks, skipping model prediction:", valResults.warnings);
+          return;
+        }
+
+        // 3. Validations passed -> send to model for prediction
         const top3 = await predict(canvas);
         if (top3 && top3.length > 0) {
           addScanHistoryItem({
@@ -360,7 +339,7 @@ export function CameraContextProvider({
     }
   };
 
-  // Predict on uploaded custom image file with 3:4 crop
+  // Predict on uploaded custom image file with 3:4 crop & pre-validations
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -383,6 +362,18 @@ export function CameraContextProvider({
               ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, 480, 480);
               const croppedDataUrl = canvas.toDataURL('image/jpeg');
               setSelectedPhotoUrl(croppedDataUrl);
+
+              // 1. Run independent validations BEFORE sending to model
+              const valResults = await validateAllImages(canvas, validationConfig);
+              setValidationResults(valResults);
+
+              // 2. If any validation failed, STOP execution before predict!
+              if (valResults.hasErrors) {
+                console.warn("[Validation Gate] Uploaded file failed quality checks, skipping model prediction:", valResults.warnings);
+                return;
+              }
+
+              // 3. Validations passed -> send to model for prediction
               const top3 = await predict(canvas);
               if (top3 && top3.length > 0) {
                 addScanHistoryItem({
@@ -405,6 +396,7 @@ export function CameraContextProvider({
   const resetDetection = () => {
     setLimaDetected(null);
     setSelectedPhotoUrl(null);
+    setValidationResults(null);
   };
 
   return (
@@ -431,7 +423,10 @@ export function CameraContextProvider({
       setSelectedPhotoUrl,
       toggleCameraPause,
       recentsExpanded,
-      setRecentsExpanded
+      setRecentsExpanded,
+      validationResults,
+      validationConfig,
+      setValidationConfig,
     }}>
       {children}
     </CameraContext.Provider>

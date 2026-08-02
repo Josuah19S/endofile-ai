@@ -13,6 +13,9 @@ import { useCamera } from './camera-context';
 
 import { useEndofileAi } from './endofile-model-context';
 
+import ImageValidationBanner from './image-validation-banner';
+import ValidationSettingsModal from './validation-settings-modal';
+
 type DrawerView = 'recents' | 'catalog' | 'detail';
 
 /**
@@ -25,12 +28,13 @@ type DetailTarget =
   | { origin: 'catalog'; classId: string };
 
 export default function CameraScreenShell() {
-  const { fileInputRef, handleFileSelect, showFlashOverlay } = useCamera();
+  const { fileInputRef, handleFileSelect, showFlashOverlay, validationResults } = useCamera();
   const { scanHistoryItems } = useEndofileAi();
 
   // Local UI Presentation Toggles & Drawer View State
   const [controlsHidden, setControlsHidden] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeDrawerView, setActiveDrawerView] = useState<DrawerView | null>(null);
 
   // File detail view state & the drawer to return to when leaving it
@@ -125,10 +129,18 @@ export default function CameraScreenShell() {
         controlsHidden={controlsHidden}
         setControlsHidden={setControlsHidden}
         setSidebarOpen={setSidebarOpen}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
       {/* Center Viewport & Reticle Area */}
       <CameraViewport />
+
+      {/* Validation Warning Banners (Desenfoque, Oscuridad, Lima lejana) */}
+      {!controlsHidden && (
+        <div className="absolute top-20 left-0 right-0 z-30 px-4 pointer-events-none">
+          <ImageValidationBanner results={validationResults} />
+        </div>
+      )}
 
       {/* Info Card Overlay (Lima detectada) */}
       {!controlsHidden && (
@@ -174,6 +186,12 @@ export default function CameraScreenShell() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onSelectNav={handleSelectNav}
+      />
+
+      {/* Threshold Settings Modal */}
+      <ValidationSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </div>
   );

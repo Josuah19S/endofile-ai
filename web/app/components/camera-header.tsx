@@ -1,5 +1,5 @@
 "use client";
-import { Menu, Zap, Maximize, ListSortDescending, X, Pause, Play } from 'lucide-react';
+import { Menu, Zap, Maximize, ListSortDescending, X, Pause, Play, Sliders } from 'lucide-react';
 import { cameraStyles } from '../styles/camera-styles';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';
@@ -8,12 +8,14 @@ interface CameraHeaderProps {
   controlsHidden: boolean;
   setControlsHidden: (hidden: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
+  onOpenSettings?: () => void;
 }
 
 export default function CameraHeader({
   controlsHidden,
   setControlsHidden,
   setSidebarOpen,
+  onOpenSettings,
 }: CameraHeaderProps) {
   const {
     cameraAvailable,
@@ -88,6 +90,18 @@ export default function CameraHeader({
             >
               <Zap size={16} />
             </button>
+
+            {onOpenSettings && (
+              <button
+                type="button"
+                className={cameraStyles.iconButton}
+                onClick={onOpenSettings}
+                aria-label="Configuración de validaciones"
+                title="Ajustar umbrales de validación"
+              >
+                <Sliders size={16} />
+              </button>
+            )}
 
             <button
               type="button"
