@@ -42,7 +42,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
   };
 
   return (
-    <div className="relative w-full h-screen h-dvh bg-[#f8fafc] text-black select-none overflow-hidden flex flex-col items-center justify-between">
+    <div className="relative w-full h-screen h-dvh bg-[#f8fafc] text-black select-none overflow-hidden flex flex-col items-center justify-end">
       {/* 1. Fullscreen Background Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <NextImage
@@ -54,34 +54,33 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
         />
       </div>
 
-      {/* 2. AI Robot (Centered, Filling Center Viewport) */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-        <div className="relative w-full h-full max-w-5xl flex items-center justify-center">
+      {/* 2. AI Robot Pinned to Ground (Bottom Stretched) */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[80vh] md:h-[85vh] flex items-end justify-center pointer-events-none overflow-hidden">
+        <div className="relative w-full h-full max-w-5xl flex items-end justify-center">
           <NextImage
             src="/elements/ai-nobg.png"
             alt="Endofile AI Robot"
             fill
-            className="object-contain object-center scale-[1.1] sm:scale-100 drop-shadow-[0_15px_30px_rgba(0,0,0,0.25)]"
+            className="object-contain object-bottom scale-[1.35] sm:scale-150 md:scale-100 origin-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
             priority
           />
         </div>
       </div>
 
-      {/* 3. Superimposed Text Content Stack (Matching exact permission_screen.jpeg structure) */}
-      <div className="relative z-20 w-full h-full flex flex-col items-center justify-between py-8 px-4 md:py-12 max-w-2xl mx-auto text-center pointer-events-auto">
+      {/* 3. Superimposed Content Stack (Title placed just above description & button label) */}
+      <div className="relative z-20 w-full h-full flex flex-col items-center justify-end pb-8 px-4 md:pb-12 max-w-2xl mx-auto text-center pointer-events-auto">
+        <div className="w-full flex flex-col items-center max-w-lg space-y-4">
 
-        {/* Top Header Branding: ENDOFILE AI + smart endo file recognition */}
-        <div className="flex flex-col items-center mt-6 md:mt-10">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#22adfa] tracking-wider font-headline uppercase drop-shadow-sm">
-            ENDOFILE AI
-          </h1>
-          <span className="text-black font-extrabold text-xs sm:text-sm md:text-base tracking-tight -mt-0.5">
-            smart endo file recognition
-          </span>
-        </div>
+          {/* Title & Subtitle Stack Just Above Button */}
+          <div className="flex flex-col items-center mb-1">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#22adfa] tracking-wider font-headline uppercase drop-shadow-md">
+              ENDOFILE AI
+            </h1>
+            <span className="text-black font-extrabold text-xs sm:text-sm md:text-base tracking-tight -mt-0.5">
+              smart endo file recognition
+            </span>
+          </div>
 
-        {/* Bottom Section: Description Text & Pill Button */}
-        <div className="w-full flex flex-col items-center mb-6 md:mb-10 max-w-lg space-y-5">
           {status === 'idle' && (
             <>
               {/* Description Paragraph */}
@@ -89,8 +88,8 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
                 Por favor, habilite el acceso a la cámara para escanear y poder identificar la lima en tiempo real
               </p>
 
-              {/* Pill-shaped Activación Button with tap-here.gif overlay */}
-              <div className="relative w-full max-w-xs sm:max-w-sm flex justify-center">
+              {/* Pill-shaped Activation Button with tap-here.gif overlay */}
+              <div className="relative w-full max-w-xs sm:max-w-sm flex justify-center mt-1">
                 <button
                   type="button"
                   onClick={handleRequestCamera}
@@ -101,7 +100,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
                 </button>
 
                 {/* Animated Tap/Click Gesture GIF Superimposed Over Button */}
-                <div className="absolute right-2 sm:right-6 -top-4 sm:-top-6 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none z-30">
+                <div className="absolute right-2 sm:right-6 -top-5 sm:-top-6 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none z-30">
                   <NextImage
                     src="/elements/tap-here.gif"
                     alt="Animación toque botón"
