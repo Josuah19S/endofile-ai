@@ -1,16 +1,16 @@
 # Graph Report - web  (2026-08-03)
 
 ## Corpus Check
-- 44 files · ~1,955,631 words
+- 44 files · ~1,963,265 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 258 nodes · 427 edges · 20 communities (14 shown, 6 thin omitted)
+- 258 nodes · 425 edges · 21 communities (14 shown, 7 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fb1df754`
+- Built from commit: `46502106`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -33,6 +33,7 @@
 - postcss.config.mjs
 - validation-settings-modal.tsx
 - camera-context.tsx
+- loading-styles.ts
 
 ## God Nodes (most connected - your core abstractions)
 1. `compilerOptions` - 16 edges
@@ -61,7 +62,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (20 total, 6 thin omitted)
+## Communities (21 total, 7 thin omitted)
 
 ### Community 0 - "camera-screen-shell.tsx"
 Cohesion: 0.17
@@ -108,13 +109,13 @@ Cohesion: 0.67
 Nodes (3): useImageValidation(), ValidationSettingsModal(), ValidationSettingsModalProps
 
 ### Community 19 - "camera-context.tsx"
-Cohesion: 0.14
-Nodes (13): CameraContext, CameraContextProvider(), ExtendedMediaTrackCapabilities, ExtendedMediaTrackConstraints, ExtendedMediaTrackConstraintSet, CameraScreen(), CameraScreenProps, LoadingScreen() (+5 more)
+Cohesion: 0.15
+Nodes (12): CameraContext, CameraContextProvider(), ExtendedMediaTrackCapabilities, ExtendedMediaTrackConstraints, ExtendedMediaTrackConstraintSet, CameraScreen(), CameraScreenProps, LoadingScreen() (+4 more)
 
 ## Knowledge Gaps
-- **101 isolated node(s):** `CameraBottomBarProps`, `ExtendedMediaTrackCapabilities`, `ExtendedMediaTrackConstraintSet`, `ExtendedMediaTrackConstraints`, `CameraContext` (+96 more)
+- **102 isolated node(s):** `CameraBottomBarProps`, `ExtendedMediaTrackCapabilities`, `ExtendedMediaTrackConstraintSet`, `ExtendedMediaTrackConstraints`, `CameraContext` (+97 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -124,7 +125,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `FILE_CLASSES` connect `endofile-dataset.ts` to `endofile-model-context.tsx`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **What connects `CameraBottomBarProps`, `ExtendedMediaTrackCapabilities`, `ExtendedMediaTrackConstraintSet` to the rest of the system?**
-  _101 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _102 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `endofile-dataset.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.0945945945945946 - nodes in this community are weakly interconnected._
 - **Should `compilerOptions` be split into smaller, more focused modules?**

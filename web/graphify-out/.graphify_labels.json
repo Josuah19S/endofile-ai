@@ -18,5 +18,6 @@
   "16": "postcss.config.mjs",
   "17": "primitives.tsx",
   "18": "validation-settings-modal.tsx",
-  "19": "camera-context.tsx"
+  "19": "camera-context.tsx",
+  "20": "loading-styles.ts"
 }

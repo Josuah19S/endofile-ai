@@ -1,7 +1,7 @@
 {
   "app/components/camera-bottom-bar.tsx": {
-    "mtime": 1785105017.7657883,
-    "ast_hash": "06a8d32fa2f9f138b290426417c250e5",
+    "mtime": 1785782077.9088483,
+    "ast_hash": "9fc78a39968ad838707d1b1c2997857a",
     "semantic_hash": ""
   },
   "app/components/camera-context.tsx": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "app/components/camera-screen-shell.tsx": {
-    "mtime": 1785736203.4367588,
-    "ast_hash": "770f94535df9c9c11383854a6fc3d8cd",
+    "mtime": 1785782077.9098485,
+    "ast_hash": "639228bd200238c77cefbbc2c26aa79f",
     "semantic_hash": ""
   },
   "app/components/camera-screen.tsx": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/components/loading-screen.tsx": {
-    "mtime": 1785770503.9655807,
-    "ast_hash": "38ee2caf5fe0df91d6b2034018eaf8ba",
+    "mtime": 1785783266.42867,
+    "ast_hash": "b6fc8085b5bd020f55aff43f81055eca",
     "semantic_hash": ""
   },
   "app/components/primitives.tsx": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "app/constants/endofile-photos.ts": {
-    "mtime": 1785716775.9828978,
-    "ast_hash": "15cc51f01d381ae4689c0a2dec5fa350",
+    "mtime": 1785782077.9098485,
+    "ast_hash": "d6eed08c4cb0aff048e3a2ac5331db74",
     "semantic_hash": ""
   },
   "app/layout.tsx": {
@@ -370,23 +370,23 @@
     "semantic_hash": ""
   },
   "public/file_photos/apical-shaper_1-z30.png": {
-    "mtime": 1785716775.983898,
-    "ast_hash": "6b9a14d6bbf1702ebdcf636d8daa0998",
+    "mtime": 1785782077.9108484,
+    "ast_hash": "3994903f9bf34b2436e5b4de64e4ae93",
     "semantic_hash": ""
   },
   "public/file_photos/apical-shaper_2-z35.png": {
-    "mtime": 1785716775.9848979,
-    "ast_hash": "617c8416adef97aa8910bc8df740799f",
+    "mtime": 1785782077.9108484,
+    "ast_hash": "39b94be016d45d405ff82fd2c214b93d",
     "semantic_hash": ""
   },
   "public/file_photos/apical-shaper_3-z40.png": {
-    "mtime": 1785716775.9848979,
-    "ast_hash": "ac577eb4241996cdb6ae42e5b31b168b",
+    "mtime": 1785782077.9108484,
+    "ast_hash": "95ff13e474fd5630501a9c2b010f92cd",
     "semantic_hash": ""
   },
   "public/file_photos/apical-shaper_4-z50.png": {
-    "mtime": 1785716775.9848979,
-    "ast_hash": "6b66f09816f1bb73feabfcd2dbc09e9b",
+    "mtime": 1785782077.9108484,
+    "ast_hash": "512e9d45a3e7ea285c366169527f6ed4",
     "semantic_hash": ""
   },
   "public/file_photos/blue-shaper_1-z1.png": {
@@ -457,6 +457,71 @@
   "public/elements/tap-here.gif": {
     "mtime": 1785735623.3605044,
     "ast_hash": "0d40c79c81e212c02130a2f74c6234ea",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_1-n45-0.4.png": {
+    "mtime": 1785782077.9118485,
+    "ast_hash": "fa39c8947cd44164b4d0a6c81086bf29",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_2-n35-0.4.png": {
+    "mtime": 1785782077.9118485,
+    "ast_hash": "f03569dd6fe6839866ba515bb008f303",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_3-n25-0.6.png": {
+    "mtime": 1785782077.9118485,
+    "ast_hash": "e608e636c300025dcabde4a0226926e3",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_4-n25-0.4.png": {
+    "mtime": 1785782077.9128485,
+    "ast_hash": "54d442ee8b54e839caf066959970f185",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-remover_1-n30.png": {
+    "mtime": 1785782077.9128485,
+    "ast_hash": "47d94b8ca4a01fc76579e4639518b99c",
+    "semantic_hash": ""
+  },
+  "public/file_photos/rising_1-17.png": {
+    "mtime": 1785782077.9128485,
+    "ast_hash": "dbef80951f71f9e76d7211d5476e05c5",
+    "semantic_hash": ""
+  },
+  "public/file_photos/rising_2-13.png": {
+    "mtime": 1785782077.9138484,
+    "ast_hash": "86e6a9cd8860f40ffc900a7d762574a0",
+    "semantic_hash": ""
+  },
+  "public/file_photos/rising_3-25.png": {
+    "mtime": 1785782077.9138484,
+    "ast_hash": "832bc93bb3804b013ecbad66cbde6c33",
+    "semantic_hash": ""
+  },
+  "public/file_photos/rising_4-30.png": {
+    "mtime": 1785782077.9138484,
+    "ast_hash": "c52a263f924c61db6f36858cdf891481",
+    "semantic_hash": ""
+  },
+  "public/file_photos/rising_5-28.png": {
+    "mtime": 1785782077.9148486,
+    "ast_hash": "7e9277a7b172f7bd1fb2285dd5ccc619",
+    "semantic_hash": ""
+  },
+  "public/file_photos/slim-shaper_zs1.png": {
+    "mtime": 1785782077.9148486,
+    "ast_hash": "293cee34541a7af5e3e88d6c926f6639",
+    "semantic_hash": ""
+  },
+  "public/file_photos/slim-shaper_zs2.png": {
+    "mtime": 1785782077.9148486,
+    "ast_hash": "000bbed4263355ab23cb2db5708a9f19",
+    "semantic_hash": ""
+  },
+  "public/file_photos/slim-shaper_zs3.png": {
+    "mtime": 1785782077.9158485,
+    "ast_hash": "a9b767e30bfe07c65b58f74b9dac90c1",
     "semantic_hash": ""
   }
 }
