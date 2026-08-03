@@ -1,5 +1,5 @@
 "use client";
-import { History, Loader2, Trash2, TriangleAlert } from 'lucide-react';
+import { Image, Loader2, Trash2, TriangleAlert } from 'lucide-react';
 import EFileDetectionCard from './detection-card';
 import { useEndofileAi } from '../../contexts/endofile-model-context';
 
@@ -69,7 +69,7 @@ export default function RecentDetectionsView({ onSelectCard }: RecentDetectionsV
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-on-surface-variant text-center">
-            <History size={40} className="mb-3 opacity-60" />
+            <Image size={40} className="mb-3 opacity-60" />
             <p className="text-sm font-medium text-on-surface-variant">No hay detecciones recientes todavía.</p>
             <span className="text-xs text-on-surface-variant/80 mt-1">Tome una foto de lima para ver los resultados aquí.</span>
           </div>
