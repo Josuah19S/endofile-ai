@@ -82,7 +82,7 @@
   --token-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-/* Dark Theme - Clinical Obsidian / Charcoal & Precision Medical Accents */
+/* Dark Theme - Clinical Obsidian / Charcoal & Celestial Sky Blue Accents */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #090c10;
@@ -98,9 +98,10 @@
     --on-surface-variant: #94a3b8;
     --outline: #273244;
     --outline-variant: #1e293b;
-    --primary: #0ea5e9;
-    --primary-container: #0369a1;
-    --on-primary-container: #38bdf8;
+    --primary: #22adfa;
+    --on-primary: #000000;
+    --primary-container: #0284c7;
+    --on-primary-container: #bae6fd;
     --secondary: #64748b;
     --secondary-container: #1e293b;
     --on-secondary-container: #94a3b8;

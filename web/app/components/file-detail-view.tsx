@@ -89,14 +89,14 @@ export default function FileDetailView({
   // the aliased systems those differ, so try both before giving up on a photo.
   const referencePhoto = getFilePhoto(classId) ?? getFilePhoto(fileInfo?.id);
 
-  const fileHeader = (
-    <div className="flex flex-col justify-end min-w-0">
-      <div className="flex items-center gap-2 mb-1.5">
-        <span className="text-[11px] uppercase font-semibold tracking-wider text-on-surface-variant truncate">
+  const HeaderBlock = (
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs uppercase font-bold tracking-widest text-primary">
           {systemName}
         </span>
         {orderDisplay && (
-          <span className="shrink-0 inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-primary-container/30 border border-primary-container/50 text-[11px] font-bold text-on-primary-container font-mono">
+          <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-primary/20 text-primary border border-primary/40">
             {orderDisplay}
           </span>
         )}
@@ -134,7 +134,7 @@ export default function FileDetailView({
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer mb-1"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer mb-1"
           >
             <ArrowLeft size={16} /> {backLabel}
           </button>
@@ -150,7 +150,7 @@ export default function FileDetailView({
                   onClick={onNewer}
                   disabled={!hasNewer}
                   className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${hasNewer
-                      ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline text-on-surface hover:scale-105 active:scale-95 shadow-md'
+                      ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline hover:border-primary hover:text-primary text-on-surface hover:scale-105 active:scale-95 shadow-md hover:shadow-[0_0_12px_rgba(34,173,250,0.35)]'
                       : 'opacity-30 border-transparent text-on-surface-variant cursor-not-allowed'
                     }`}
                   aria-label="Foto más reciente"
@@ -183,7 +183,7 @@ export default function FileDetailView({
                   onClick={onOlder}
                   disabled={!hasOlder}
                   className={`p-2.5 rounded-full border transition-all cursor-pointer shrink-0 ${hasOlder
-                      ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline text-on-surface hover:scale-105 active:scale-95 shadow-md'
+                      ? 'bg-surface-container-high hover:bg-surface-container-highest border-outline hover:border-primary hover:text-primary text-on-surface hover:scale-105 active:scale-95 shadow-md hover:shadow-[0_0_12px_rgba(34,173,250,0.35)]'
                       : 'opacity-30 border-transparent text-on-surface-variant cursor-not-allowed'
                     }`}
                   aria-label="Foto anterior"
@@ -194,10 +194,10 @@ export default function FileDetailView({
               )}
             </div>
 
-            {fileHeader}
+            {HeaderBlock}
           </div>
         ) : (
-          fileHeader
+          HeaderBlock
         )}
 
         {/* Technical Specs Parameters */}

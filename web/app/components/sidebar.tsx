@@ -27,11 +27,11 @@ export default function Sidebar({ isOpen, onClose, onSelectNav, onOpenGuide }: S
         <div>
           <div className="flex justify-between items-center pb-6 border-b border-outline">
             <h2 className="text-xl font-bold tracking-tight text-on-surface flex items-center gap-2">
-              <span className="text-on-primary-container">Endofile</span>AI
+              <span className="text-primary font-black">Endofile</span>AI
             </h2>
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-xl bg-surface-container-lowest/80 hover:bg-surface-container border border-outline/60 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-surface-container-lowest/80 hover:bg-surface-container border border-outline/60 flex items-center justify-center text-on-surface-variant hover:text-primary transition-all cursor-pointer"
               aria-label="Cerrar menú"
             >
               <ChevronLeft size={20} />
@@ -45,9 +45,9 @@ export default function Sidebar({ isOpen, onClose, onSelectNav, onOpenGuide }: S
                 onSelectNav?.('inicio');
                 onClose();
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary-container/40 hover:bg-primary-container/70 text-on-surface font-medium text-sm transition-all cursor-pointer border border-primary-container/60"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/15 hover:bg-primary/25 text-on-surface font-semibold text-sm transition-all cursor-pointer border border-primary/40"
             >
-              <Home size={18} className="text-on-primary-container" />
+              <Home size={18} className="text-primary" />
               <span>Inicio</span>
             </button>
 
