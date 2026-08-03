@@ -160,12 +160,12 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
       const top3 = ranked.slice(0, 3);
       
-      // Confidence threshold check (e.g., 35% minimum probability across all 47 classes)
-      const MIN_CONFIDENCE_THRESHOLD = 0.35;
+      // Confidence threshold check (2% minimum probability across all 47 classes)
+      const MIN_CONFIDENCE_THRESHOLD = 0.02;
       const topConfidence = top3[0]?.confidence || 0;
 
       if (topConfidence < MIN_CONFIDENCE_THRESHOLD) {
-        console.warn(`[TF.js Low Confidence]: Highest class probability was only ${(topConfidence * 100).toFixed(2)}% (< 35%).`);
+        console.warn(`[TF.js Low Confidence]: Highest class probability was only ${(topConfidence * 100).toFixed(2)}% (< 2%).`);
         setLimaDetected('Lima no identificada');
         setTopPredictions([{ classId: 'Lima no identificada', confidence: topConfidence }, ...top3]);
 
