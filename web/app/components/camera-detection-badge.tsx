@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { CheckCircle, AlertTriangle, Camera, Focus, Moon, ZoomIn } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Camera, Focus, Moon, ZoomIn, HelpCircle } from 'lucide-react';
 import { cameraStyles } from '../styles/camera-styles';
 import { useCamera } from './camera-context';
 import { useEndofileAi } from './endofile-model-context';
@@ -13,6 +13,7 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
   const { resetDetection, validationResults, selectedPhotoUrl } = useCamera();
   const { limaDetected, isAnalyzing } = useEndofileAi();
 
+  const isUnidentified = limaDetected === 'Lima no identificada';
   const hasValidationErrors = validationResults?.hasErrors;
   const blurError = validationResults?.blur.isBlurry;
   const darkError = validationResults?.dark.isDark;
@@ -22,9 +23,9 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
     <div className={cameraStyles.infoOverlayContainer}>
       <div
         className={`${cameraStyles.infoCard} ${
-          limaDetected
+          limaDetected && !isUnidentified
             ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)] cursor-pointer hover:border-primary'
-            : hasValidationErrors
+            : isUnidentified || hasValidationErrors
             ? 'border-amber-500/60 bg-surface-container-low shadow-[0_10px_25px_rgba(245,158,11,0.15)]'
             : 'border-outline/80'
         }`}
@@ -32,15 +33,17 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
         {/* State Icon */}
         <div
           className={`${cameraStyles.infoIconContainer} ${
-            limaDetected
+            limaDetected && !isUnidentified
               ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50'
-              : hasValidationErrors
+              : isUnidentified || hasValidationErrors
               ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
               : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
           }`}
         >
           {isAnalyzing ? (
             <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          ) : isUnidentified ? (
+            <HelpCircle size={14} className="animate-pulse text-amber-400" />
           ) : limaDetected ? (
             <CheckCircle size={14} className="animate-scale-in" />
           ) : hasValidationErrors ? (
@@ -60,17 +63,21 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
         <div
           className="flex-1 min-w-0"
           onClick={() => {
-            if (limaDetected && onOpenDetail) {
+            if (limaDetected && !isUnidentified && onOpenDetail) {
               onOpenDetail(limaDetected);
             }
           }}
         >
           <p className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant leading-none mb-1">
-            {hasValidationErrors ? 'Validación de Imagen' : 'Detector de Limas'}
+            {isUnidentified || hasValidationErrors ? 'Validación de Imagen' : 'Detector de Limas'}
           </p>
           <p className={cameraStyles.infoText}>
             {isAnalyzing ? (
               <span className="text-on-surface-variant font-medium">Analizando lima...</span>
+            ) : isUnidentified ? (
+              <span className="text-amber-300 font-semibold text-xs">
+                Lima no identificada. Intente enfocar la lima nuevamente.
+              </span>
             ) : hasValidationErrors ? (
               <span className="text-amber-300 font-medium text-xs">
                 {blurError

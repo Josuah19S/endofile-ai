@@ -328,7 +328,7 @@ export function CameraContextProvider({
 
         // 2. Proceed with model prediction
         const top3 = await predict(canvas);
-        if (top3 && top3.length > 0) {
+        if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
           addScanHistoryItem({
             id: createScanId(),
             classId: top3[0].classId,
@@ -376,7 +376,7 @@ export function CameraContextProvider({
 
               // 2. Proceed with model prediction
               const top3 = await predict(canvas);
-              if (top3 && top3.length > 0) {
+              if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
                 addScanHistoryItem({
                   id: createScanId(),
                   classId: top3[0].classId,

@@ -5,13 +5,13 @@
     "semantic_hash": ""
   },
   "app/components/camera-context.tsx": {
-    "mtime": 1785716775.9818978,
-    "ast_hash": "72bc4113f603d0a4e573e70f370fcccd",
+    "mtime": 1785769714.5718377,
+    "ast_hash": "d13c5c43a13e8accb106db8905edba21",
     "semantic_hash": ""
   },
   "app/components/camera-detection-badge.tsx": {
-    "mtime": 1785642229.6197536,
-    "ast_hash": "fe252313c08996e5d79ba781c0573fc8",
+    "mtime": 1785769542.209673,
+    "ast_hash": "0b2851acb2cb381a84d50a2942f93425",
     "semantic_hash": ""
   },
   "app/components/camera-header.tsx": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "app/components/camera-screen-shell.tsx": {
-    "mtime": 1785734421.6913376,
-    "ast_hash": "e09c3999220454210f016ff42f13b2d5",
+    "mtime": 1785736203.4367588,
+    "ast_hash": "770f94535df9c9c11383854a6fc3d8cd",
     "semantic_hash": ""
   },
   "app/components/camera-screen.tsx": {
@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "app/components/endofile-model-context.tsx": {
-    "mtime": 1785638930.7889977,
-    "ast_hash": "eef1124abefc66fbae3ca91870ff6e44",
+    "mtime": 1785769491.4499466,
+    "ast_hash": "2957dfe18287e7298f4482ba3172a929",
     "semantic_hash": ""
   },
   "app/components/file-catalog-view.tsx": {

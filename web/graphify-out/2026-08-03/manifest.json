@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "app/components/camera-screen-shell.tsx": {
-    "mtime": 1785716775.9818978,
-    "ast_hash": "0b18b3b4df1068264cc0451b3f3e18ac",
+    "mtime": 1785734421.6913376,
+    "ast_hash": "e09c3999220454210f016ff42f13b2d5",
     "semantic_hash": ""
   },
   "app/components/camera-screen.tsx": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/components/loading-screen.tsx": {
-    "mtime": 1785431652.709678,
-    "ast_hash": "238df2a48afb2818438236817ed4f83d",
+    "mtime": 1785735983.2175226,
+    "ast_hash": "4401dcf58ad3bc343b3b93b101c144e0",
     "semantic_hash": ""
   },
   "app/components/primitives.tsx": {
@@ -437,6 +437,26 @@
   "public/file_photos/super-files-iii_6-f3.png": {
     "mtime": 1785716775.988898,
     "ast_hash": "6e0f503f1a16893dd6f70b2dfb4491e3",
+    "semantic_hash": ""
+  },
+  "public/elements/ai-nobg.png": {
+    "mtime": 1785731029.4608917,
+    "ast_hash": "83ceebf5b817e8b8a0d68cdb13796a38",
+    "semantic_hash": ""
+  },
+  "public/elements/bg_camera.jpg": {
+    "mtime": 1785731225.591517,
+    "ast_hash": "9755353c4dd820f0a36f83e6fd64868a",
+    "semantic_hash": ""
+  },
+  "public/elements/bg_permission.jpg": {
+    "mtime": 1785731249.1457124,
+    "ast_hash": "ea7e190801e9bc5bf51fe87e3fa4592d",
+    "semantic_hash": ""
+  },
+  "public/elements/tap-here.gif": {
+    "mtime": 1785735623.3605044,
+    "ast_hash": "0d40c79c81e212c02130a2f74c6234ea",
     "semantic_hash": ""
   }
 }

@@ -159,6 +159,23 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       })).sort((a, b) => b.confidence - a.confidence);
 
       const top3 = ranked.slice(0, 3);
+      
+      // Confidence threshold check (e.g., 35% minimum probability across all 47 classes)
+      const MIN_CONFIDENCE_THRESHOLD = 0.35;
+      const topConfidence = top3[0]?.confidence || 0;
+
+      if (topConfidence < MIN_CONFIDENCE_THRESHOLD) {
+        console.warn(`[TF.js Low Confidence]: Highest class probability was only ${(topConfidence * 100).toFixed(2)}% (< 35%).`);
+        setLimaDetected('Lima no identificada');
+        setTopPredictions([{ classId: 'Lima no identificada', confidence: topConfidence }, ...top3]);
+
+        // Clean up WebGL tensors completely after prediction
+        tf.dispose(inputTensor);
+        tf.dispose(prediction);
+
+        return [{ classId: 'Lima no identificada', confidence: topConfidence }, ...top3];
+      }
+
       setTopPredictions(top3);
 
       const bestOption = top3[0]?.classId || 'Clase desconocida';

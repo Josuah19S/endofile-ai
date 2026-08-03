@@ -75,7 +75,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
       </div>
 
       {/* Superimposed Floating Glass Card (Permission Request Prompt Overlaid Directly on Robot) */}
-      <div className="relative z-20 w-full max-w-sm mx-4 p-6 rounded-3xl bg-surface-container-low/80 backdrop-blur-xs border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex flex-col items-center text-center my-auto">
+      <div className="relative z-20 w-full max-w-sm mx-4 p-6 rounded-3xl bg-surface-container-low/80  border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex flex-col items-center text-center my-auto">
         {/* Title */}
         <h1 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline">
           <span className="text-primary font-black">Endofile</span> AI
