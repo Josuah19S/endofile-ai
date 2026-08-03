@@ -161,6 +161,7 @@ export default function CameraScreenShell() {
       {/* Bottom Action Bar & Abstracted Drawer */}
       <CameraBottomBar
         expanded={activeDrawerView !== null}
+        fullHeight={activeDrawerView === 'catalog'}
         controlsHidden={controlsHidden}
         onClose={() => setActiveDrawerView(null)}
         onOpenRecents={() => setActiveDrawerView('recents')}

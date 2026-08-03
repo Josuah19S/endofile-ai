@@ -44,6 +44,19 @@ export const FILE_PHOTOS: Readonly<Record<string, FilePhoto>> = {
   '3d-files_2-f25': { src: '/file_photos/3d-files_2-f25.png', width: 420, height: 125 },
   '3d-files_3-f30': { src: '/file_photos/3d-files_3-f30.png', width: 420, height: 125 },
   '3d-files_1-s30': { src: '/file_photos/3d-files_1-s30.png', width: 420, height: 125 },
+  'micromega-remover_1-n30': { src: '/file_photos/micromega-remover_1-n30.png', width: 420, height: 125 },
+  'rising_1-17': { src: '/file_photos/rising_1-17.png', width: 420, height: 125 },
+  'rising_2-13': { src: '/file_photos/rising_2-13.png', width: 420, height: 125 },
+  'rising_3-25': { src: '/file_photos/rising_3-25.png', width: 420, height: 125 },
+  'rising_4-30': { src: '/file_photos/rising_4-30.png', width: 420, height: 125 },
+  'rising_5-28': { src: '/file_photos/rising_5-28.png', width: 420, height: 125 },
+  'slim-shaper_zs1': { src: '/file_photos/slim-shaper_zs1.png', width: 420, height: 125 },
+  'slim-shaper_zs2': { src: '/file_photos/slim-shaper_zs2.png', width: 420, height: 125 },
+  'slim-shaper_zs3': { src: '/file_photos/slim-shaper_zs3.png', width: 420, height: 125 },
+  'micromega-one-curve-mini-assorted_1-n45-0.4': { src: '/file_photos/micromega-one-curve-mini-assorted_1-n45-0.4.png', width: 420, height: 125 },
+  'micromega-one-curve-mini-assorted_2-n35-0.4': { src: '/file_photos/micromega-one-curve-mini-assorted_2-n35-0.4.png', width: 420, height: 125 },
+  'micromega-one-curve-mini-assorted_3-n25-0.6': { src: '/file_photos/micromega-one-curve-mini-assorted_3-n25-0.6.png', width: 420, height: 125 },
+  'micromega-one-curve-mini-assorted_4-n25-0.4': { src: '/file_photos/micromega-one-curve-mini-assorted_4-n25-0.4.png', width: 420, height: 125 },
 };
 
 /** `null` when the file has no reference photo, so callers can skip the frame entirely. */

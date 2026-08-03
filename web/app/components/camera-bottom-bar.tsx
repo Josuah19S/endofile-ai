@@ -7,6 +7,8 @@ import { useEndofileAi } from './endofile-model-context';
 
 interface CameraBottomBarProps {
   expanded: boolean;
+  /** Catalog needs nearly the full screen; other drawer views keep the shorter default height. */
+  fullHeight?: boolean;
   controlsHidden?: boolean;
   onClose: () => void;
   onOpenRecents: () => void;
@@ -15,6 +17,7 @@ interface CameraBottomBarProps {
 
 export default function CameraBottomBar({
   expanded,
+  fullHeight = false,
   controlsHidden = false,
   onClose,
   onOpenRecents,
@@ -37,7 +40,11 @@ export default function CameraBottomBar({
   return (
     <div
       className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
-        expanded ? 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]' : 'h-24'
+        expanded
+          ? fullHeight
+            ? 'h-[calc(100dvh-96px)] max-h-[calc(100dvh-96px)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
+            : 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
+          : 'h-24'
       }`}
     >
       {expanded ? (
