@@ -146,11 +146,13 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
       const rawArray = Array.from(rawOutput);
 
-      // Numerically stable Softmax calculation
-      const maxVal = Math.max(...rawArray);
-      const expArray = rawArray.map(v => Math.exp(v - maxVal));
-      const expSum = expArray.reduce((a, b) => a + b, 0);
-      const probabilities = expArray.map(v => v / (expSum || 1));
+      // The graph already ends in a Softmax (Identity <- Softmax <- dense), so
+      // rawOutput is a proper probability distribution that sums to 1. Applying
+      // softmax a second time here would compress every confidence toward the
+      // uniform distribution (1/38 ≈ 2.6%) — argmax and top-3 would still be
+      // correct since softmax is monotone, but the numbers would be useless.
+      // See model/README.md §4.
+      const probabilities = rawArray;
 
       // Rank all classes by confidence score
       const ranked = FILE_CLASSES.map((className, idx) => ({
@@ -159,6 +161,10 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       })).sort((a, b) => b.confidence - a.confidence);
 
       const top3 = ranked.slice(0, 3);
+
+      // Debug log: top 10 ranked classes per prediction. Dev-only, kept commented
+      // for quick re-enable during debugging. Uncomment to inspect raw confidences.
+      // console.log(`[TF.js Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
       
       // Confidence threshold check (2% minimum probability across all 47 classes)
       const MIN_CONFIDENCE_THRESHOLD = 0.02;
