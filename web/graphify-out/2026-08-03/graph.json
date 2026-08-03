@@ -117,7 +117,7 @@
       "label": "useCamera()",
       "file_type": "code",
       "source_file": "app/components/camera-context.tsx",
-      "source_location": "L439",
+      "source_location": "L470",
       "_origin": "ast",
       "id": "app_components_camera_context_usecamera",
       "community": 0,
@@ -3055,7 +3055,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/components/camera-context.tsx",
-      "source_location": "L439",
+      "source_location": "L470",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_camera_context",
@@ -3308,7 +3308,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/components/camera-context.tsx",
-      "source_location": "L333",
+      "source_location": "L364",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_camera_context_cameracontextprovider",
@@ -3320,7 +3320,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/components/camera-context.tsx",
-      "source_location": "L322",
+      "source_location": "L275",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_camera_context_cameracontextprovider",
@@ -7778,5 +7778,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "868353201e5b619f9fdcf63fe2589ff6c46d5841"
+  "built_at_commit": "3857ad38060d96a22409993ab08381ea46176865"
 }

@@ -91,6 +91,7 @@ export function CameraContextProvider({
   const [validationResults, setValidationResults] = useState<ImageValidationResults | null>(null);
   const [validationConfig, setValidationConfig] = useState<ValidationConfig>(DEFAULT_VALIDATION_CONFIG);
   const [showUserGuide, setShowUserGuide] = useState(false);
+  const isFirstCameraLoad = useRef(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -138,7 +139,11 @@ export function CameraContextProvider({
       setStream(newStream);
       setCameraAvailable(true);
       setActiveDeviceIndex(deviceIndex);
-      setShowUserGuide(true);
+
+      if (isFirstCameraLoad.current) {
+        setShowUserGuide(true);
+        isFirstCameraLoad.current = false;
+      }
 
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
