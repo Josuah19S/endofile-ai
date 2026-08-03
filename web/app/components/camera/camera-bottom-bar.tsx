@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { Upload, RefreshCw, History, ChevronDown, RotateCcw } from 'lucide-react';
+import { Upload, RefreshCw, Image, ChevronDown, RotateCcw } from 'lucide-react';
 import { cameraStyles } from '../../styles/camera-styles';
 import { useCamera } from '../../contexts/camera-context';
 import { useEndofileAi } from '../../contexts/endofile-model-context';
@@ -39,13 +39,12 @@ export default function CameraBottomBar({
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
-        expanded
-          ? fullHeight
-            ? 'h-[calc(100dvh-96px)] max-h-[calc(100dvh-96px)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
-            : 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
-          : 'h-24'
-      }`}
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${expanded
+        ? fullHeight
+          ? 'h-[calc(100dvh-96px)] max-h-[calc(100dvh-96px)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
+          : 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
+        : 'h-24'
+        }`}
     >
       {expanded ? (
         /* Expanded Drawer Container holding children views */
@@ -120,7 +119,7 @@ export default function CameraBottomBar({
                 aria-label="Detecciones recientes"
                 title="Ver detecciones recientes"
               >
-                <History size={20} />
+                <Image size={20} />
               </button>
             </div>
           ) : (
