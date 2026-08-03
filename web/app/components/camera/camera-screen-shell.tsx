@@ -115,10 +115,25 @@ export default function CameraScreenShell() {
       {/* Background Image (16:9, centered horizontally for mobile) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <NextImage
-          src="/elements/bg_camera.jpg"
+          src="/elements/bg_camera.png"
           alt="Fondo Cámara Clínica"
           fill
           className="object-cover object-center opacity-85 brightness-95"
+          priority
+        />
+      </div>
+
+      {/* Robot arm overlay: 10rem in from the left, 11rem past the right edge.
+         object-cover + object-right keeps the arm (which sits on the right side of
+         the source PNG) visible on every viewport, while h-[80vh] always gives it
+         the full intended vertical space — object-contain was width-bound on mobile
+         and shrank the visible height to ~33% of the container. */}
+      <div className="absolute bottom-0 left-[10rem] right-[-30rem] sm:right-[-20rem] md:right-[-11rem] z-[5] h-[80vh] pointer-events-none">
+        <NextImage
+          src="/elements/camera_screen_robot_arm.png"
+          alt="Brazo del Robot"
+          fill
+          className="object-cover object-right"
           priority
         />
       </div>
