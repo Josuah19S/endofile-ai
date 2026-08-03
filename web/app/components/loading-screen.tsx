@@ -89,13 +89,26 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
               Aplicación de asistencia endodóntica. Por favor, habilite el acceso a la cámara para escanear y medir limas en tiempo real.
             </p>
 
-            <button
-              type="button"
-              onClick={handleRequestCamera}
-              className={loadingStyles.actionButton}
-            >
-              Activar Cámara
-            </button>
+            <div className="relative w-full mt-6">
+              <button
+                type="button"
+                onClick={handleRequestCamera}
+                className="px-6 py-3.5 w-full bg-primary hover:bg-primary-container text-on-primary font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-98 text-sm cursor-pointer"
+              >
+                Activar Cámara
+              </button>
+
+              {/* Superimposed Animated Tap/Click Gesture GIF (Upper half aligns with button click target) */}
+              <div className="absolute left-3/4 +translate-x-1/2 -top-1 sm:-top-2 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none z-30">
+                <NextImage
+                  src="/elements/tap-here.gif"
+                  alt="Animación tocar botón"
+                  fill
+                  className="object-contain drop-shadow-[0_4px_16px_rgba(34,173,250,0.6)]"
+                  unoptimized
+                />
+              </div>
+            </div>
           </>
         )}
 
