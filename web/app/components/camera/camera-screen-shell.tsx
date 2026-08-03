@@ -118,10 +118,9 @@ export default function CameraScreenShell() {
           src="/elements/bg_camera.jpg"
           alt="Fondo Cámara Clínica"
           fill
-          className="object-cover object-center opacity-65 brightness-90"
+          className="object-cover object-center opacity-85 brightness-95"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/80" />
       </div>
 
       {/* Hidden file input for uploading custom photos */}
