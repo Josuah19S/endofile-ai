@@ -118,7 +118,7 @@ export default function CameraScreenShell() {
           src="/elements/bg_camera.jpg"
           alt="Fondo Cámara Clínica"
           fill
-          className="object-cover object-center opacity-55 brightness-90"
+          className="object-cover object-center opacity-65 brightness-90"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/80" />

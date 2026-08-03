@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/components/loading-screen.tsx": {
-    "mtime": 1785734791.231983,
-    "ast_hash": "100ab050e65809da8b6d994699819dd3",
+    "mtime": 1785735983.2175226,
+    "ast_hash": "4401dcf58ad3bc343b3b93b101c144e0",
     "semantic_hash": ""
   },
   "app/components/primitives.tsx": {
@@ -452,6 +452,11 @@
   "public/elements/bg_permission.jpg": {
     "mtime": 1785731249.1457124,
     "ast_hash": "ea7e190801e9bc5bf51fe87e3fa4592d",
+    "semantic_hash": ""
+  },
+  "public/elements/tap-here.gif": {
+    "mtime": 1785735623.3605044,
+    "ast_hash": "0d40c79c81e212c02130a2f74c6234ea",
     "semantic_hash": ""
   }
 }
