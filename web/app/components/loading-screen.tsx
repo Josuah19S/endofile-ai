@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import NextImage from 'next/image';
-import { loadingStyles } from '../styles/loading-styles';
+import { Camera } from 'lucide-react';
 
 interface LoadingScreenProps {
   onPermissionGranted: (stream: MediaStream) => void;
@@ -24,14 +24,11 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
     };
 
     try {
-      // Explicitly trigger the browser's permission prompt
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       onPermissionGranted(stream);
     } catch (err) {
       console.error("Camera permission error:", err);
       setStatus('error');
-
-      // getUserMedia rejects with a DOMException whose `name` identifies the failure
       const errorName = err instanceof DOMException ? err.name : '';
 
       if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError') {
@@ -45,99 +42,103 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
   };
 
   return (
-    <div className="relative w-full h-screen h-dvh bg-background text-on-surface select-none overflow-hidden flex items-center justify-center">
-      {/* Background Image (16:9, centered horizontally for mobile, increased visibility) */}
+    <div className="relative w-full h-screen h-dvh bg-[#f8fafc] text-black select-none overflow-hidden flex flex-col items-center justify-between">
+      {/* 1. Fullscreen Background Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <NextImage
           src="/elements/bg_permission.jpg"
-          alt="Fondo de Clínica Endodóntica"
+          alt="Fondo Clínica Endodoncia"
           fill
-          className="object-cover object-center opacity-65 brightness-90"
+          className="object-cover object-center opacity-85 brightness-95"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/30 to-background/80" />
       </div>
 
-      {/* AI Robot Pinned to Bottom, Centered Horizontally (Stretched to occupy 65-70% of screen height) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[70vh] md:h-[75vh] max-h-[800px] flex items-end justify-center pointer-events-none overflow-hidden">
-        {/* Soft Cyan Ambient Radial Glow */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-primary/30 blur-3xl" />
-
-        <div className="relative w-full h-full max-w-4xl flex items-end justify-center">
+      {/* 2. AI Robot (Centered, Filling Center Viewport) */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <div className="relative w-full h-full max-w-5xl flex items-center justify-center">
           <NextImage
             src="/elements/ai-nobg.png"
             alt="Endofile AI Robot"
             fill
-            className="object-contain object-bottom scale-[1.55] sm:scale-[1.35] md:scale-[1.2] origin-bottom drop-shadow-[0_20px_40px_rgba(34,173,250,0.5)] animate-fade-in"
+            className="object-contain object-center scale-[1.1] sm:scale-100 drop-shadow-[0_15px_30px_rgba(0,0,0,0.25)]"
             priority
           />
         </div>
       </div>
 
-      {/* Superimposed Floating Glass Card (Permission Request Prompt Overlaid Directly on Robot) */}
-      <div className="relative z-20 w-full max-w-sm mx-4 p-6 rounded-3xl bg-surface-container-low/80  border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex flex-col items-center text-center my-auto">
-        {/* Title */}
-        <h1 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline">
-          <span className="text-primary font-black">Endofile</span> AI
-        </h1>
-        <span className='text-primary text-xs mb-3'>Smart endodontic file recognition</span>
+      {/* 3. Superimposed Text Content Stack (Matching exact permission_screen.jpeg structure) */}
+      <div className="relative z-20 w-full h-full flex flex-col items-center justify-between py-8 px-4 md:py-12 max-w-2xl mx-auto text-center pointer-events-auto">
 
-        {/* Request permission button */}
-        {status === 'idle' && (
-          <>
-            <p className={loadingStyles.subtitleText}>
-              Aplicación de asistencia endodóntica. Por favor, habilite el acceso a la cámara para escanear y medir limas en tiempo real.
-            </p>
+        {/* Top Header Branding: ENDOFILE AI + smart endo file recognition */}
+        <div className="flex flex-col items-center mt-6 md:mt-10">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#22adfa] tracking-wider font-headline uppercase drop-shadow-sm">
+            ENDOFILE AI
+          </h1>
+          <span className="text-black font-extrabold text-xs sm:text-sm md:text-base tracking-tight -mt-0.5">
+            smart endo file recognition
+          </span>
+        </div>
 
-            <div className="relative w-full mt-6">
+        {/* Bottom Section: Description Text & Pill Button */}
+        <div className="w-full flex flex-col items-center mb-6 md:mb-10 max-w-lg space-y-5">
+          {status === 'idle' && (
+            <>
+              {/* Description Paragraph */}
+              <p className="text-black font-semibold text-sm sm:text-base md:text-lg leading-snug px-4 drop-shadow-sm max-w-md">
+                Por favor, habilite el acceso a la cámara para escanear y poder identificar la lima en tiempo real
+              </p>
+
+              {/* Pill-shaped Activación Button with tap-here.gif overlay */}
+              <div className="relative w-full max-w-xs sm:max-w-sm flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleRequestCamera}
+                  className="w-full py-3.5 px-6 rounded-full bg-[#38bdf8] hover:bg-[#0284c7] text-white font-extrabold tracking-wider uppercase text-sm sm:text-base shadow-xl shadow-sky-400/40 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer border border-white/40"
+                >
+                  <span>ACTIVAR CÁMARA</span>
+                  <Camera className="w-5 h-5 shrink-0" />
+                </button>
+
+                {/* Animated Tap/Click Gesture GIF Superimposed Over Button */}
+                <div className="absolute right-2 sm:right-6 -top-4 sm:-top-6 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none z-30">
+                  <NextImage
+                    src="/elements/tap-here.gif"
+                    alt="Animación toque botón"
+                    fill
+                    className="object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
+                    unoptimized
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {status === 'requesting' && (
+            <div className="flex flex-col items-center py-4 space-y-3">
+              <div className="w-10 h-10 border-4 border-sky-200 border-t-[#38bdf8] rounded-full animate-spin" />
+              <p className="text-black font-extrabold text-xs tracking-widest uppercase animate-pulse">
+                Solicitando permiso de cámara...
+              </p>
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div className="flex flex-col items-center space-y-4 px-4">
+              <p className="text-red-600 font-semibold text-xs sm:text-sm bg-white/90 p-3 rounded-2xl shadow-md border border-red-200">
+                {errorMsg}
+              </p>
+
               <button
                 type="button"
                 onClick={handleRequestCamera}
-                className="px-6 py-3.5 w-full bg-primary hover:bg-primary-container text-on-primary font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-98 text-sm cursor-pointer"
+                className="py-3 px-8 rounded-full bg-[#38bdf8] hover:bg-[#0284c7] text-white font-extrabold tracking-wider uppercase text-xs sm:text-sm shadow-lg transition-all active:scale-95 cursor-pointer"
               >
-                Activar Cámara
+                Reintentar Permiso
               </button>
-
-              {/* Superimposed Animated Tap/Click Gesture GIF (Upper half aligns with button click target) */}
-              <div className="absolute left-3/4 +translate-x-1/2 -top-1 sm:-top-2 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none z-30">
-                <NextImage
-                  src="/elements/tap-here.gif"
-                  alt="Animación tocar botón"
-                  fill
-                  className="object-contain drop-shadow-[0_4px_16px_rgba(34,173,250,0.6)]"
-                  unoptimized
-                />
-              </div>
             </div>
-          </>
-        )}
-
-        {status === 'requesting' && (
-          <div className="flex flex-col items-center my-4">
-            <div className={loadingStyles.spinnerContainer}>
-              <div className={loadingStyles.spinnerRing}></div>
-            </div>
-            <p className={loadingStyles.loadingText}>
-              Solicitando permiso...
-            </p>
-          </div>
-        )}
-
-        {status === 'error' && (
-          <>
-            <p className={loadingStyles.errorText}>
-              {errorMsg}
-            </p>
-
-            <button
-              type="button"
-              onClick={handleRequestCamera}
-              className={loadingStyles.actionButton}
-            >
-              Reintentar Permiso
-            </button>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
