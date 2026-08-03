@@ -67,6 +67,13 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
         </div>
       </div>
 
+      {/* 3. Page Bottom Fade (Theme-Aware Gradient) */}
+      <div
+        aria-hidden
+        className="absolute bottom-0 left-0 right-0 h-1/2 z-[15] pointer-events-none"
+        style={{ background: 'var(--token-page-fade)' }}
+      />
+
       {/* 3. Superimposed Floating Glass Card (Containing Title, Subtitle, Description & Pill Button) */}
       <div className="relative z-20 w-full h-full flex flex-col items-center justify-around pb-6 px-4 md:pb-10 max-w-2xl mx-auto text-center pointer-events-auto">
         <div className="h-1/3"></div>
@@ -79,9 +86,8 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
             smart endo file recognition
           </span>
         </div>
-        <div className="w-full max-w-sm sm:max-w-md p-6 sm:p-7 rounded-3xl bg-surface-container-low/85 backdrop-blur-lg border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col items-center text-center space-y-4">
-
-
+        {/* rounded-3xl bg-surface-container-low/85 backdrop-blur-lg border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.6)] */}
+        <div className="w-full max-w-sm sm:max-w-md p-6 sm:p-7 flex flex-col items-center text-center space-y-4">
           {status === 'idle' && (
             <>
               {/* Description Paragraph */}

@@ -80,6 +80,10 @@
   --token-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --token-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --token-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Permission screen: page-bottom fade. White in light, black in dark. Anchored at the
+     bottom of the viewport and reaches up to roughly the top of the permission card. */
+  --token-page-fade: linear-gradient(to top, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.7) 60%, transparent 100%);
 }
 
 /* Dark Theme - Clinical Obsidian / Charcoal & Celestial Sky Blue Accents */
@@ -108,6 +112,8 @@
     --tertiary: #10b981;
     --tertiary-container: #064e3b;
     --on-tertiary-container: #34d399;
+
+    --token-page-fade: linear-gradient(to top, rgb(0 0 0 / 0.95) 0%, rgb(0 0 0 / 0.7) 60%, transparent 100%);
   }
 }
 
