@@ -58,28 +58,29 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/30 to-background/80" />
       </div>
 
-      {/* AI Robot Pinned to Bottom, Centered Horizontally (Occupying 65-70% of screen height) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[68vh] md:h-[72vh] flex items-end justify-center pointer-events-none">
+      {/* AI Robot Pinned to Bottom, Centered Horizontally (Stretched to occupy 65-70% of screen height) */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[70vh] md:h-[75vh] max-h-[800px] flex items-end justify-center pointer-events-none overflow-hidden">
         {/* Soft Cyan Ambient Radial Glow */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-primary/30 blur-3xl" />
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-primary/30 blur-3xl" />
 
-        <div className="relative w-full h-full max-w-xl">
+        <div className="relative w-full h-full max-w-4xl flex items-end justify-center">
           <NextImage
             src="/elements/ai-nobg.png"
             alt="Endofile AI Robot"
             fill
-            className="object-contain object-bottom drop-shadow-[0_20px_40px_rgba(34,173,250,0.5)] animate-fade-in"
+            className="object-contain object-bottom scale-[1.55] sm:scale-[1.35] md:scale-[1.2] origin-bottom drop-shadow-[0_20px_40px_rgba(34,173,250,0.5)] animate-fade-in"
             priority
           />
         </div>
       </div>
 
       {/* Superimposed Floating Glass Card (Permission Request Prompt Overlaid Directly on Robot) */}
-      <div className="relative z-20 w-full max-w-sm mx-4 p-6 rounded-3xl bg-surface-container-low/80 backdrop-blur-xl border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex flex-col items-center text-center my-auto">
+      <div className="relative z-20 w-full max-w-sm mx-4 p-6 rounded-3xl bg-surface-container-low/80 backdrop-blur-xs border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex flex-col items-center text-center my-auto">
         {/* Title */}
-        <h1 className="text-3xl font-extrabold text-on-surface tracking-tight mb-3 font-headline">
+        <h1 className="text-3xl font-extrabold text-on-surface tracking-tight font-headline">
           <span className="text-primary font-black">Endofile</span> AI
         </h1>
+        <span className='text-primary text-xs mb-3'>Smart endodontic file recognition</span>
 
         {/* Request permission button */}
         {status === 'idle' && (
