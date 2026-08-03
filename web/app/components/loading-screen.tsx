@@ -15,8 +15,8 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
     setStatus('requesting');
     setErrorMsg(null);
 
-    const constraints = { 
-      video: { 
+    const constraints = {
+      video: {
         facingMode: 'environment', // Request back/rear camera on mobile
         width: { ideal: 1080 },
         height: { ideal: 1920 }
@@ -45,7 +45,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-between min-h-screen min-h-dvh bg-background text-on-surface p-4 md:p-6 select-none overflow-hidden">
+    <div className="relative w-full h-screen h-dvh bg-background text-on-surface select-none overflow-hidden flex items-center justify-center">
       {/* Background Image (16:9, centered horizontally for mobile, increased visibility) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <NextImage
@@ -55,11 +55,27 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
           className="object-cover object-center opacity-65 brightness-90"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/30 to-background/80" />
       </div>
 
-      {/* Top Floating Glass Card (Title, Subtitle & Action CTA) */}
-      <div className="relative z-20 w-full max-w-sm mt-6 md:mt-10 p-6 rounded-3xl bg-surface-container-low/85 backdrop-blur-md border border-outline/70 shadow-2xl flex flex-col items-center text-center">
+      {/* AI Robot Pinned to Bottom, Centered Horizontally (Occupying 65-70% of screen height) */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[68vh] md:h-[72vh] flex items-end justify-center pointer-events-none">
+        {/* Soft Cyan Ambient Radial Glow */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-primary/30 blur-3xl" />
+
+        <div className="relative w-full h-full max-w-xl">
+          <NextImage
+            src="/elements/ai-nobg.png"
+            alt="Endofile AI Robot"
+            fill
+            className="object-contain object-bottom drop-shadow-[0_20px_40px_rgba(34,173,250,0.5)] animate-fade-in"
+            priority
+          />
+        </div>
+      </div>
+
+      {/* Superimposed Floating Glass Card (Permission Request Prompt Overlaid Directly on Robot) */}
+      <div className="relative z-20 w-full max-w-sm mx-4 p-6 rounded-3xl bg-surface-container-low/80 backdrop-blur-xl border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.7)] flex flex-col items-center text-center my-auto">
         {/* Title */}
         <h1 className="text-3xl font-extrabold text-on-surface tracking-tight mb-3 font-headline">
           <span className="text-primary font-black">Endofile</span> AI
@@ -71,7 +87,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
             <p className={loadingStyles.subtitleText}>
               Aplicación de asistencia endodóntica. Por favor, habilite el acceso a la cámara para escanear y medir limas en tiempo real.
             </p>
-            
+
             <button
               type="button"
               onClick={handleRequestCamera}
@@ -98,7 +114,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
             <p className={loadingStyles.errorText}>
               {errorMsg}
             </p>
-            
+
             <button
               type="button"
               onClick={handleRequestCamera}
@@ -108,22 +124,6 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
             </button>
           </>
         )}
-      </div>
-
-      {/* AI Robot Pinned to Bottom, Centered Horizontally (60-70% height) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full flex justify-center pointer-events-none">
-        {/* Soft Cyan Ambient Radial Glow */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-primary/25 blur-3xl" />
-
-        <div className="relative h-[62vh] md:h-[68vh] max-h-[700px] w-auto aspect-square flex items-end justify-center">
-          <NextImage
-            src="/elements/ai-nobg.png"
-            alt="Endofile AI Robot"
-            fill
-            className="object-contain object-bottom drop-shadow-[0_15px_30px_rgba(34,173,250,0.4)] animate-fade-in"
-            priority
-          />
-        </div>
       </div>
     </div>
   );
