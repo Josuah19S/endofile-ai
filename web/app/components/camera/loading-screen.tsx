@@ -107,7 +107,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
                 </button>
 
                 {/* Animated Tap/Click Gesture GIF Superimposed Over Button */}
-                <div className="absolute right-1 sm:right-3 -top-5 sm:-top-6 w-20 h-20 sm:w-22 sm:h-22 pointer-events-none z-30">
+                <div className="absolute right-1 sm:right-3 +top-2 w-20 h-20 sm:w-22 sm:h-22 pointer-events-none z-30">
                   <NextImage
                     src="/elements/tap-here.gif"
                     alt="Animación toque botón"
