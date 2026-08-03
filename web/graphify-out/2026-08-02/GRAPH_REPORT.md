@@ -1,16 +1,16 @@
-# Graph Report - web  (2026-08-02)
+# Graph Report - web  (2026-08-01)
 
 ## Corpus Check
-- 44 files · ~1,873,674 words
+- 44 files · ~1,858,998 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 258 nodes · 429 edges · 19 communities (14 shown, 5 thin omitted)
+- 255 nodes · 420 edges · 18 communities (13 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c8a31ac6`
+- Built from commit: `13950a48`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,19 +31,18 @@
 - GEMINI.md
 - next.config.ts
 - postcss.config.mjs
-- validation-settings-modal.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `compilerOptions` - 16 edges
 2. `useEndofileAi()` - 15 edges
 3. `useCamera()` - 11 edges
 4. `saveScanItem()` - 9 edges
-5. `ImageValidationProvider()` - 8 edges
-6. `getEndoFileInfo()` - 8 edges
-7. `validateAllImages()` - 8 edges
-8. `isOpenCVReady()` - 8 edges
-9. `ImageValidationContextType` - 7 edges
-10. `ImageValidationResults` - 7 edges
+5. `getEndoFileInfo()` - 8 edges
+6. `validateAllImages()` - 8 edges
+7. `ImageValidationContextType` - 7 edges
+8. `ImageValidationProvider()` - 7 edges
+9. `ImageValidationResults` - 7 edges
+10. `include` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `CameraContextProvider()` --calls--> `validateAllImages()`  [EXTRACTED]
@@ -60,19 +59,19 @@
 ## Import Cycles
 - None detected.
 
-## Communities (19 total, 5 thin omitted)
+## Communities (18 total, 5 thin omitted)
 
 ### Community 0 - "camera-screen-shell.tsx"
-Cohesion: 0.11
-Nodes (29): CameraBottomBar(), CameraBottomBarProps, CameraContext, CameraContextProvider(), ExtendedMediaTrackCapabilities, ExtendedMediaTrackConstraints, ExtendedMediaTrackConstraintSet, useCamera() (+21 more)
+Cohesion: 0.12
+Nodes (27): CameraBottomBar(), CameraBottomBarProps, CameraContext, CameraContextProvider(), ExtendedMediaTrackCapabilities, ExtendedMediaTrackConstraints, ExtendedMediaTrackConstraintSet, useCamera() (+19 more)
 
 ### Community 1 - "endofile-dataset.ts"
 Cohesion: 0.09
 Nodes (29): CatalogFileRow(), CatalogFileRowProps, EFileDetectionCard(), EFileDetectionCardProps, EFileDetectionCard(), EFileDetectionCardProps, FileCatalogView(), FileCatalogViewProps (+21 more)
 
 ### Community 2 - "image-validation-context.tsx"
-Cohesion: 0.21
-Nodes (22): CameraContextType, ImageValidationBanner(), ImageValidationBannerProps, ImageValidationContext, ImageValidationContextType, ImageValidationProvider(), BlurValidationResult, BoundingBox (+14 more)
+Cohesion: 0.16
+Nodes (25): CameraContextType, ImageValidationBanner(), ImageValidationBannerProps, ImageValidationContext, ImageValidationContextType, ImageValidationProvider(), useImageValidation(), ValidationSettingsModal() (+17 more)
 
 ### Community 3 - "compilerOptions"
 Cohesion: 0.07
@@ -106,26 +105,22 @@ Nodes (3): geistMono, geistSans, metadata
 Cohesion: 0.50
 Nodes (3): Deploy on Vercel, Getting Started, Learn More
 
-### Community 18 - "validation-settings-modal.tsx"
-Cohesion: 0.67
-Nodes (3): useImageValidation(), ValidationSettingsModal(), ValidationSettingsModalProps
-
 ## Knowledge Gaps
-- **101 isolated node(s):** `CameraBottomBarProps`, `ExtendedMediaTrackCapabilities`, `ExtendedMediaTrackConstraintSet`, `ExtendedMediaTrackConstraints`, `CameraContext` (+96 more)
+- **100 isolated node(s):** `CameraBottomBarProps`, `ExtendedMediaTrackCapabilities`, `ExtendedMediaTrackConstraintSet`, `ExtendedMediaTrackConstraints`, `CameraContext` (+95 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `FILE_CLASSES` connect `endofile-dataset.ts` to `endofile-model-context.tsx`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Why does `devDependencies` connect `devDependencies` to `dependencies`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Why does `FILE_CLASSES` connect `endofile-dataset.ts` to `endofile-model-context.tsx`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `CameraBottomBarProps`, `ExtendedMediaTrackCapabilities`, `ExtendedMediaTrackConstraintSet` to the rest of the system?**
-  _101 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _100 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `camera-screen-shell.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.10853658536585366 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.12091038406827881 - nodes in this community are weakly interconnected._
 - **Should `endofile-dataset.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.0945945945945946 - nodes in this community are weakly interconnected._
 - **Should `compilerOptions` be split into smaller, more focused modules?**

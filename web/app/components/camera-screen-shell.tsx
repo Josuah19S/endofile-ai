@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useState } from 'react';
+import NextImage from 'next/image';
 import { cameraStyles } from '../styles/camera-styles';
 import Sidebar from './sidebar';
 import CameraHeader from './camera-header';
@@ -111,6 +112,18 @@ export default function CameraScreenShell() {
 
   return (
     <div className={cameraStyles.screenContainer}>
+      {/* Background Image (16:9, centered horizontally for mobile) */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <NextImage
+          src="/elements/bg_camera.jpg"
+          alt="Fondo Cámara Clínica"
+          fill
+          className="object-cover object-center opacity-30 brightness-75 mix-blend-luminosity"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/80" />
+      </div>
+
       {/* Hidden file input for uploading custom photos */}
       <input
         type="file"
