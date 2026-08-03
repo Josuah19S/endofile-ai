@@ -330,6 +330,44 @@ export function CameraContextProvider({
     return { sx, sy, cropW, cropH };
   };
 
+  /**
+   * Render the same 3:4 crop into two canvases off the same source bounds:
+   *   - displayCanvas: 480x640, aspect preserved, what the user sees and what
+   *     gets saved into history.
+   *   - modelCanvas:   480x480, the 3:4 crop squished into 1:1, what the
+   *     TensorFlow.js graph expects (see endofile-model-context.tsx).
+   *
+   * Returns null only if the browser refuses to allocate a 2D context for
+   * either canvas; otherwise the caller can rely on both being usable.
+   */
+  const buildCaptureArtifacts = (
+    source: CanvasImageSource,
+    sourceWidth: number,
+    sourceHeight: number,
+  ): { displayDataUrl: string; modelCanvas: HTMLCanvasElement } | null => {
+    const { sx, sy, cropW, cropH } = get3by4CropBounds(sourceWidth, sourceHeight);
+
+    const displayCanvas = document.createElement('canvas');
+    displayCanvas.width = 480;
+    displayCanvas.height = 640;
+    const displayCtx = displayCanvas.getContext('2d');
+    if (!displayCtx) return null;
+
+    const modelCanvas = document.createElement('canvas');
+    modelCanvas.width = 480;
+    modelCanvas.height = 480;
+    const modelCtx = modelCanvas.getContext('2d');
+    if (!modelCtx) return null;
+
+    displayCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 480, 640);
+    modelCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 480, 480);
+
+    return {
+      displayDataUrl: displayCanvas.toDataURL('image/jpeg'),
+      modelCanvas,
+    };
+  };
+
   // Capture frame from camera stream, VALIDATE, then predict
   const capturePhoto = async () => {
     if (isAnalyzing) return;
@@ -337,97 +375,83 @@ export function CameraContextProvider({
     setShowFlashOverlay(true);
     setTimeout(() => setShowFlashOverlay(false), 200);
 
-    if (videoRef.current && cameraAvailable) {
-      const videoElement = videoRef.current;
-      const vw = videoElement.videoWidth || 640;
-      const vh = videoElement.videoHeight || 480;
-
-      const { sx, sy, cropW, cropH } = get3by4CropBounds(vw, vh);
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 480;
-      canvas.height = 480;
-
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(videoElement, sx, sy, cropW, cropH, 0, 0, 480, 480);
-        const capturedDataUrl = canvas.toDataURL('image/jpeg');
-        setSelectedPhotoUrl(capturedDataUrl);
-
-        // 1. Run independent validations BEFORE sending to model
-        const valResults = await validateAllImages(canvas, validationConfig);
-        setValidationResults(valResults);
-
-        if (valResults.hasErrors) {
-          console.warn("[Validation Gate] Photo has quality warnings:", valResults.warnings);
-        }
-
-        // 2. Proceed with model prediction
-        const top3 = await predict(canvas);
-        if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
-          addScanHistoryItem({
-            id: createScanId(),
-            classId: top3[0].classId,
-            photoUrl: capturedDataUrl,
-            timestamp: Date.now(),
-          });
-        }
-      }
-    } else {
+    if (!videoRef.current || !cameraAvailable) {
       setLimaDetected('mg3-blue_1-sv');
+      return;
+    }
+
+    const videoElement = videoRef.current;
+    const vw = videoElement.videoWidth || 640;
+    const vh = videoElement.videoHeight || 480;
+
+    const artifacts = buildCaptureArtifacts(videoElement, vw, vh);
+    if (!artifacts) return;
+
+    setSelectedPhotoUrl(artifacts.displayDataUrl);
+
+    // 1. Run independent validations BEFORE sending to model
+    const valResults = await validateAllImages(artifacts.modelCanvas, validationConfig);
+    setValidationResults(valResults);
+
+    if (valResults.hasErrors) {
+      console.warn("[Validation Gate] Photo has quality warnings:", valResults.warnings);
+    }
+
+    // 2. Proceed with model prediction
+    const top3 = await predict(artifacts.modelCanvas);
+    if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
+      addScanHistoryItem({
+        id: createScanId(),
+        classId: top3[0].classId,
+        photoUrl: artifacts.displayDataUrl,
+        timestamp: Date.now(),
+      });
     }
   };
 
   // Predict on uploaded custom image file with 3:4 crop & pre-validations
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = new Image();
-        img.src = reader.result as string;
-        img.onload = async () => {
-          try {
-            const iw = img.naturalWidth || img.width;
-            const ih = img.naturalHeight || img.height;
+    if (!file) return;
 
-            const { sx, sy, cropW, cropH } = get3by4CropBounds(iw, ih);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result as string;
+      img.onload = async () => {
+        try {
+          const iw = img.naturalWidth || img.width;
+          const ih = img.naturalHeight || img.height;
 
-            const canvas = document.createElement('canvas');
-            canvas.width = 480;
-            canvas.height = 480;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, 480, 480);
-              const croppedDataUrl = canvas.toDataURL('image/jpeg');
-              setSelectedPhotoUrl(croppedDataUrl);
+          const artifacts = buildCaptureArtifacts(img, iw, ih);
+          if (!artifacts) return;
 
-              // 1. Run independent validations BEFORE sending to model
-              const valResults = await validateAllImages(canvas, validationConfig);
-              setValidationResults(valResults);
+          setSelectedPhotoUrl(artifacts.displayDataUrl);
 
-              if (valResults.hasErrors) {
-                console.warn("[Validation Gate] Uploaded file has quality warnings:", valResults.warnings);
-              }
+          // 1. Run independent validations BEFORE sending to model
+          const valResults = await validateAllImages(artifacts.modelCanvas, validationConfig);
+          setValidationResults(valResults);
 
-              // 2. Proceed with model prediction
-              const top3 = await predict(canvas);
-              if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
-                addScanHistoryItem({
-                  id: createScanId(),
-                  classId: top3[0].classId,
-                  photoUrl: croppedDataUrl,
-                  timestamp: Date.now(),
-                });
-              }
-            }
-          } catch (err) {
-            console.error("Uploaded file prediction error:", err);
+          if (valResults.hasErrors) {
+            console.warn("[Validation Gate] Uploaded file has quality warnings:", valResults.warnings);
           }
-        };
+
+          // 2. Proceed with model prediction
+          const top3 = await predict(artifacts.modelCanvas);
+          if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
+            addScanHistoryItem({
+              id: createScanId(),
+              classId: top3[0].classId,
+              photoUrl: artifacts.displayDataUrl,
+              timestamp: Date.now(),
+            });
+          }
+        } catch (err) {
+          console.error("Uploaded file prediction error:", err);
+        }
       };
-      reader.readAsDataURL(file);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   const resetDetection = () => {
