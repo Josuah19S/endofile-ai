@@ -258,6 +258,37 @@ export function CameraContextProvider({
     requestCameraAccessRef.current = requestCameraAccess;
   });
 
+  // Periodic 1-second async image quality validation loop for live camera stream
+  useEffect(() => {
+    if (!stream || isCameraPaused || selectedPhotoUrl) return;
+
+    let isMounted = true;
+    let isValidating = false;
+
+    const intervalId = setInterval(async () => {
+      if (!isMounted || isValidating || !videoRef.current) return;
+      const video = videoRef.current;
+      if (video.readyState < 2 || video.paused || video.ended) return;
+
+      try {
+        isValidating = true;
+        const valResults = await validateAllImages(video, validationConfig);
+        if (isMounted && !selectedPhotoUrl) {
+          setValidationResults(valResults);
+        }
+      } catch (err) {
+        // Silent catch for live stream validation loop
+      } finally {
+        isValidating = false;
+      }
+    }, 1000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
+  }, [stream, isCameraPaused, selectedPhotoUrl, validationConfig]);
+
   useEffect(() => {
     if (!cameraAvailable) return;
 

@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "app/components/camera-context.tsx": {
-    "mtime": 1785769714.5718377,
-    "ast_hash": "d13c5c43a13e8accb106db8905edba21",
+    "mtime": 1785772298.2176104,
+    "ast_hash": "6006603e7a2ad65db9c658bbc2adce8a",
     "semantic_hash": ""
   },
   "app/components/camera-detection-badge.tsx": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/components/loading-screen.tsx": {
-    "mtime": 1785735983.2175226,
-    "ast_hash": "4401dcf58ad3bc343b3b93b101c144e0",
+    "mtime": 1785770503.9655807,
+    "ast_hash": "38ee2caf5fe0df91d6b2034018eaf8ba",
     "semantic_hash": ""
   },
   "app/components/primitives.tsx": {

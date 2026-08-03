@@ -469,7 +469,7 @@
       "label": "useEndofileAi()",
       "file_type": "code",
       "source_file": "app/components/endofile-model-context.tsx",
-      "source_location": "L206",
+      "source_location": "L223",
       "_origin": "ast",
       "id": "app_components_endofile_model_context_useendofileai",
       "community": 0,
@@ -4400,7 +4400,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/components/endofile-model-context.tsx",
-      "source_location": "L206",
+      "source_location": "L223",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_endofile_model_context",
@@ -7778,5 +7778,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f61d15fbecfc04a240fe1b373f6eecab052ade24"
+  "built_at_commit": "868353201e5b619f9fdcf63fe2589ff6c46d5841"
 }
