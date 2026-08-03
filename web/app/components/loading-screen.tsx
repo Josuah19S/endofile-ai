@@ -45,35 +45,23 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background text-on-surface p-6 select-none overflow-hidden">
-      {/* Background Image (16:9, centered horizontally for mobile) */}
+    <div className="relative flex flex-col items-center justify-between min-h-screen min-h-dvh bg-background text-on-surface p-4 md:p-6 select-none overflow-hidden">
+      {/* Background Image (16:9, centered horizontally for mobile, increased visibility) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <NextImage
           src="/elements/bg_permission.jpg"
           alt="Fondo de Clínica Endodóntica"
           fill
-          className="object-cover object-center opacity-40 brightness-75"
+          className="object-cover object-center opacity-65 brightness-90"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/80" />
       </div>
 
-      <div className={`${loadingStyles.contentWrapper} relative z-10`}>
-        {/* AI Robot Hero Illustration */}
-        <div className="relative w-48 h-48 md:w-56 md:h-56 mb-4 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl animate-pulse" />
-          <NextImage
-            src="/elements/ai-nobg.png"
-            alt="Endofile AI Robot"
-            width={240}
-            height={240}
-            className="object-contain relative z-10 drop-shadow-[0_12px_24px_rgba(34,173,250,0.35)] animate-fade-in"
-            priority
-          />
-        </div>
-        
+      {/* Top Floating Glass Card (Title, Subtitle & Action CTA) */}
+      <div className="relative z-20 w-full max-w-sm mt-6 md:mt-10 p-6 rounded-3xl bg-surface-container-low/85 backdrop-blur-md border border-outline/70 shadow-2xl flex flex-col items-center text-center">
         {/* Title */}
-        <h1 className={loadingStyles.brandTitle}>
+        <h1 className="text-3xl font-extrabold text-on-surface tracking-tight mb-3 font-headline">
           <span className="text-primary font-black">Endofile</span> AI
         </h1>
 
@@ -95,7 +83,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
         )}
 
         {status === 'requesting' && (
-          <div className="flex flex-col items-center mt-6">
+          <div className="flex flex-col items-center my-4">
             <div className={loadingStyles.spinnerContainer}>
               <div className={loadingStyles.spinnerRing}></div>
             </div>
@@ -120,6 +108,22 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
             </button>
           </>
         )}
+      </div>
+
+      {/* AI Robot Pinned to Bottom, Centered Horizontally (60-70% height) */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full flex justify-center pointer-events-none">
+        {/* Soft Cyan Ambient Radial Glow */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-primary/25 blur-3xl" />
+
+        <div className="relative h-[62vh] md:h-[68vh] max-h-[700px] w-auto aspect-square flex items-end justify-center">
+          <NextImage
+            src="/elements/ai-nobg.png"
+            alt="Endofile AI Robot"
+            fill
+            className="object-contain object-bottom drop-shadow-[0_15px_30px_rgba(34,173,250,0.4)] animate-fade-in"
+            priority
+          />
+        </div>
       </div>
     </div>
   );
