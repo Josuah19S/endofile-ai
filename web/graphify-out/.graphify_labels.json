@@ -5,19 +5,15 @@
   "3": "compilerOptions",
   "4": "endofile-model-context.tsx",
   "5": "dependencies",
-  "6": "icons.tsx",
+  "6": "validation-settings-modal.tsx",
   "7": "devDependencies",
   "8": "generate-photo-manifest.mjs",
   "9": "opencv.js",
   "10": "layout.tsx",
   "11": "README.md",
-  "12": "colors.ts",
   "13": "eslint.config.mjs",
   "14": "GEMINI.md",
   "15": "next.config.ts",
   "16": "postcss.config.mjs",
-  "17": "primitives.tsx",
-  "18": "validation-settings-modal.tsx",
-  "19": "camera-context.tsx",
-  "20": "loading-styles.ts"
+  "19": "camera-context.tsx"
 }

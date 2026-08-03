@@ -1,114 +1,4 @@
 {
-  "app/components/camera-bottom-bar.tsx": {
-    "mtime": 1785782077.9088483,
-    "ast_hash": "9fc78a39968ad838707d1b1c2997857a",
-    "semantic_hash": ""
-  },
-  "app/components/camera-context.tsx": {
-    "mtime": 1785773882.631203,
-    "ast_hash": "df1ec8a0531930eed3c7b9715fae4483",
-    "semantic_hash": ""
-  },
-  "app/components/camera-detection-badge.tsx": {
-    "mtime": 1785769542.209673,
-    "ast_hash": "0b2851acb2cb381a84d50a2942f93425",
-    "semantic_hash": ""
-  },
-  "app/components/camera-header.tsx": {
-    "mtime": 1785640090.8047328,
-    "ast_hash": "af50f22aebd01b31ba5a3101d5d6b6b1",
-    "semantic_hash": ""
-  },
-  "app/components/camera-screen-shell.tsx": {
-    "mtime": 1785782077.9098485,
-    "ast_hash": "639228bd200238c77cefbbc2c26aa79f",
-    "semantic_hash": ""
-  },
-  "app/components/camera-screen.tsx": {
-    "mtime": 1785014374.931843,
-    "ast_hash": "d666be921b574c3980d981af7c282021",
-    "semantic_hash": ""
-  },
-  "app/components/camera-viewport.tsx": {
-    "mtime": 1785431652.7086778,
-    "ast_hash": "a895c8814461f5007324009956fa7ae4",
-    "semantic_hash": ""
-  },
-  "app/components/catalog-file-row.tsx": {
-    "mtime": 1785638356.6590238,
-    "ast_hash": "1d745d21c76a8d58608406bf4a24389e",
-    "semantic_hash": ""
-  },
-  "app/components/efile-detection-card.tsx": {
-    "mtime": 1785019812.4232225,
-    "ast_hash": "3d175457782a7993dc1761370aeec151",
-    "semantic_hash": ""
-  },
-  "app/components/endofile-detection-card.tsx": {
-    "mtime": 1785098800.8080328,
-    "ast_hash": "78cc67b5921507ec922dc626eed614e1",
-    "semantic_hash": ""
-  },
-  "app/components/endofile-model-context.tsx": {
-    "mtime": 1785769491.4499466,
-    "ast_hash": "2957dfe18287e7298f4482ba3172a929",
-    "semantic_hash": ""
-  },
-  "app/components/file-catalog-view.tsx": {
-    "mtime": 1785638356.6590238,
-    "ast_hash": "cbc420fe24b13c19ae7038013a2b2d2f",
-    "semantic_hash": ""
-  },
-  "app/components/file-detail-view.tsx": {
-    "mtime": 1785720361.4788947,
-    "ast_hash": "cbf84ef15db1b775014f133e890dacca",
-    "semantic_hash": ""
-  },
-  "app/components/icons.tsx": {
-    "mtime": 1784569614.7784612,
-    "ast_hash": "167346f0b798a87b73804de643e1a5a2",
-    "semantic_hash": ""
-  },
-  "app/components/image-validation-banner.tsx": {
-    "mtime": 1785639961.304297,
-    "ast_hash": "80c6b16dd0c6f7ad526549a620c61a1c",
-    "semantic_hash": ""
-  },
-  "app/components/image-validation-context.tsx": {
-    "mtime": 1785641716.772527,
-    "ast_hash": "cd2cd8cfb848b02b6fd338079b3d9759",
-    "semantic_hash": ""
-  },
-  "app/components/loading-screen.tsx": {
-    "mtime": 1785783266.42867,
-    "ast_hash": "b6fc8085b5bd020f55aff43f81055eca",
-    "semantic_hash": ""
-  },
-  "app/components/primitives.tsx": {
-    "mtime": 1781975307.141029,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "app/components/recent-detections-view.tsx": {
-    "mtime": 1785640612.051191,
-    "ast_hash": "160d1f09cfca4e527329fd48e85b7f3d",
-    "semantic_hash": ""
-  },
-  "app/components/sidebar.tsx": {
-    "mtime": 1785720144.3195262,
-    "ast_hash": "70b32ba534b147262b77f8a5413c56f7",
-    "semantic_hash": ""
-  },
-  "app/components/validation-settings-modal.tsx": {
-    "mtime": 1785642264.3775961,
-    "ast_hash": "6cc9d661cb968a4e6a67f4f7ea8c7517",
-    "semantic_hash": ""
-  },
-  "app/constants/colors.ts": {
-    "mtime": 1783369778.0371196,
-    "ast_hash": "303032060c23cc1a5fc1d21794728e90",
-    "semantic_hash": ""
-  },
   "app/constants/endofile-classes.ts": {
     "mtime": 1785644445.9092517,
     "ast_hash": "9aa077fc65a91b45297cd74630597977",
@@ -150,18 +40,13 @@
     "semantic_hash": ""
   },
   "app/page.tsx": {
-    "mtime": 1785640671.0528638,
-    "ast_hash": "af6065edaac99232c7767c69d3de861c",
+    "mtime": 1785783598.0419087,
+    "ast_hash": "73a57cc36674362a635ed0d6b6c59ed3",
     "semantic_hash": ""
   },
   "app/styles/camera-styles.ts": {
     "mtime": 1785720266.4688416,
     "ast_hash": "6f3b8415ff8a465f3eb75d680ec7ac87",
-    "semantic_hash": ""
-  },
-  "app/styles/loading-styles.ts": {
-    "mtime": 1785018900.145866,
-    "ast_hash": "648c52510d8620dc27d23e6fc43d8ed6",
     "semantic_hash": ""
   },
   "eslint.config.mjs": {
@@ -349,11 +234,6 @@
     "ast_hash": "a2760511c65806022ad20adf74370ff3",
     "semantic_hash": ""
   },
-  "app/components/user-guide-modal.tsx": {
-    "mtime": 1785716775.9828978,
-    "ast_hash": "ae77adf8aa9c4f6625f7ecaf277d9124",
-    "semantic_hash": ""
-  },
   "public/file_photos/3d-files_1-s30.png": {
     "mtime": 1785716775.9828978,
     "ast_hash": "d62d7b5555a06b0b58482baae177e886",
@@ -522,6 +402,101 @@
   "public/file_photos/slim-shaper_zs3.png": {
     "mtime": 1785782077.9158485,
     "ast_hash": "a9b767e30bfe07c65b58f74b9dac90c1",
+    "semantic_hash": ""
+  },
+  "app/components/camera/camera-bottom-bar.tsx": {
+    "mtime": 1785783604.1449356,
+    "ast_hash": "c207015c36b14ff43f4ee309fe8c1d14",
+    "semantic_hash": ""
+  },
+  "app/components/camera/camera-detection-badge.tsx": {
+    "mtime": 1785783604.1459355,
+    "ast_hash": "5a5a9eb6b580493aec397292660ff2c6",
+    "semantic_hash": ""
+  },
+  "app/components/camera/camera-header.tsx": {
+    "mtime": 1785783604.1429355,
+    "ast_hash": "0cce414142ed098eb4724ea2a45c0a84",
+    "semantic_hash": ""
+  },
+  "app/components/camera/camera-screen-shell.tsx": {
+    "mtime": 1785783599.6079154,
+    "ast_hash": "65b7e3b59cfdbcb614e3a040f80fb176",
+    "semantic_hash": ""
+  },
+  "app/components/camera/camera-screen.tsx": {
+    "mtime": 1785783598.1159089,
+    "ast_hash": "992baa1425c89515f482e9e677496164",
+    "semantic_hash": ""
+  },
+  "app/components/camera/camera-viewport.tsx": {
+    "mtime": 1785783604.1419356,
+    "ast_hash": "ad9a17609c6345cfc555b35586286229",
+    "semantic_hash": ""
+  },
+  "app/components/camera/loading-screen.tsx": {
+    "mtime": 1785783266.42867,
+    "ast_hash": "b6fc8085b5bd020f55aff43f81055eca",
+    "semantic_hash": ""
+  },
+  "app/components/file/catalog-file-row.tsx": {
+    "mtime": 1785783608.7964134,
+    "ast_hash": "b65ada03dea58cd5285eb9b394e67097",
+    "semantic_hash": ""
+  },
+  "app/components/file/detection-card.tsx": {
+    "mtime": 1785783609.7279606,
+    "ast_hash": "a796e561609a0bfdd624844046e146d5",
+    "semantic_hash": ""
+  },
+  "app/components/file/file-catalog-view.tsx": {
+    "mtime": 1785783606.7959473,
+    "ast_hash": "b99f23c0b5571b0bbbf3b8f05217a764",
+    "semantic_hash": ""
+  },
+  "app/components/file/file-detail-view.tsx": {
+    "mtime": 1785783608.6139555,
+    "ast_hash": "912c99f8029e5296508bca32cc5aadee",
+    "semantic_hash": ""
+  },
+  "app/components/file/recent-detections-view.tsx": {
+    "mtime": 1785783609.2559586,
+    "ast_hash": "b9bad7f6d18e9a6b797175de847d486c",
+    "semantic_hash": ""
+  },
+  "app/components/overlays/image-validation-banner.tsx": {
+    "mtime": 1785783612.8239748,
+    "ast_hash": "751704736113d3ddbb024c72350707f8",
+    "semantic_hash": ""
+  },
+  "app/components/overlays/sidebar.tsx": {
+    "mtime": 1785720144.3195262,
+    "ast_hash": "70b32ba534b147262b77f8a5413c56f7",
+    "semantic_hash": ""
+  },
+  "app/components/overlays/user-guide-modal.tsx": {
+    "mtime": 1785716775.9828978,
+    "ast_hash": "ae77adf8aa9c4f6625f7ecaf277d9124",
+    "semantic_hash": ""
+  },
+  "app/components/overlays/validation-settings-modal.tsx": {
+    "mtime": 1785783612.8259747,
+    "ast_hash": "44f994893ab098175089a74e6fbe0d8d",
+    "semantic_hash": ""
+  },
+  "app/contexts/camera-context.tsx": {
+    "mtime": 1785773882.631203,
+    "ast_hash": "df1ec8a0531930eed3c7b9715fae4483",
+    "semantic_hash": ""
+  },
+  "app/contexts/endofile-model-context.tsx": {
+    "mtime": 1785769491.4499466,
+    "ast_hash": "2957dfe18287e7298f4482ba3172a929",
+    "semantic_hash": ""
+  },
+  "app/contexts/image-validation-context.tsx": {
+    "mtime": 1785641716.772527,
+    "ast_hash": "cd2cd8cfb848b02b6fd338079b3d9759",
     "semantic_hash": ""
   }
 }

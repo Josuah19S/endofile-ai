@@ -1,9 +1,9 @@
 "use client";
 import { useState } from 'react';
-import LoadingScreen from "@/app/components/loading-screen";
-import CameraScreen from "@/app/components/camera-screen";
-import { EndofileContextProvider } from "@/app/components/endofile-model-context";
-import { ImageValidationProvider } from './components/image-validation-context';
+import LoadingScreen from "@/app/components/camera/loading-screen";
+import CameraScreen from "@/app/components/camera/camera-screen";
+import { EndofileContextProvider } from "@/app/contexts/endofile-model-context";
+import { ImageValidationProvider } from './contexts/image-validation-context';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);

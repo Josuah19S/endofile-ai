@@ -2,8 +2,8 @@
 import React from 'react';
 import NextImage from 'next/image';
 import { CameraOff, ChevronRight } from 'lucide-react';
-import type { CatalogEntry } from '../constants/endofile-dataset';
-import { getFilePhoto } from '../constants/endofile-photos';
+import type { CatalogEntry } from '../../constants/endofile-dataset';
+import { getFilePhoto } from '../../constants/endofile-photos';
 
 interface CatalogFileRowProps {
   entry: CatalogEntry;

@@ -1,6 +1,6 @@
 "use client";
 import NextImage from 'next/image';
-import { getEndoFileInfo } from '../constants/endofile-dataset';
+import { getEndoFileInfo } from '../../constants/endofile-dataset';
 import { FileText } from 'lucide-react';
 
 export interface EFileDetectionCardProps {

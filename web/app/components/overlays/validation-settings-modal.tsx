@@ -1,7 +1,7 @@
 "use client";
 
 import { Sliders, RotateCcw, X, Focus, Moon, ZoomIn, Check } from 'lucide-react';
-import { useImageValidation } from './image-validation-context';
+import { useImageValidation } from '../../contexts/image-validation-context';
 
 interface ValidationSettingsModalProps {
   isOpen: boolean;

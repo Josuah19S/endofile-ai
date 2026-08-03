@@ -1,7 +1,7 @@
 "use client";
 import NextImage from 'next/image';
-import { getEndoFileInfo } from '../constants/endofile-dataset';
-import { getFilePhoto } from '../constants/endofile-photos';
+import { getEndoFileInfo } from '../../constants/endofile-dataset';
+import { getFilePhoto } from '../../constants/endofile-photos';
 import { FileText, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FileDetailViewProps {

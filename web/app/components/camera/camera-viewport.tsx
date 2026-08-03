@@ -2,9 +2,9 @@
 import React from 'react';
 import NextImage from 'next/image';
 import { Scan } from 'lucide-react';
-import { cameraStyles } from '../styles/camera-styles';
-import { useCamera } from './camera-context';
-import { useEndofileAi } from './endofile-model-context';
+import { cameraStyles } from '../../styles/camera-styles';
+import { useCamera } from '../../contexts/camera-context';
+import { useEndofileAi } from '../../contexts/endofile-model-context';
 
 export default function CameraViewport() {
   const {

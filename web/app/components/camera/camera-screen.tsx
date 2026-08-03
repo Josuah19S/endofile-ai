@@ -1,5 +1,5 @@
 "use client";
-import { CameraContextProvider } from './camera-context';
+import { CameraContextProvider } from '../../contexts/camera-context';
 import CameraScreenShell from './camera-screen-shell';
 
 interface CameraScreenProps {

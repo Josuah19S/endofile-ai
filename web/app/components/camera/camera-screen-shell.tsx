@@ -1,22 +1,22 @@
 "use client";
 import React, { useRef, useState } from 'react';
 import NextImage from 'next/image';
-import { cameraStyles } from '../styles/camera-styles';
-import Sidebar from './sidebar';
+import { cameraStyles } from '../../styles/camera-styles';
+import Sidebar from '../overlays/sidebar';
 import CameraHeader from './camera-header';
 import CameraViewport from './camera-viewport';
 import CameraDetectionBadge from './camera-detection-badge';
 import CameraBottomBar from './camera-bottom-bar';
-import RecentDetectionsView from './recent-detections-view';
-import FileCatalogView from './file-catalog-view';
-import FileDetailView from './file-detail-view';
-import UserGuideModal from './user-guide-modal';
-import { useCamera } from './camera-context';
+import RecentDetectionsView from '../file/recent-detections-view';
+import FileCatalogView from '../file/file-catalog-view';
+import FileDetailView from '../file/file-detail-view';
+import UserGuideModal from '../overlays/user-guide-modal';
+import { useCamera } from '../../contexts/camera-context';
 
-import { useEndofileAi } from './endofile-model-context';
+import { useEndofileAi } from '../../contexts/endofile-model-context';
 
-import ImageValidationBanner from './image-validation-banner';
-import ValidationSettingsModal from './validation-settings-modal';
+import ImageValidationBanner from '../overlays/image-validation-banner';
+import ValidationSettingsModal from '../overlays/validation-settings-modal';
 
 type DrawerView = 'recents' | 'catalog' | 'detail';
 

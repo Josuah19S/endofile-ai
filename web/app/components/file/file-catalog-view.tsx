@@ -1,7 +1,7 @@
 "use client";
 import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import { BookOpen, Search, SearchX, X } from 'lucide-react';
-import { searchEndoFiles } from '../constants/endofile-dataset';
+import { searchEndoFiles } from '../../constants/endofile-dataset';
 import CatalogFileRow from './catalog-file-row';
 
 interface FileCatalogViewProps {

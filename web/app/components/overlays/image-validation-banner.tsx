@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AlertTriangle, Moon, Focus, ZoomIn } from 'lucide-react';
-import { ImageValidationResults } from '../lib/image-validations';
+import { ImageValidationResults } from '../../lib/image-validations';
 
 interface ImageValidationBannerProps {
   results: ImageValidationResults | null;

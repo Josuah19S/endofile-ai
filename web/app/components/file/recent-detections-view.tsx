@@ -1,7 +1,7 @@
 "use client";
 import { History, Loader2, Trash2, TriangleAlert } from 'lucide-react';
-import EFileDetectionCard from './efile-detection-card';
-import { useEndofileAi } from './endofile-model-context';
+import EFileDetectionCard from './detection-card';
+import { useEndofileAi } from '../../contexts/endofile-model-context';
 
 interface RecentDetectionsViewProps {
   onSelectCard?: (classId: string, photoUrl?: string | null) => void;

@@ -1,9 +1,9 @@
 "use client";
 import React from 'react';
 import { Upload, RefreshCw, History, ChevronDown, RotateCcw } from 'lucide-react';
-import { cameraStyles } from '../styles/camera-styles';
-import { useCamera } from './camera-context';
-import { useEndofileAi } from './endofile-model-context';
+import { cameraStyles } from '../../styles/camera-styles';
+import { useCamera } from '../../contexts/camera-context';
+import { useEndofileAi } from '../../contexts/endofile-model-context';
 
 interface CameraBottomBarProps {
   expanded: boolean;

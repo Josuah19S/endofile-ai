@@ -29,7 +29,7 @@
       "label": "CameraBottomBar()",
       "file_type": "code",
       "source_file": "app/components/camera-bottom-bar.tsx",
-      "source_location": "L16",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "app_components_camera_bottom_bar_camerabottombar",
       "community": 0,
@@ -1173,7 +1173,7 @@
       "label": "getFilePhoto()",
       "file_type": "code",
       "source_file": "app/constants/endofile-photos.ts",
-      "source_location": "L50",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "app_constants_endofile_photos_getfilephoto",
       "community": 1,
@@ -1715,8 +1715,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_styles_loading_styles",
-      "community": 19,
-      "community_name": "camera-context.tsx",
+      "community": 20,
+      "community_name": "loading-styles.ts",
       "norm_label": "loading-styles.ts"
     },
     {
@@ -1726,8 +1726,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "app_styles_loading_styles_loadingstyles",
-      "community": 19,
-      "community_name": "camera-context.tsx",
+      "community": 20,
+      "community_name": "loading-styles.ts",
       "norm_label": "loadingstyles"
     },
     {
@@ -2847,7 +2847,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/components/camera-bottom-bar.tsx",
-      "source_location": "L16",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_camera_bottom_bar",
@@ -2955,7 +2955,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/components/camera-bottom-bar.tsx",
-      "source_location": "L30",
+      "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_camera_bottom_bar_camerabottombar",
@@ -2967,7 +2967,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/components/camera-bottom-bar.tsx",
-      "source_location": "L35",
+      "source_location": "L38",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_camera_bottom_bar_camerabottombar",
@@ -5398,30 +5398,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/components/loading-screen.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "app_components_loading_screen",
-      "target": "app_styles_loading_styles",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/components/loading-screen.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "app_components_loading_screen",
-      "target": "app_styles_loading_styles_loadingstyles",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
@@ -5875,7 +5851,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/constants/endofile-photos.ts",
-      "source_location": "L50",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_constants_endofile_photos",
@@ -7778,5 +7754,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "fb1df754ed9ff24470527770996e72ad7351e478"
+  "built_at_commit": "465021064444940b829f090aa904aa0d6934b512"
 }
