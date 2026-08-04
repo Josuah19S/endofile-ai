@@ -164,10 +164,10 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
       // Debug log: top 10 ranked classes per prediction. Dev-only, kept commented
       // for quick re-enable during debugging. Uncomment to inspect raw confidences.
-      // console.log(`[TF.js Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
-      
+      console.log(`[TF.js Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
+
       // Confidence threshold check (2% minimum probability across all 47 classes)
-      const MIN_CONFIDENCE_THRESHOLD = 0.02;
+      const MIN_CONFIDENCE_THRESHOLD = 0.35;
       const topConfidence = top3[0]?.confidence || 0;
 
       if (topConfidence < MIN_CONFIDENCE_THRESHOLD) {
