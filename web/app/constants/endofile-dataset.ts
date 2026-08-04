@@ -604,6 +604,46 @@ export const ENDOFILE_DICTIONARY: Record<string, EndoFileDetails> = {
     velocidadMax: 500,
     torque: 3,
   },
+  // Alias under the id the current (28-class) model emits — see the 3D-Files note above.
+  'slim-shaper_1-zs1': {
+    id: 'slim-shaper_1-zs1',
+    sistema: 'Slim-Shaper',
+    numero: 1,
+    nombre: 'ZS1',
+    diametroApical: 15,
+    longitud: 25,
+    conicidad: 0.02,
+    conicidadAlt: 0.06,
+    velocidadMin: 300,
+    velocidadMax: 500,
+    torque: 3,
+  },
+  'slim-shaper_2-zs2': {
+    id: 'slim-shaper_2-zs2',
+    sistema: 'Slim-Shaper',
+    numero: 2,
+    nombre: 'ZS2',
+    diametroApical: 20,
+    longitud: 25,
+    conicidad: 0.04,
+    conicidadAlt: 0.03,
+    velocidadMin: 300,
+    velocidadMax: 500,
+    torque: 3,
+  },
+  'slim-shaper_3-zs3': {
+    id: 'slim-shaper_3-zs3',
+    sistema: 'Slim-Shaper',
+    numero: 3,
+    nombre: 'ZS3',
+    diametroApical: 25,
+    longitud: 25,
+    conicidad: 0.04,
+    conicidadAlt: 0.03,
+    velocidadMin: 300,
+    velocidadMax: 500,
+    torque: 3,
+  },
 
   // MicroMega One Curve Mini Assorted
   'micromega-one-curve-mini-assorted_1-n45-0.4': {
@@ -658,6 +698,59 @@ export const ENDOFILE_DICTIONARY: Record<string, EndoFileDetails> = {
     velocidadMax: 450,
     torque: 2.5,
   },
+  // Alias under the id the current (28-class) model emits — see the 3D-Files note above.
+  'micromega-one-curve-mini_1-n45-0.4': {
+    id: 'micromega-one-curve-mini_1-n45-0.4',
+    sistema: 'MicroMega One Curve Mini',
+    numero: 1,
+    nombre: 'N45 4%',
+    diametroApical: 45,
+    longitud: 25,
+    longitudesAdicionales: [21, 31],
+    conicidad: 0.04,
+    velocidadMin: 300,
+    velocidadMax: 450,
+    torque: 2.5,
+  },
+  'micromega-one-curve-mini_2-n35-0.4': {
+    id: 'micromega-one-curve-mini_2-n35-0.4',
+    sistema: 'MicroMega One Curve Mini',
+    numero: 2,
+    nombre: 'N35 4%',
+    diametroApical: 35,
+    longitud: 25,
+    longitudesAdicionales: [21, 31],
+    conicidad: 0.04,
+    velocidadMin: 300,
+    velocidadMax: 450,
+    torque: 2.5,
+  },
+  'micromega-one-curve-mini_3-n25-0.6': {
+    id: 'micromega-one-curve-mini_3-n25-0.6',
+    sistema: 'MicroMega One Curve Mini',
+    numero: 3,
+    nombre: 'N25 6%',
+    diametroApical: 25,
+    longitud: 25,
+    longitudesAdicionales: [21, 31],
+    conicidad: 0.06,
+    velocidadMin: 300,
+    velocidadMax: 450,
+    torque: 2.5,
+  },
+  'micromega-one-curve-mini_4-n25-0.4': {
+    id: 'micromega-one-curve-mini_4-n25-0.4',
+    sistema: 'MicroMega One Curve Mini',
+    numero: 4,
+    nombre: 'N25 4%',
+    diametroApical: 25,
+    longitud: 25,
+    longitudesAdicionales: [21, 31],
+    conicidad: 0.04,
+    velocidadMin: 300,
+    velocidadMax: 450,
+    torque: 2.5,
+  },
 };
 
 /**
@@ -692,16 +785,21 @@ export function getEndoFileInfo(classId: string | null): EndoFileDetails | null 
  *
  * Deliberately separate from `FILE_CLASSES`: this is the reference list the user browses,
  * while `FILE_CLASSES` is the model's output contract. The two overlap but neither contains
- * the other — MG3-Blue and S-Blue (9 files) are listed here with no class in the model, and
- * so carry `detectable: false`.
+ * the other — the current (28-class) model only covers Blue-Shaper, MG3-Blue, Apical-Shaper,
+ * 3D-Files, Rising, Slim-Shaper and MicroMega One Curve Mini. Re-Treaty, S-Blue, RC-Blue,
+ * Super-Files-III and MicroMega-Remover (19 files) are listed here with no class in the
+ * model, and so carry `detectable: false` until a future model covers them again.
  *
  * `Blue-Shaper` is the one system with no row in the CSV: its ficha exists only here and in
  * the dictionary, and its four files duplicate MG3-Blue's first four field for field, which
  * suggests they are the same instruments under the model's naming. Unresolved on purpose —
  * merging them is a data decision, not a rendering one.
  *
- * 3D-Files holds two aliases per file in the dictionary; the ids used here are the ones the
- * model emits, so catalog, detection and detail all key on the same string.
+ * 3D-Files, Slim-Shaper and MicroMega One Curve Mini each hold two aliases per file in the
+ * dictionary — one under the retired 47-class model's ids (kept so history captured under
+ * the old model still resolves a ficha) and one under the ids the current model emits. The
+ * ids used here are always the ones the current model emits, so catalog, detection and
+ * detail key on the same string.
  */
 export const CATALOG_FILE_IDS = [
   're-treaty_1-bully', 're-treaty_2-skinny', 're-treaty_3-shapy1',
@@ -713,12 +811,12 @@ export const CATALOG_FILE_IDS = [
   'super-files-iii_1-sx', 'super-files-iii_2-s1', 'super-files-iii_3-s2',
   'super-files-iii_4-f1', 'super-files-iii_5-f2', 'super-files-iii_6-f3',
   'apical-shaper_1-z30', 'apical-shaper_2-z35', 'apical-shaper_3-z40', 'apical-shaper_4-z50',
-  '3d-files_2-f25', '3d-files_3-f30', '3d-files_1-s30',
+  '3d-files_1-f25', '3d-files_2-f30', '3d-files_3-s30',
   'micromega-remover_1-n30',
   'rising_1-17', 'rising_2-13', 'rising_3-25', 'rising_4-30', 'rising_5-28',
-  'slim-shaper_zs1', 'slim-shaper_zs2', 'slim-shaper_zs3',
-  'micromega-one-curve-mini-assorted_1-n45-0.4', 'micromega-one-curve-mini-assorted_2-n35-0.4',
-  'micromega-one-curve-mini-assorted_3-n25-0.6', 'micromega-one-curve-mini-assorted_4-n25-0.4',
+  'slim-shaper_1-zs1', 'slim-shaper_2-zs2', 'slim-shaper_3-zs3',
+  'micromega-one-curve-mini_1-n45-0.4', 'micromega-one-curve-mini_2-n35-0.4',
+  'micromega-one-curve-mini_3-n25-0.6', 'micromega-one-curve-mini_4-n25-0.4',
 ] as const;
 
 /** Lookup for the detectable flag below. */
