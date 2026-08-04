@@ -130,10 +130,11 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       const inputTensor = tf.tidy(() => {
         const tensor = tf.browser.fromPixels(src);
         const resized = tf.image.resizeBilinear(tensor, [448, 448]);
+        // The model has its own Rescaling + Normalization layers baked into the graph
+        // (1/255 then ImageNet mean/std, see model/README.md §3) and expects raw [0, 255]
+        // pixels — normalizing here a second time would feed it a near-constant input.
         const casted = resized.cast('float32');
-        // Normalización EfficientNet: [0, 255] → [-1, 1]
-        const normalized = casted.div(127.5).sub(1.0);
-        return normalized.expandDims(0);
+        return casted.expandDims(0);
       });
 
       // Execute graph model asynchronously
