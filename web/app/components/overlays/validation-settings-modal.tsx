@@ -31,7 +31,7 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
           </button>
         </div>
 
-        {/* OpenCV Status indicator */}
+  {/* OpenCV Status indicator */}
         <div className="flex items-center justify-between text-xs px-3 py-2 rounded-xl bg-surface-container-lowest border border-outline/70">
           <span className="text-on-surface-variant">Motor de Visión OpenCV.js:</span>
           {isOpenCvLoading ? (
@@ -45,13 +45,20 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
           )}
         </div>
 
+        {/* Intro: what the gates do, in clinical terms. */}
+        <p className="text-[11px] leading-relaxed text-on-surface-variant">
+          Antes de clasificar la imagen, el sistema aplica tres controles de calidad. Si alguno
+          falla, el resultado se sigue mostrando como <em>identificación tentativa</em>; use estos
+          umbrales para ajustar qué tan estricta es la advertencia.
+        </p>
+
         {/* Sliders Form */}
         <div className="space-y-4 text-sm">
-          {/* 1. Sensibilidad de Enfoque */}
+          {/* 1. Nitidez */}
           <div className="space-y-1.5 p-3 rounded-xl bg-surface-container-low border border-outline/60">
             <div className="flex items-center justify-between">
               <label className="font-semibold flex items-center gap-1.5 text-xs uppercase tracking-wider text-on-surface-variant">
-                <Focus size={15} className="text-amber-400" /> Sensibilidad de Enfoque
+                <Focus size={15} className="text-amber-400" /> Nitidez de la Foto
               </label>
               <span className="text-xs font-bold text-primary">
                 {config.thresholdBlur < 50
@@ -77,11 +84,11 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
             </div>
           </div>
 
-          {/* 2. Nivel de Iluminación */}
+          {/* 2. Iluminación */}
           <div className="space-y-1.5 p-3 rounded-xl bg-surface-container-low border border-outline/60">
             <div className="flex items-center justify-between">
               <label className="font-semibold flex items-center gap-1.5 text-xs uppercase tracking-wider text-on-surface-variant">
-                <Moon size={15} className="text-blue-400" /> Nivel de Iluminación Mínimo
+                <Moon size={15} className="text-blue-400" /> Iluminación Mínima
               </label>
               <span className="text-xs font-bold text-primary">
                 {config.thresholdBrightness < 35
@@ -107,10 +114,10 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
             </div>
           </div>
 
-          {/* 3. Encuadre y Distancia */}
+          {/* 3. Tamaño de la lima */}
           <div className="space-y-2.5 p-3 rounded-xl bg-surface-container-low border border-outline/60">
             <label className="font-semibold flex items-center gap-1.5 text-xs uppercase tracking-wider text-on-surface-variant">
-              <ZoomIn size={15} className="text-rose-400" /> Distancia y Encuadre de Lima
+              <ZoomIn size={15} className="text-rose-400" /> Tamaño de la Lima en Pantalla
             </label>
 
             <div className="space-y-1">

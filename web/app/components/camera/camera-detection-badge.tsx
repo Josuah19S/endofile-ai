@@ -1,12 +1,35 @@
 "use client";
 import React from 'react';
-import { CheckCircle, AlertTriangle, Camera, Focus, Moon, ZoomIn, HelpCircle } from 'lucide-react';
+import { CheckCircle, Camera, Focus, Moon, ZoomIn, HelpCircle } from 'lucide-react';
 import { cameraStyles } from '../../styles/camera-styles';
 import { useCamera } from '../../contexts/camera-context';
 import { useEndofileAi } from '../../contexts/endofile-model-context';
 
 interface CameraDetectionBadgeProps {
   onOpenDetail?: (classId: string) => void;
+}
+
+/** Formats a model class id (`re-treaty_1-bully`) into display name (`1° Bully`). */
+function formatClassName(classId: string): { system: string; orderAndName: string } | null {
+  const parts = classId.split('_');
+  if (parts.length < 2) return null;
+
+  const system = parts[0].replace(/-/g, ' ');
+  const fileRaw = parts.slice(1).join('_');
+
+  let orderStr: string | null = null;
+  let fileName = fileRaw.replace(/-/g, ' ');
+
+  if (fileRaw.includes('-')) {
+    const dashParts = fileRaw.split('-');
+    orderStr = `${dashParts[0]}°`;
+    fileName = dashParts.slice(1).join(' ').replace(/-/g, ' ');
+  }
+
+  return {
+    system,
+    orderAndName: orderStr ? `${orderStr} ${fileName}` : fileName,
+  };
 }
 
 export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBadgeProps) {
@@ -19,11 +42,14 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
   const darkError = validationResults?.dark.isDark;
   const tooFarError = validationResults?.tooFar.isTooFar;
 
+  const hasMatch = limaDetected && !isUnidentified;
+  const predictedName = hasMatch ? formatClassName(limaDetected!) : null;
+
   return (
     <div className={cameraStyles.infoOverlayContainer}>
       <div
         className={`${cameraStyles.infoCard} ${
-          limaDetected && !isUnidentified
+          hasMatch
             ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)] cursor-pointer hover:border-primary'
             : isUnidentified || hasValidationErrors
             ? 'border-amber-500/60 bg-surface-container-low shadow-[0_10px_25px_rgba(245,158,11,0.15)]'
@@ -33,7 +59,7 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
         {/* State Icon */}
         <div
           className={`${cameraStyles.infoIconContainer} ${
-            limaDetected && !isUnidentified
+            hasMatch
               ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50'
               : isUnidentified || hasValidationErrors
               ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
@@ -44,7 +70,7 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
             <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           ) : isUnidentified ? (
             <HelpCircle size={14} className="animate-pulse text-amber-400" />
-          ) : limaDetected ? (
+          ) : hasMatch ? (
             <CheckCircle size={14} className="animate-scale-in" />
           ) : hasValidationErrors ? (
             blurError ? (
@@ -63,8 +89,8 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
         <div
           className="flex-1 min-w-0"
           onClick={() => {
-            if (limaDetected && !isUnidentified && onOpenDetail) {
-              onOpenDetail(limaDetected);
+            if (hasMatch && onOpenDetail) {
+              onOpenDetail(limaDetected!);
             }
           }}
         >
@@ -86,39 +112,17 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
                   ? 'Imagen muy oscura. Encienda la luz o el flash.'
                   : 'Lima muy lejos. Acerque la cámara a la lima.'}
               </span>
-            ) : limaDetected ? (
-              (() => {
-                const parts = limaDetected.split('_');
-                if (parts.length >= 2) {
-                  const system = parts[0].replace(/-/g, ' ');
-                  const fileRaw = parts.slice(1).join('_');
-
-                  let orderStr: string | null = null;
-                  let fileName = fileRaw.replace(/-/g, ' ');
-
-                  if (fileRaw.includes('-')) {
-                    const dashParts = fileRaw.split('-');
-                    orderStr = `${dashParts[0]}°`;
-                    fileName = dashParts.slice(1).join(' ').replace(/-/g, ' ');
-                  }
-
-                  return (
-                    <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
-                      <span className="text-on-surface-variant font-normal">Lima detectada:</span>
-                      <span className="text-xs font-medium text-on-surface-variant/80">{system}</span>
-                      <span className="text-sm font-semibold text-on-surface">
-                        {orderStr ? `${orderStr} ${fileName}` : fileName}
-                      </span>
-                    </span>
-                  );
-                }
-                return (
-                  <span>
-                    <span className="text-on-surface-variant font-normal">Lima detectada:</span>{' '}
-                    <span className="text-sm font-semibold text-on-surface">{limaDetected.replace(/-/g, ' ')}</span>
-                  </span>
-                );
-              })()
+            ) : hasMatch && predictedName ? (
+              <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                <span className="text-on-surface-variant font-normal">Lima detectada:</span>
+                <span className="text-xs font-medium text-on-surface-variant/80">{predictedName.system}</span>
+                <span className="text-sm font-semibold text-on-surface">{predictedName.orderAndName}</span>
+              </span>
+            ) : hasMatch && limaDetected ? (
+              <span>
+                <span className="text-on-surface-variant font-normal">Lima detectada:</span>{' '}
+                <span className="text-sm font-semibold text-on-surface">{limaDetected.replace(/-/g, ' ')}</span>
+              </span>
             ) : (
               <span className="text-emerald-400 font-medium text-xs flex items-center gap-1">
                 Lista para tomar foto
