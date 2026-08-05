@@ -115,7 +115,7 @@ export default function CameraScreenShell() {
       {/* Background Image (16:9, centered horizontally for mobile) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <NextImage
-          src="/elements/bg_camera.png"
+          src="/elements/bg_camera.webp"
           alt="Fondo Cámara Clínica"
           fill
           className="object-cover object-center opacity-85 brightness-95"
@@ -130,7 +130,7 @@ export default function CameraScreenShell() {
          and shrank the visible height to ~33% of the container. */}
       <div className="absolute bottom-0 left-[10rem] right-[-30rem] sm:right-[-20rem] md:right-[-11rem] z-[5] h-[80vh] pointer-events-none">
         <NextImage
-          src="/elements/camera_screen_robot_arm.png"
+          src="/elements/camera_screen_robot_arm.webp"
           alt="Brazo del Robot"
           fill
           className="object-cover object-right"

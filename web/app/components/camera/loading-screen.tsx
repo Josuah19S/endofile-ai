@@ -46,7 +46,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
       {/* 1. Fullscreen Background Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <NextImage
-          src="/elements/bg_permission.jpg"
+          src="/elements/bg_permission.webp"
           alt="Fondo Clínica Endodoncia"
           fill
           className="object-cover object-center opacity-85 brightness-95"
@@ -58,7 +58,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[80vh] flex items-end justify-center pointer-events-none">
         <div className="relative w-full h-full max-w-5xl flex items-end justify-center">
           <NextImage
-            src="/elements/ai-nobg.png"
+            src="/elements/ai_nobg.webp"
             alt="Endofile AI Robot"
             fill
             className="object-contain object-bottom scale-[3] sm:scale-[1.35] md:scale-[1.2] origin-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
@@ -76,16 +76,18 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
 
       {/* 3. Superimposed Floating Glass Card (Containing Title, Subtitle, Description & Pill Button) */}
       <div className="relative z-20 w-full h-full flex flex-col items-center justify-around pb-6 px-4 md:pb-10 max-w-2xl mx-auto text-center pointer-events-auto">
-        <div className="h-1/3"></div>
         {/* Title & Subtitle Stack */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center mt-20 text-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
           <h1 className="text-3xl sm:text-4xl font-black text-[#22adfa] tracking-wider font-headline uppercase drop-shadow-md">
-            ENDOFILE AI
+            <span className="font-normal text-on-surface">ENDOFILE</span> AI
           </h1>
           <span className="text-on-surface font-extrabold text-xs sm:text-sm tracking-tight -mt-0.5">
             smart endo file recognition
           </span>
         </div>
+
+        <div className="h-1/3"></div>
+
         {/* rounded-3xl bg-surface-container-low/85 backdrop-blur-lg border border-outline/70 shadow-[0_20px_50px_rgba(0,0,0,0.6)] */}
         <div className="w-full max-w-sm sm:max-w-md p-6 sm:p-7 flex flex-col items-center text-center space-y-4">
           {status === 'idle' && (
