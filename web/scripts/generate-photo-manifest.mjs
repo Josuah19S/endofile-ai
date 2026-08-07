@@ -10,6 +10,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname, basename, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const WEB_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PHOTO_DIR = join(WEB_ROOT, 'public', 'file_photos');
@@ -17,14 +18,23 @@ const DATASET_FILE = join(WEB_ROOT, 'app', 'constants', 'endofile-dataset.ts');
 const OUT_FILE = join(WEB_ROOT, 'app', 'constants', 'endofile-photos.ts');
 const PUBLIC_PATH = '/file_photos';
 
-/** Width and height straight out of the PNG IHDR chunk, so the manifest never guesses. */
-function readPngSize(path) {
+/**
+ * Width, height and a content hash straight out of the PNG bytes, so the manifest never
+ * guesses. The hash becomes the `?v=` cache-buster: replacing a photo under the same
+ * filename changes the hash, which changes the `src` URL, which busts the browser's and
+ * Next's image-optimizer caches without anyone having to rename a file.
+ */
+function readPngInfo(path) {
   const buf = readFileSync(path);
   const isPng = buf.length > 24 && buf.readUInt32BE(0) === 0x89504e47;
   if (!isPng || buf.toString('ascii', 12, 16) !== 'IHDR') {
     throw new Error(`${basename(path)} no es un PNG válido.`);
   }
-  return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  return {
+    width: buf.readUInt32BE(16),
+    height: buf.readUInt32BE(20),
+    hash: createHash('sha256').update(buf).digest('hex').slice(0, 8),
+  };
 }
 
 /** Catalog ids, read from the source of truth so a typo in a filename is caught here. */
@@ -47,7 +57,7 @@ const photos = readdirSync(PHOTO_DIR)
         `${name}: solo se admite PNG. Conviértelo o amplía readPngSize() en este script.`
       );
     }
-    return { id: basename(name, ext), file: name, ...readPngSize(join(PHOTO_DIR, name)) };
+    return { id: basename(name, ext), file: name, ...readPngInfo(join(PHOTO_DIR, name)) };
   })
   .sort((a, b) => (catalogOrder.get(a.id) ?? Infinity) - (catalogOrder.get(b.id) ?? Infinity)
     || a.id.localeCompare(b.id));
@@ -60,7 +70,7 @@ for (const orphan of orphans) {
 }
 
 const entries = photos
-  .map(p => `  '${p.id}': { src: '${PUBLIC_PATH}/${p.file}', width: ${p.width}, height: ${p.height} },`)
+  .map(p => `  '${p.id}': { src: '${PUBLIC_PATH}/${p.file}?v=${p.hash}', width: ${p.width}, height: ${p.height} },`)
   .join('\n');
 
 writeFileSync(OUT_FILE, `// GENERATED FILE — do not edit by hand.
