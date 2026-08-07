@@ -101,7 +101,10 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         // Warm up the model (compiles WebGL shaders in the background to avoid first-click latency)
         console.log("Warming up model...");
         const dummyInput = tfjs.zeros([1, 448, 448, 3]);
-        const warmupPrediction = await loadedModel.executeAsync(dummyInput);
+        // Sync execute(): the graph has no control flow or dynamic output shapes (see
+        // model/README.md §5), so executeAsync()'s extra async round-trip buys nothing —
+        // it only exists for graphs that need it, and TF.js warns on every run otherwise.
+        const warmupPrediction = loadedModel.execute(dummyInput);
         tfjs.dispose(dummyInput);
         tfjs.dispose(warmupPrediction);
 
@@ -137,8 +140,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         return casted.expandDims(0);
       });
 
-      // Execute graph model asynchronously
-      const prediction = await model.executeAsync(inputTensor);
+      // Sync execute(): no control flow or dynamic shapes in this graph (see warm-up above).
+      const prediction = model.execute(inputTensor);
 
       let rawOutput: Float32Array;
       if (Array.isArray(prediction)) {
@@ -152,7 +155,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       // The graph already ends in a Softmax (Identity <- Softmax <- dense), so
       // rawOutput is a proper probability distribution that sums to 1. Applying
       // softmax a second time here would compress every confidence toward the
-      // uniform distribution (1/28 ≈ 3.6%) — argmax and top-3 would still be
+      // uniform distribution (1/29 ≈ 3.4%) — argmax and top-3 would still be
       // correct since softmax is monotone, but the numbers would be useless.
       // See model/README.md §4.
       const probabilities = rawArray;
@@ -169,7 +172,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       // for quick re-enable during debugging. Uncomment to inspect raw confidences.
       console.log(`[TF.js Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
 
-      // Confidence threshold check (35% minimum probability across all 28 classes)
+      // Confidence threshold check (35% minimum probability across all 29 classes)
       const MIN_CONFIDENCE_THRESHOLD = 0.35;
       const topConfidence = top3[0]?.confidence || 0;
 

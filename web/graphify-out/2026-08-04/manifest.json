@@ -1,17 +1,17 @@
 {
   "app/constants/endofile-classes.ts": {
-    "mtime": 1785901932.7951972,
-    "ast_hash": "076cf3dcab504716b28fa3e4c8d5c136",
+    "mtime": 1785644445.9092517,
+    "ast_hash": "9aa077fc65a91b45297cd74630597977",
     "semantic_hash": ""
   },
   "app/constants/endofile-dataset.ts": {
-    "mtime": 1785901932.7953973,
-    "ast_hash": "a7c39a9ae2295f11f7f56a9373d1cf42",
+    "mtime": 1785638356.6600237,
+    "ast_hash": "8cf3bc86fa236c99a33d56f023fd8603",
     "semantic_hash": ""
   },
   "app/constants/endofile-photos.ts": {
-    "mtime": 1785901932.7953973,
-    "ast_hash": "6348be0e9afd9c49186feb86a524fa72",
+    "mtime": 1785782077.9098485,
+    "ast_hash": "d6eed08c4cb0aff048e3a2ac5331db74",
     "semantic_hash": ""
   },
   "app/layout.tsx": {
@@ -40,7 +40,7 @@
     "semantic_hash": ""
   },
   "app/page.tsx": {
-    "mtime": 1785785161.5289936,
+    "mtime": 1785783598.0419087,
     "ast_hash": "73a57cc36674362a635ed0d6b6c59ed3",
     "semantic_hash": ""
   },
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "public/model_proto/model.json": {
-    "mtime": 1785901933.067549,
-    "ast_hash": "bca66a3b9ffff855a263ae8956cdcaa3",
+    "mtime": 1785633678.5087047,
+    "ast_hash": "561e7565d2c00b1d2ff8f72b9708305e",
     "semantic_hash": ""
   },
   "scripts/generate-photo-manifest.mjs": {
@@ -234,6 +234,21 @@
     "ast_hash": "a2760511c65806022ad20adf74370ff3",
     "semantic_hash": ""
   },
+  "public/file_photos/3d-files_1-s30.png": {
+    "mtime": 1785716775.9828978,
+    "ast_hash": "d62d7b5555a06b0b58482baae177e886",
+    "semantic_hash": ""
+  },
+  "public/file_photos/3d-files_2-f25.png": {
+    "mtime": 1785716775.983898,
+    "ast_hash": "63c53ae7ca064249c025e95b20f659c4",
+    "semantic_hash": ""
+  },
+  "public/file_photos/3d-files_3-f30.png": {
+    "mtime": 1785716775.983898,
+    "ast_hash": "48a0da0eb39570faacd779c098e69e40",
+    "semantic_hash": ""
+  },
   "public/file_photos/apical-shaper_1-z30.png": {
     "mtime": 1785782077.9108484,
     "ast_hash": "3994903f9bf34b2436e5b4de64e4ae93",
@@ -309,9 +324,39 @@
     "ast_hash": "83ceebf5b817e8b8a0d68cdb13796a38",
     "semantic_hash": ""
   },
+  "public/elements/bg_camera.jpg": {
+    "mtime": 1785731225.591517,
+    "ast_hash": "9755353c4dd820f0a36f83e6fd64868a",
+    "semantic_hash": ""
+  },
+  "public/elements/bg_permission.jpg": {
+    "mtime": 1785731249.1457124,
+    "ast_hash": "ea7e190801e9bc5bf51fe87e3fa4592d",
+    "semantic_hash": ""
+  },
   "public/elements/tap-here.gif": {
     "mtime": 1785735623.3605044,
     "ast_hash": "0d40c79c81e212c02130a2f74c6234ea",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_1-n45-0.4.png": {
+    "mtime": 1785782077.9118485,
+    "ast_hash": "fa39c8947cd44164b4d0a6c81086bf29",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_2-n35-0.4.png": {
+    "mtime": 1785782077.9118485,
+    "ast_hash": "f03569dd6fe6839866ba515bb008f303",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_3-n25-0.6.png": {
+    "mtime": 1785782077.9118485,
+    "ast_hash": "e608e636c300025dcabde4a0226926e3",
+    "semantic_hash": ""
+  },
+  "public/file_photos/micromega-one-curve-mini-assorted_4-n25-0.4.png": {
+    "mtime": 1785782077.9128485,
+    "ast_hash": "54d442ee8b54e839caf066959970f185",
     "semantic_hash": ""
   },
   "public/file_photos/micromega-remover_1-n30.png": {
@@ -344,169 +389,114 @@
     "ast_hash": "7e9277a7b172f7bd1fb2285dd5ccc619",
     "semantic_hash": ""
   },
+  "public/file_photos/slim-shaper_zs1.png": {
+    "mtime": 1785782077.9148486,
+    "ast_hash": "293cee34541a7af5e3e88d6c926f6639",
+    "semantic_hash": ""
+  },
+  "public/file_photos/slim-shaper_zs2.png": {
+    "mtime": 1785782077.9148486,
+    "ast_hash": "000bbed4263355ab23cb2db5708a9f19",
+    "semantic_hash": ""
+  },
+  "public/file_photos/slim-shaper_zs3.png": {
+    "mtime": 1785782077.9158485,
+    "ast_hash": "a9b767e30bfe07c65b58f74b9dac90c1",
+    "semantic_hash": ""
+  },
   "app/components/camera/camera-bottom-bar.tsx": {
-    "mtime": 1785790007.5174427,
-    "ast_hash": "fd92fbf6d4e7770cf2a4da9b3b1006b4",
+    "mtime": 1785783604.1449356,
+    "ast_hash": "c207015c36b14ff43f4ee309fe8c1d14",
     "semantic_hash": ""
   },
   "app/components/camera/camera-detection-badge.tsx": {
-    "mtime": 1785785161.5269935,
+    "mtime": 1785783604.1459355,
     "ast_hash": "5a5a9eb6b580493aec397292660ff2c6",
     "semantic_hash": ""
   },
   "app/components/camera/camera-header.tsx": {
-    "mtime": 1785785161.5269935,
+    "mtime": 1785783604.1429355,
     "ast_hash": "0cce414142ed098eb4724ea2a45c0a84",
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen-shell.tsx": {
-    "mtime": 1785901933.077618,
-    "ast_hash": "10452cc1ef8ee136a52662c533d349e2",
+    "mtime": 1785783599.6079154,
+    "ast_hash": "65b7e3b59cfdbcb614e3a040f80fb176",
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen.tsx": {
-    "mtime": 1785785161.5269935,
+    "mtime": 1785783598.1159089,
     "ast_hash": "992baa1425c89515f482e9e677496164",
     "semantic_hash": ""
   },
   "app/components/camera/camera-viewport.tsx": {
-    "mtime": 1785785161.5269935,
+    "mtime": 1785783604.1419356,
     "ast_hash": "ad9a17609c6345cfc555b35586286229",
     "semantic_hash": ""
   },
   "app/components/camera/loading-screen.tsx": {
-    "mtime": 1785901933.0780647,
-    "ast_hash": "65af84ad8761d7ba3b287162ef5f023b",
+    "mtime": 1785783266.42867,
+    "ast_hash": "b6fc8085b5bd020f55aff43f81055eca",
     "semantic_hash": ""
   },
   "app/components/file/catalog-file-row.tsx": {
-    "mtime": 1785785161.5269935,
+    "mtime": 1785783608.7964134,
     "ast_hash": "b65ada03dea58cd5285eb9b394e67097",
     "semantic_hash": ""
   },
   "app/components/file/detection-card.tsx": {
-    "mtime": 1785785161.5277643,
+    "mtime": 1785783609.7279606,
     "ast_hash": "a796e561609a0bfdd624844046e146d5",
     "semantic_hash": ""
   },
   "app/components/file/file-catalog-view.tsx": {
-    "mtime": 1785785161.5277643,
+    "mtime": 1785783606.7959473,
     "ast_hash": "b99f23c0b5571b0bbbf3b8f05217a764",
     "semantic_hash": ""
   },
   "app/components/file/file-detail-view.tsx": {
-    "mtime": 1785785161.5277643,
+    "mtime": 1785783608.6139555,
     "ast_hash": "912c99f8029e5296508bca32cc5aadee",
     "semantic_hash": ""
   },
   "app/components/file/recent-detections-view.tsx": {
-    "mtime": 1785789872.5407877,
-    "ast_hash": "a4d4d38006e7fd0406b2fe5ca9087663",
+    "mtime": 1785783609.2559586,
+    "ast_hash": "b9bad7f6d18e9a6b797175de847d486c",
     "semantic_hash": ""
   },
   "app/components/overlays/image-validation-banner.tsx": {
-    "mtime": 1785785161.5279937,
+    "mtime": 1785783612.8239748,
     "ast_hash": "751704736113d3ddbb024c72350707f8",
     "semantic_hash": ""
   },
   "app/components/overlays/sidebar.tsx": {
-    "mtime": 1785785161.5282912,
+    "mtime": 1785720144.3195262,
     "ast_hash": "70b32ba534b147262b77f8a5413c56f7",
     "semantic_hash": ""
   },
   "app/components/overlays/user-guide-modal.tsx": {
-    "mtime": 1785785161.5282912,
+    "mtime": 1785716775.9828978,
     "ast_hash": "ae77adf8aa9c4f6625f7ecaf277d9124",
     "semantic_hash": ""
   },
   "app/components/overlays/validation-settings-modal.tsx": {
-    "mtime": 1785785161.5282912,
+    "mtime": 1785783612.8259747,
     "ast_hash": "44f994893ab098175089a74e6fbe0d8d",
     "semantic_hash": ""
   },
   "app/contexts/camera-context.tsx": {
-    "mtime": 1785790155.4472818,
-    "ast_hash": "4a4b166b23fd5f338d4a9c4678569873",
+    "mtime": 1785773882.631203,
+    "ast_hash": "df1ec8a0531930eed3c7b9715fae4483",
     "semantic_hash": ""
   },
   "app/contexts/endofile-model-context.tsx": {
-    "mtime": 1785901932.7953973,
-    "ast_hash": "5b604e89d1ea5b395c5fa91711febcdd",
+    "mtime": 1785769491.4499466,
+    "ast_hash": "2957dfe18287e7298f4482ba3172a929",
     "semantic_hash": ""
   },
   "app/contexts/image-validation-context.tsx": {
-    "mtime": 1785785161.5289936,
+    "mtime": 1785641716.772527,
     "ast_hash": "cd2cd8cfb848b02b6fd338079b3d9759",
-    "semantic_hash": ""
-  },
-  "public/elements/ai_nobg.webp": {
-    "mtime": 1785901933.0804017,
-    "ast_hash": "e83ba9a17ef40c2abe357cf5e6971fcd",
-    "semantic_hash": ""
-  },
-  "public/elements/bg_camera.webp": {
-    "mtime": 1785901933.0854018,
-    "ast_hash": "89f8362312929be6c90f95d0e514c4db",
-    "semantic_hash": ""
-  },
-  "public/elements/bg_permission.webp": {
-    "mtime": 1785901933.0874019,
-    "ast_hash": "1d690ca268ee5e65115843730ff5d7e6",
-    "semantic_hash": ""
-  },
-  "public/elements/camera_screen_robot_arm.webp": {
-    "mtime": 1785901933.0894017,
-    "ast_hash": "ddc33e35fbd4c10c849f80c1f7919de8",
-    "semantic_hash": ""
-  },
-  "public/file_photos/3d-files_1-f25.png": {
-    "mtime": 1785901932.838398,
-    "ast_hash": "63c53ae7ca064249c025e95b20f659c4",
-    "semantic_hash": ""
-  },
-  "public/file_photos/3d-files_2-f30.png": {
-    "mtime": 1785901932.8393981,
-    "ast_hash": "48a0da0eb39570faacd779c098e69e40",
-    "semantic_hash": ""
-  },
-  "public/file_photos/3d-files_3-s30.png": {
-    "mtime": 1785901932.840398,
-    "ast_hash": "d62d7b5555a06b0b58482baae177e886",
-    "semantic_hash": ""
-  },
-  "public/file_photos/micromega-one-curve-mini_1-n45-0.4.png": {
-    "mtime": 1785901932.840398,
-    "ast_hash": "fa39c8947cd44164b4d0a6c81086bf29",
-    "semantic_hash": ""
-  },
-  "public/file_photos/micromega-one-curve-mini_2-n35-0.4.png": {
-    "mtime": 1785901932.8415298,
-    "ast_hash": "f03569dd6fe6839866ba515bb008f303",
-    "semantic_hash": ""
-  },
-  "public/file_photos/micromega-one-curve-mini_3-n25-0.6.png": {
-    "mtime": 1785901932.8422146,
-    "ast_hash": "e608e636c300025dcabde4a0226926e3",
-    "semantic_hash": ""
-  },
-  "public/file_photos/micromega-one-curve-mini_4-n25-0.4.png": {
-    "mtime": 1785901932.8426285,
-    "ast_hash": "54d442ee8b54e839caf066959970f185",
-    "semantic_hash": ""
-  },
-  "public/file_photos/slim-shaper_1-zs1.png": {
-    "mtime": 1785901932.8429928,
-    "ast_hash": "293cee34541a7af5e3e88d6c926f6639",
-    "semantic_hash": ""
-  },
-  "public/file_photos/slim-shaper_2-zs2.png": {
-    "mtime": 1785901932.8434944,
-    "ast_hash": "000bbed4263355ab23cb2db5708a9f19",
-    "semantic_hash": ""
-  },
-  "public/file_photos/slim-shaper_3-zs3.png": {
-    "mtime": 1785901932.844398,
-    "ast_hash": "a9b767e30bfe07c65b58f74b9dac90c1",
     "semantic_hash": ""
   }
 }

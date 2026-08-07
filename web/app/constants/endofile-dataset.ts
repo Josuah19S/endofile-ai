@@ -604,7 +604,7 @@ export const ENDOFILE_DICTIONARY: Record<string, EndoFileDetails> = {
     velocidadMax: 500,
     torque: 3,
   },
-  // Alias under the id the current (28-class) model emits — see the 3D-Files note above.
+  // Alias under the id the current (v2) model emits — see the 3D-Files note above.
   'slim-shaper_1-zs1': {
     id: 'slim-shaper_1-zs1',
     sistema: 'Slim Shaper',
@@ -698,7 +698,7 @@ export const ENDOFILE_DICTIONARY: Record<string, EndoFileDetails> = {
     velocidadMax: 450,
     torque: 2.5,
   },
-  // Alias under the id the current (28-class) model emits — see the 3D-Files note above.
+  // Alias under the id the current (v2) model emits — see the 3D-Files note above.
   'micromega-one-curve-mini_1-n45-0.4': {
     id: 'micromega-one-curve-mini_1-n45-0.4',
     sistema: 'MicroMega One Curve Mini',
@@ -785,11 +785,10 @@ export function getEndoFileInfo(classId: string | null): EndoFileDetails | null 
  *
  * Deliberately separate from `FILE_CLASSES`: this is the reference list the user browses,
  * while `FILE_CLASSES` is the model's output contract. The two overlap but neither contains
- * the other — the current model covers Blue Shaper, MG3 Blue, Apical Shaper, 3D Files,
- * Rising, Slim Shaper, MicroMega One Curve Mini and MicroMega Remover (the last pending
- * the v2 graph — see the note on `FILE_CLASSES`). Re Treaty, S Blue, RC Blue and
- * Super Files III (18 files) are listed here with no class in the model, and so carry
- * `detectable: false` until a future model covers them again.
+ * the other — the current (v2) model covers Blue Shaper, MG3 Blue, Apical Shaper, 3D Files,
+ * Rising, Slim Shaper, MicroMega One Curve Mini and MicroMega Remover (29 classes / 8
+ * systems). Re Treaty, S Blue, RC Blue and Super Files III (18 files) are listed here with
+ * no class in the model, and so carry `detectable: false` until a future model covers them.
  *
  * `Blue Shaper` is the one system with no row in the CSV: its ficha exists only here and in
  * the dictionary, and its four files duplicate MG3 Blue's first four field for field, which
