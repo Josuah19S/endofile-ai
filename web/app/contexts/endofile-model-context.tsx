@@ -1,10 +1,11 @@
 "use client"
-import React, { createContext, useContext, useState, useEffect } from "react"
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
 import type { GraphModel } from "@tensorflow/tfjs"
 import { FILE_CLASSES } from "@/app/constants/endofile-classes"
 import {
   MAX_HISTORY_ITEMS,
   clearScanHistory,
+  createScanId,
   isHistoryStorageAvailable,
   loadScanHistory,
   saveScanItem,
@@ -21,6 +22,14 @@ export interface TopPrediction {
 export type { RecentScanItem };
 
 type PredictionSource = HTMLCanvasElement | HTMLImageElement | HTMLVideoElement | ImageData | ImageBitmap;
+
+/**
+ * How many ranked candidates we keep after each prediction. The top one is shown in
+ * the detection badge; the rest (up to TOP_N - 1) are surfaced as tappable chips in
+ * the bottom bar so the doctor can pick an alternative when the model's top guess
+ * is wrong — see feat/transition-detector-helper.
+ */
+const TOP_N = 6;
 
 export interface EndofileAiContextType {
   tf: TensorFlow | null;
@@ -39,6 +48,18 @@ export interface EndofileAiContextType {
   historyPersisted: boolean;
   setLimaDetected: React.Dispatch<React.SetStateAction<string | null>>;
   isAnalyzing: boolean;
+  /**
+   * Lock in one of the model's predictions as the final detection. Updates
+   * `limaDetected`, persists the scan to history, and clears the pending
+   * alternatives so the bottom bar collapses back to its idle layout.
+   * No-op when the class is the synthetic "Lima no identificada" sentinel.
+   */
+  confirmCandidate: (classId: string, photoUrl?: string | null) => void;
+  /**
+   * True after a fresh prediction until either confirmCandidate runs or the
+   * prediction is reset. Drives the bottom-bar "alternatives" view.
+   */
+  pendingConfirmation: boolean;
 }
 
 const EndofileAiContext = createContext<EndofileAiContextType | null>(null);
@@ -50,6 +71,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
   const [historyHydrated, setHistoryHydrated] = useState(false);
   const [historyPersisted, setHistoryPersisted] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  /** True after a fresh prediction, until confirmCandidate or a reset runs. */
+  const [pendingConfirmation, setPendingConfirmation] = useState(false);
 
   // Read the persisted history after mounting on the client. Starting from an empty array
   // keeps the server and the first client render identical, so no hydration mismatch.
@@ -123,11 +146,30 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
     };
   }, []);
 
+  /**
+   * Lock in `classId` as the final detection and persist it to history.
+   * The photoUrl comes from the caller (camera-context) because the model
+   * context doesn't own the captured frame.
+   */
+  const confirmCandidate = useCallback((classId: string, photoUrl?: string | null) => {
+    if (!classId || classId === 'Lima no identificada') return;
+    setLimaDetected(classId);
+    setPendingConfirmation(false);
+    if (photoUrl) {
+      addScanHistoryItem({
+        id: createScanId(),
+        classId,
+        photoUrl,
+        timestamp: Date.now(),
+      });
+    }
+  }, []);
 
   const predict = async (src: PredictionSource): Promise<TopPrediction[]> => {
     if (isAnalyzing || !tf || !model) return [];
     setIsAnalyzing(true);
     setLimaDetected(null);
+    setPendingConfirmation(true);
     try {
       // Wrap intermediate preprocessing tensors in tf.tidy to prevent WebGL memory leaks
       const inputTensor = tf.tidy(() => {
@@ -166,7 +208,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         confidence: probabilities[idx] || 0,
       })).sort((a, b) => b.confidence - a.confidence);
 
-      const top3 = ranked.slice(0, 3);
+      const topN = ranked.slice(0, TOP_N);
 
       // Debug log: top 10 ranked classes per prediction. Dev-only, kept commented
       // for quick re-enable during debugging. Uncomment to inspect raw confidences.
@@ -174,36 +216,41 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
       // Confidence threshold check (35% minimum probability across all 29 classes)
       const MIN_CONFIDENCE_THRESHOLD = 0.35;
-      const topConfidence = top3[0]?.confidence || 0;
+      const topConfidence = topN[0]?.confidence || 0;
 
       if (topConfidence < MIN_CONFIDENCE_THRESHOLD) {
         console.warn(`[TF.js Low Confidence]: Highest class probability was only ${(topConfidence * 100).toFixed(2)}% (< 2%).`);
         setLimaDetected('Lima no identificada');
-        setTopPredictions([{ classId: 'Lima no identificada', confidence: topConfidence }, ...top3]);
+        setTopPredictions([{ classId: 'Lima no identificada', confidence: topConfidence }, ...topN]);
 
         // Clean up WebGL tensors completely after prediction
         tf.dispose(inputTensor);
         tf.dispose(prediction);
 
-        return [{ classId: 'Lima no identificada', confidence: topConfidence }, ...top3];
+        // No confirmation needed for the synthetic "unidentified" sentinel — the
+        // doctor will retake rather than confirm a non-prediction.
+        setPendingConfirmation(false);
+
+        return [{ classId: 'Lima no identificada', confidence: topConfidence }, ...topN];
       }
 
-      setTopPredictions(top3);
+      setTopPredictions(topN);
 
-      const bestOption = top3[0]?.classId || 'Clase desconocida';
+      const bestOption = topN[0]?.classId || 'Clase desconocida';
       setLimaDetected(bestOption);
 
       // Clean up WebGL tensors completely after prediction
       tf.dispose(inputTensor);
       tf.dispose(prediction);
 
-      console.log(`[TF.js Top 3 Predictions]:\n` + top3.map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
+      console.log(`[TF.js Top ${TOP_N} Predictions]:\n` + topN.map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
       console.log(`[TF.js Memory] Active Tensors after prediction: ${tf.memory().numTensors}`);
 
-      return top3;
+      return topN;
     } catch (err) {
       console.error("Capture prediction error:", err);
       setLimaDetected("Error al analizar");
+      setPendingConfirmation(false);
       return [];
     } finally {
       setIsAnalyzing(false);
@@ -226,6 +273,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       historyPersisted,
       setLimaDetected,
       isAnalyzing,
+      confirmCandidate,
+      pendingConfirmation,
     }}>
       {children}
     </EndofileAiContext.Provider>

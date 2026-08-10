@@ -1,46 +1,28 @@
 "use client";
 import React from 'react';
-import { CheckCircle, Camera, Focus, Moon, ZoomIn, HelpCircle } from 'lucide-react';
+import { CheckCircle, Camera, Focus, Moon, ZoomIn, HelpCircle, Check, ListChecks } from 'lucide-react';
 import { cameraStyles } from '../../styles/camera-styles';
 import { useCamera } from '../../contexts/camera-context';
 import { useEndofileAi } from '../../contexts/endofile-model-context';
+import { formatClassName } from '../../lib/format-class-name';
 
 interface CameraDetectionBadgeProps {
   onOpenDetail?: (classId: string) => void;
+  /**
+   * Open the alternatives drawer — wired up to the camera-screen-shell so the
+   * bottom bar grows to display the next-best candidates.
+   */
+  onOpenAlternatives?: () => void;
 }
 
-/** Formats a model class id (`re-treaty_1-bully`) into display name (`1° Bully`). */
-function formatClassName(classId: string): { system: string; orderAndName: string } | null {
-  const parts = classId.split('_');
-  if (parts.length < 2) return null;
-
-  const system = parts[0].replace(/-/g, ' ');
-  const fileRaw = parts.slice(1).join('_');
-
-  let orderStr: string | null = null;
-  let fileName = fileRaw.replace(/-/g, ' ');
-
-  if (fileRaw.includes('-')) {
-    const dashParts = fileRaw.split('-');
-    orderStr = `${dashParts[0]}°`;
-    fileName = dashParts.slice(1).join(' ').replace(/-/g, ' ');
-  }
-
-  return {
-    system,
-    orderAndName: orderStr ? `${orderStr} ${fileName}` : fileName,
-  };
-}
-
-export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBadgeProps) {
-  const { resetDetection, validationResults, selectedPhotoUrl } = useCamera();
-  const { limaDetected, isAnalyzing } = useEndofileAi();
+export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives }: CameraDetectionBadgeProps) {
+  const { validationResults, selectedPhotoUrl, lockInDetection } = useCamera();
+  const { limaDetected, isAnalyzing, pendingConfirmation } = useEndofileAi();
 
   const isUnidentified = limaDetected === 'Lima no identificada';
   const hasValidationErrors = validationResults?.hasErrors;
   const blurError = validationResults?.blur.isBlurry;
   const darkError = validationResults?.dark.isDark;
-  const tooFarError = validationResults?.tooFar.isTooFar;
 
   const hasMatch = limaDetected && !isUnidentified;
   const predictedName = hasMatch ? formatClassName(limaDetected!) : null;
@@ -131,13 +113,42 @@ export default function CameraDetectionBadge({ onOpenDetail }: CameraDetectionBa
           </p>
         </div>
 
-        {(limaDetected || selectedPhotoUrl || hasValidationErrors) && (
-          <button
-            onClick={resetDetection}
-            className="text-xs text-on-surface-variant hover:text-on-surface font-medium px-2.5 py-1 rounded-lg hover:bg-surface-variant/50 transition-colors cursor-pointer"
-          >
-            Limpiar
-          </button>
+        {/*
+          Confirmation affordances — appear while the model has a pending pick.
+          Two side-by-side buttons: "Confirmar" locks in the main prediction
+          shown in the badge; "Otras alternativas" opens the drawer so the
+          doctor can pick a different candidate when the model's top guess
+          is wrong (feat/transition-detector-helper).
+        */}
+        {pendingConfirmation && hasMatch && (
+          <div className="shrink-0 flex items-center gap-1.5">
+            {onOpenAlternatives && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenAlternatives();
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline text-on-surface text-xs font-semibold hover:bg-surface-container-highest active:scale-95 transition-all cursor-pointer"
+                aria-label="Ver otras alternativas"
+                title="Ver otras alternativas"
+              >
+                <ListChecks size={14} />
+                Otras alternativas
+              </button>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                lockInDetection(limaDetected!);
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-md"
+              aria-label="Confirmar identificación"
+              title="Confirmar esta identificación"
+            >
+              <Check size={14} />
+              Confirmar
+            </button>
+          </div>
         )}
       </div>
     </div>

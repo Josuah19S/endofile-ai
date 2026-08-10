@@ -15,6 +15,13 @@ interface CameraBottomBarProps {
   children?: React.ReactNode;
 }
 
+/**
+ * Standard bottom action bar. When the camera-screen-shell has an active drawer
+ * view it renders the view (recents / catalog / detail / alternatives) inside
+ * `children` and grows the bar to roughly two-thirds of the viewport. When no
+ * drawer is open the bar is the compact h-24 strip with upload, shutter,
+ * recents and switch-camera controls.
+ */
 export default function CameraBottomBar({
   expanded,
   fullHeight = false,
@@ -39,12 +46,13 @@ export default function CameraBottomBar({
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${expanded
-        ? fullHeight
-          ? 'h-[calc(100dvh-96px)] max-h-[calc(100dvh-96px)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
-          : 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
-        : 'h-24'
-        }`}
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
+        expanded
+          ? fullHeight
+            ? 'h-[calc(100dvh-96px)] max-h-[calc(100dvh-96px)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
+            : 'h-[65vh] max-h-[70vh] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
+          : 'h-24'
+      }`}
     >
       {expanded ? (
         /* Expanded Drawer Container holding children views */

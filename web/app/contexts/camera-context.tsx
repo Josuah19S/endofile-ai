@@ -1,7 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useEndofileAi } from './endofile-model-context';
-import { createScanId } from '@/app/lib/history-store';
 import { isMobileDevice } from '@/app/lib/device-detection';
 import {
   validateAllImages,
@@ -53,6 +52,15 @@ export interface CameraContextType {
   setSelectedPhotoUrl: React.Dispatch<React.SetStateAction<string | null>>;
   toggleCameraPause: () => void;
 
+  /**
+   * Lock in the doctor's choice as the final detection. Takes the picked
+   * class id; the captured photo is supplied by the camera context.
+   * No-op if no photo has been captured.
+   */
+  lockInDetection: (classId: string) => void;
+  /** True when a prediction has run but the doctor has not yet confirmed a candidate. */
+  pendingConfirmation: boolean;
+
   recentsExpanded: boolean;
   setRecentsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 
@@ -98,7 +106,7 @@ export function CameraContextProvider({
   // Latest stream, so teardown never acts on a stale render-time closure
   const streamRef = useRef<MediaStream | null>(initialStream);
 
-  const { predict, isAnalyzing, setLimaDetected, addScanHistoryItem } = useEndofileAi();
+  const { predict, isAnalyzing, setLimaDetected, confirmCandidate, pendingConfirmation } = useEndofileAi();
 
   // Enumerate all video inputs to allow switching between lenses
   const enumerateCameras = async () => {
@@ -376,6 +384,7 @@ export function CameraContextProvider({
     setTimeout(() => setShowFlashOverlay(false), 200);
 
     if (!videoRef.current || !cameraAvailable) {
+      // WHAT
       setLimaDetected('mg3-blue_1-sv');
       return;
     }
@@ -387,6 +396,10 @@ export function CameraContextProvider({
     const artifacts = buildCaptureArtifacts(videoElement, vw, vh);
     if (!artifacts) return;
 
+    // New capture supersedes the previous prediction. Clearing limaDetected
+    // up front keeps the badge from flashing the old result while the new
+    // photo is being validated and (if it passes) predicted.
+    setLimaDetected(null);
     setSelectedPhotoUrl(artifacts.displayDataUrl);
 
     // 1. Run independent validations BEFORE sending to model
@@ -395,18 +408,16 @@ export function CameraContextProvider({
 
     if (valResults.hasErrors) {
       console.warn("[Validation Gate] Photo has quality warnings:", valResults.warnings);
+      // Validation failed: don't bother running the model on a blurry / dark /
+      // poorly-framed shot. The doctor needs to retake; no prediction, no
+      // alternatives, nothing to confirm.
+      return;
     }
 
-    // 2. Proceed with model prediction
-    const top3 = await predict(artifacts.modelCanvas);
-    if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
-      addScanHistoryItem({
-        id: createScanId(),
-        classId: top3[0].classId,
-        photoUrl: artifacts.displayDataUrl,
-        timestamp: Date.now(),
-      });
-    }
+    // 2. Proceed with model prediction. Persistence happens only when the doctor
+    //    confirms a candidate (see confirmCandidate) — pendingConfirmation stays
+    //    true so the bottom bar can offer the alternatives.
+    await predict(artifacts.modelCanvas);
   };
 
   // Predict on uploaded custom image file with 3:4 crop & pre-validations
@@ -426,6 +437,7 @@ export function CameraContextProvider({
           const artifacts = buildCaptureArtifacts(img, iw, ih);
           if (!artifacts) return;
 
+          setLimaDetected(null);
           setSelectedPhotoUrl(artifacts.displayDataUrl);
 
           // 1. Run independent validations BEFORE sending to model
@@ -434,18 +446,12 @@ export function CameraContextProvider({
 
           if (valResults.hasErrors) {
             console.warn("[Validation Gate] Uploaded file has quality warnings:", valResults.warnings);
+            // Same gate as live capture: skip the model on a bad photo.
+            return;
           }
 
-          // 2. Proceed with model prediction
-          const top3 = await predict(artifacts.modelCanvas);
-          if (top3 && top3.length > 0 && top3[0].classId !== 'Lima no identificada') {
-            addScanHistoryItem({
-              id: createScanId(),
-              classId: top3[0].classId,
-              photoUrl: artifacts.displayDataUrl,
-              timestamp: Date.now(),
-            });
-          }
+          // 2. Proceed with model prediction (no auto-save — confirmation required).
+          await predict(artifacts.modelCanvas);
         } catch (err) {
           console.error("Uploaded file prediction error:", err);
         }
@@ -458,6 +464,16 @@ export function CameraContextProvider({
     setLimaDetected(null);
     setSelectedPhotoUrl(null);
     setValidationResults(null);
+  };
+
+  /**
+   * Lock in the doctor's pick as the detection result. Thin wrapper around the
+   * model context's confirmCandidate that supplies the captured frame as the
+   * photoUrl for history persistence.
+   */
+  const lockInDetection = (classId: string) => {
+    if (!selectedPhotoUrl) return;
+    confirmCandidate(classId, selectedPhotoUrl);
   };
 
   return (
@@ -483,6 +499,8 @@ export function CameraContextProvider({
       resetDetection,
       setSelectedPhotoUrl,
       toggleCameraPause,
+      lockInDetection,
+      pendingConfirmation,
       recentsExpanded,
       setRecentsExpanded,
       validationResults,
