@@ -6,6 +6,7 @@ import {
   MAX_HISTORY_ITEMS,
   clearScanHistory,
   createScanId,
+  deleteScanItem,
   isHistoryStorageAvailable,
   loadScanHistory,
   saveScanItem,
@@ -151,19 +152,38 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
    * Lock in `classId` as the final detection and persist it to history.
    * The photoUrl comes from the caller (camera-context) because the model
    * context doesn't own the captured frame.
+   *
+   * capturePhoto / handleFileSelect already auto-save the top candidate as
+   * soon as predict() finishes, so by the time the doctor taps an
+   * alternative in the drawer the most recent history item is usually the
+   * auto-saved top. We detect that case by matching photoUrl and update the
+   * existing entry in place (both in state and in IndexedDB) instead of
+   * adding a duplicate.
    */
   const confirmCandidate = useCallback((classId: string, photoUrl?: string | null) => {
     if (!classId || classId === 'Lima no identificada') return;
     setLimaDetected(classId);
     setPendingConfirmation(false);
-    if (photoUrl) {
-      addScanHistoryItem({
+    if (!photoUrl) return;
+
+    setScanHistoryItems((prev) => {
+      const latest = prev[0];
+      if (latest && latest.photoUrl === photoUrl) {
+        // Same photo as the auto-saved top — swap its classId in place.
+        const updated: RecentScanItem = { ...latest, classId };
+        void deleteScanItem(latest.id).then(() => saveScanItem(updated));
+        return [updated, ...prev.slice(1)];
+      }
+      // Different photo (or empty history): create a fresh entry.
+      const item: RecentScanItem = {
         id: createScanId(),
         classId,
         photoUrl,
         timestamp: Date.now(),
-      });
-    }
+      };
+      void saveScanItem(item);
+      return [item, ...prev];
+    });
   }, []);
 
   const predict = async (src: PredictionSource): Promise<TopPrediction[]> => {

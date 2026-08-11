@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { CheckCircle, Camera, Focus, Moon, ZoomIn, HelpCircle, Check, ListChecks } from 'lucide-react';
+import { CheckCircle, Camera, Focus, Moon, ZoomIn, HelpCircle, ArrowRight, ListChecks } from 'lucide-react';
 import { cameraStyles } from '../../styles/camera-styles';
 import { useCamera } from '../../contexts/camera-context';
 import { useEndofileAi } from '../../contexts/endofile-model-context';
@@ -16,7 +16,7 @@ interface CameraDetectionBadgeProps {
 }
 
 export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives }: CameraDetectionBadgeProps) {
-  const { validationResults, selectedPhotoUrl, lockInDetection } = useCamera();
+  const { validationResults, selectedPhotoUrl, resetDetection } = useCamera();
   const { limaDetected, isAnalyzing, pendingConfirmation } = useEndofileAi();
 
   const isUnidentified = limaDetected === 'Lima no identificada';
@@ -30,23 +30,21 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
   return (
     <div className={cameraStyles.infoOverlayContainer}>
       <div
-        className={`${cameraStyles.infoCard} ${
-          hasMatch
+        className={`${cameraStyles.infoCard} ${hasMatch
             ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)] cursor-pointer hover:border-primary'
             : isUnidentified || hasValidationErrors
-            ? 'border-amber-500/60 bg-surface-container-low shadow-[0_10px_25px_rgba(245,158,11,0.15)]'
-            : 'border-outline/80'
-        }`}
+              ? 'border-amber-500/60 bg-surface-container-low shadow-[0_10px_25px_rgba(245,158,11,0.15)]'
+              : 'border-outline/80'
+          }`}
       >
         {/* State Icon */}
         <div
-          className={`${cameraStyles.infoIconContainer} ${
-            hasMatch
+          className={`${cameraStyles.infoIconContainer} ${hasMatch
               ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50'
               : isUnidentified || hasValidationErrors
-              ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
-              : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-          }`}
+                ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+            }`}
         >
           {isAnalyzing ? (
             <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -91,8 +89,8 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
                 {blurError
                   ? 'Imagen desenfocada. Mantenga la cámara firme.'
                   : darkError
-                  ? 'Imagen muy oscura. Encienda la luz o el flash.'
-                  : 'Lima muy lejos. Acerque la cámara a la lima.'}
+                    ? 'Imagen muy oscura. Encienda la luz o el flash.'
+                    : 'Lima muy lejos. Acerque la cámara a la lima.'}
               </span>
             ) : hasMatch && predictedName ? (
               <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
@@ -114,14 +112,17 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
         </div>
 
         {/*
-          Confirmation affordances — appear while the model has a pending pick.
-          Two side-by-side buttons: "Confirmar" locks in the main prediction
-          shown in the badge; "Otras alternativas" opens the drawer so the
-          doctor can pick a different candidate when the model's top guess
-          is wrong (feat/transition-detector-helper).
+          Disambiguation affordances — appear while the model has a pending pick.
+          Two side-by-side buttons:
+            - "Otras alternativas" opens the drawer so the doctor can pick a
+              different candidate when the model's top guess is wrong.
+            - "Continuar" is just "move on" — clears the camera back to the
+              live stream so the doctor can take the next shot. Persisting
+              the current pick (or not) is handled in the drawer and in
+              history-store; the badge only owns the dismissal gesture.
         */}
         {pendingConfirmation && hasMatch && (
-          <div className="shrink-0 flex items-center gap-1.5">
+          <div className="shrink-0 flex flex-col items-center gap-1.5">
             {onOpenAlternatives && (
               <button
                 onClick={(e) => {
@@ -139,14 +140,14 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                lockInDetection(limaDetected!);
+                resetDetection();
               }}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-md"
-              aria-label="Confirmar identificación"
-              title="Confirmar esta identificación"
+              aria-label="Continuar"
+              title="Continuar — descartar la captura y volver a la cámara en vivo"
             >
-              <Check size={14} />
-              Confirmar
+              <ArrowRight size={14} />
+              Continuar
             </button>
           </div>
         )}

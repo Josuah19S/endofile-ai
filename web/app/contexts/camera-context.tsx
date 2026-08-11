@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useEndofileAi } from './endofile-model-context';
+import { createScanId } from '@/app/lib/history-store';
 import { isMobileDevice } from '@/app/lib/device-detection';
 import {
   validateAllImages,
@@ -106,7 +107,7 @@ export function CameraContextProvider({
   // Latest stream, so teardown never acts on a stale render-time closure
   const streamRef = useRef<MediaStream | null>(initialStream);
 
-  const { predict, isAnalyzing, setLimaDetected, confirmCandidate, pendingConfirmation } = useEndofileAi();
+  const { predict, isAnalyzing, setLimaDetected, addScanHistoryItem, confirmCandidate, pendingConfirmation } = useEndofileAi();
 
   // Enumerate all video inputs to allow switching between lenses
   const enumerateCameras = async () => {
@@ -414,10 +415,20 @@ export function CameraContextProvider({
       return;
     }
 
-    // 2. Proceed with model prediction. Persistence happens only when the doctor
-    //    confirms a candidate (see confirmCandidate) — pendingConfirmation stays
-    //    true so the bottom bar can offer the alternatives.
-    await predict(artifacts.modelCanvas);
+    // 2. Proceed with model prediction, then persist the top candidate so
+    //    the doctor can dismiss with "Continuar" without losing the result.
+    //    If they tap "Otras alternativas" and pick a different class, that
+    //    picker updates the entry in place (see confirmCandidate).
+    const topN = await predict(artifacts.modelCanvas);
+    const top = topN[0];
+    if (top && top.classId !== 'Lima no identificada') {
+      addScanHistoryItem({
+        id: createScanId(),
+        classId: top.classId,
+        photoUrl: artifacts.displayDataUrl,
+        timestamp: Date.now(),
+      });
+    }
   };
 
   // Predict on uploaded custom image file with 3:4 crop & pre-validations
@@ -450,8 +461,19 @@ export function CameraContextProvider({
             return;
           }
 
-          // 2. Proceed with model prediction (no auto-save — confirmation required).
-          await predict(artifacts.modelCanvas);
+          // 2. Proceed with model prediction and auto-save the top (same
+          //    semantics as live capture: tap "Continuar" to dismiss with the
+          //    result already in history).
+          const topN = await predict(artifacts.modelCanvas);
+          const top = topN[0];
+          if (top && top.classId !== 'Lima no identificada') {
+            addScanHistoryItem({
+              id: createScanId(),
+              classId: top.classId,
+              photoUrl: artifacts.displayDataUrl,
+              timestamp: Date.now(),
+            });
+          }
         } catch (err) {
           console.error("Uploaded file prediction error:", err);
         }
