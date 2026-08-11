@@ -11,6 +11,7 @@ import {
   saveScanItem,
 } from "@/app/lib/history-store"
 import type { RecentScanItem } from "@/app/lib/history-store"
+import { devLog } from "@/app/lib/logger"
 type TensorFlow = typeof import("@tensorflow/tfjs")
 
 export interface TopPrediction {
@@ -111,18 +112,18 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
     let active = true;
     const initModel = async () => {
       try {
-        console.log("Loading TensorFlow.js...");
+        devLog("Loading TensorFlow.js...");
         // Dynamic import to avoid Next.js node-side compile/SSR issues
         const tfjs = await import('@tensorflow/tfjs');
         if (!active) return;
         setTf(tfjs);
 
-        console.log("Loading graph model...");
+        devLog("Loading graph model...");
         // Load the graph model from public directory (served at root /model_proto/model.json)
         const loadedModel = await tfjs.loadGraphModel('/model_proto/model.json');
 
         // Warm up the model (compiles WebGL shaders in the background to avoid first-click latency)
-        console.log("Warming up model...");
+        devLog("Warming up model...");
         const dummyInput = tfjs.zeros([1, 448, 448, 3]);
         // Sync execute(): the graph has no control flow or dynamic output shapes (see
         // model/README.md §5), so executeAsync()'s extra async round-trip buys nothing —
@@ -134,7 +135,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         if (!active) return;
         setModel(loadedModel);
         setModelStatus('ready');
-        console.log(`EndoScan Graph Model loaded and warmed up successfully! Active Tensors: ${tfjs.memory().numTensors}`);
+        devLog(`EndoScan Graph Model loaded and warmed up successfully! Active Tensors: ${tfjs.memory().numTensors}`);
       } catch (err) {
         console.error("Error initializing model:", err);
         if (active) setModelStatus('error');
@@ -212,7 +213,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
 
       // Debug log: top 10 ranked classes per prediction. Dev-only, kept commented
       // for quick re-enable during debugging. Uncomment to inspect raw confidences.
-      console.log(`[TF.js Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
+      devLog(`[TF.js Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
 
       // Confidence threshold check (35% minimum probability across all 29 classes)
       const MIN_CONFIDENCE_THRESHOLD = 0.35;
@@ -243,8 +244,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       tf.dispose(inputTensor);
       tf.dispose(prediction);
 
-      console.log(`[TF.js Top ${TOP_N} Predictions]:\n` + topN.map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
-      console.log(`[TF.js Memory] Active Tensors after prediction: ${tf.memory().numTensors}`);
+      devLog(`[TF.js Top ${TOP_N} Predictions]:\n` + topN.map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
+      devLog(`[TF.js Memory] Active Tensors after prediction: ${tf.memory().numTensors}`);
 
       return topN;
     } catch (err) {

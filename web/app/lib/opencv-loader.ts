@@ -1,5 +1,7 @@
 "use client";
 
+import { devLog } from './logger';
+
 declare global {
   interface Window {
     cv: any;
@@ -32,7 +34,7 @@ export function loadOpenCV(): Promise<any> {
     const checkReady = () => {
       if (!resolved && isOpenCVReady()) {
         resolved = true;
-        console.log("[OpenCV.js] Engine ready and cv.Mat available!");
+        devLog("[OpenCV.js] Engine ready and cv.Mat available!");
         resolve(window.cv);
         return true;
       }
