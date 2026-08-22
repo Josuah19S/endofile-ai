@@ -83,12 +83,21 @@ await tfjs.loadGraphModel('/model_proto/model.json');
 **El modelo lleva su propia normalización incorporada**, con la misma fórmula que v1 (§3 de
 la versión anterior de este documento): el grafo confirma los mismos nodos
 `rescaling_1/mul`, `rescaling_1/add` y `normalization_1/truediv` que en v1, bajo el mismo
-namespace `efficientnetb2_1` en vez de `efficientnetb0_1`. No se han vuelto a leer los bytes
-exactos de esas constantes para esta versión (a diferencia de v1, donde sí se hizo — ver
-§9), pero es la misma función de Keras (`efficientnet.preprocess_input`, no-op sobre la
-entrada; el reescalado real vive en las capas `Rescaling`/`Normalization` del propio
-`EfficientNetB2`) para cualquier variante de la familia, así que se asume la misma fórmula:
-`(x/255 − mean) / std` con media y desviación típica de ImageNet.
+namespace `efficientnetb2_1` en vez de `efficientnetb0_1`. Reverificado byte a byte para esta
+versión leyendo las constantes reales de `web/public/model_proto/`:
+
+| Constante | Valor | Interpretación |
+| --- | --- | --- |
+| `rescaling_1/Cast/x` | `0.0039215689` | `1/255` |
+| `rescaling_1/add` | `[-0.485, -0.456, -0.406]` | `-mean` de ImageNet (R,G,B) |
+| `normalization_1/truediv` | `[4.3668, 4.4643, 4.4444]` | `1/std` de ImageNet (1/0.229, 1/0.224, 1/0.225) |
+
+Confirma la fórmula `(x/255 − mean) / std` con media y desviación típica de ImageNet — la
+misma función de Keras (`efficientnet.preprocess_input`, no-op sobre la entrada; el
+reescalado real vive en las capas `Rescaling`/`Normalization` del propio `EfficientNetB2`)
+para cualquier variante de la familia. **No** es el modo `[-1, 1]` (`x/127.5 − 1`) que usan
+otras familias de Keras Applications (MobileNet, Xception, InceptionV3) — pasar de B0 a B2
+no cambió el esquema de normalización.
 
 Es decir, el modelo espera **píxeles crudos en [0, 255]**, igual que v1. El cliente
 (`endofile-model-context.tsx`) no aplica ninguna normalización manual — el defecto que
@@ -337,9 +346,6 @@ nueva de esta versión.
 - **Imágenes de entrenamiento**: viven en Google Drive (`dataset_flat_reduced`, celda 3 del
   notebook), fuera del repositorio. No hay forma de reproducir el entrenamiento sin acceso a
   esa carpeta.
-- **Constantes exactas de normalización**: a diferencia de v1, no se han vuelto a leer los
-  bytes de `rescaling_1`/`normalization_1` para esta versión — se asume la misma fórmula por
-  ser la misma función de Keras, pero no está reverificada byte a byte (§3).
 - **GPU de entrenamiento**: v1 registraba una Tesla T4; este notebook no lo imprime.
 - **Matriz de confusión**: se genera en el notebook (celda 30) pero no se ha exportado como
   imagen ni transcrito, igual que en v1.
@@ -360,7 +366,6 @@ validación clínica**, coherente con el aviso del README raíz.
 | Re-ejecutar la celda de verificación de clases | §6.5. Tal como está, no cumple su propio propósito: compara contra una lista vieja |
 | Corregir el `print` de la fase 2 | §6.3. Dice "30 capas", el código descongela 40 — alguien que solo lea el log se lleva un dato falso |
 | Investigar la caída de `rising_3-25` | §6.4, §9. Es la única clase que empeoró respecto a v1 |
-| Reverificar la normalización de entrada byte a byte | §3, §9. Se asume igual que v1 por ser la misma función de Keras, pero no se confirmó para este grafo |
 | Medir la accuracy en producción | Sigue sin hacerse ni para v1 ni para v2 (§9) |
 | Cuantizar los pesos | `--quantize_uint8` reduciría los ≈32,60 MiB actuales — más relevante ahora que con v1, dado el salto de tamaño de B0 a B2 |
 | Reincorporar los sistemas que faltan | Re-Treaty, S-Blue, RC-Blue y Super-Files-III siguen en el catálogo pero no en el modelo — evaluar si hay dataset suficiente |

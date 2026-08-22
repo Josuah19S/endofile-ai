@@ -144,7 +144,7 @@ export default function ValidationSettingsModal({ isOpen, onClose }: ValidationS
 
             <div className="space-y-1 pt-1">
               <div className="flex justify-between text-xs">
-                <span>Altura Mínima en Pantalla:</span>
+                <span>Tamaño Mínimo en Pantalla:</span>
                 <span className="font-bold text-primary">
                   {config.thresholdMinHeightPercent < 15
                     ? 'Flexible'

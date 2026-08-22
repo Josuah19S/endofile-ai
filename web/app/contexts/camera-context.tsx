@@ -385,8 +385,8 @@ export function CameraContextProvider({
     setTimeout(() => setShowFlashOverlay(false), 200);
 
     if (!videoRef.current || !cameraAvailable) {
-      // WHAT
-      setLimaDetected('mg3-blue_1-sv');
+      console.warn("[Camera] capturePhoto called with no active video stream.");
+      setLimaDetected('Error al analizar');
       return;
     }
 

@@ -9,7 +9,17 @@ export interface ValidationConfig {
   thresholdBrightness: number;
   /** Minimum contour area percentage (0-100%) of total image. Below this = file too far. Default: 1.5 */
   thresholdMinAreaPercent: number;
-  /** Minimum bounding box height percentage (0-100%) of image height. Below this = file too far. Default: 20.0 */
+  /**
+   * Minimum size percentage (0-100%) the object's longest bounding-box side must reach,
+   * relative to the image's longest side. Below this = file too far. Default: 20.0
+   *
+   * Deliberately uses the *longest* side of the bounding box, not just its vertical
+   * height: a file photographed diagonally (the natural way to hold one) has a much
+   * shorter axis-aligned bounding-box height than the same file held vertically at the
+   * same real distance from the camera. Measuring height alone made this check
+   * orientation-sensitive instead of distance-sensitive, rejecting perfectly
+   * well-framed diagonal shots.
+   */
   thresholdMinHeightPercent: number;
   /** Binary inversion threshold value for light background segmentation. Default: 200 */
   binaryThreshold: number;
@@ -45,6 +55,7 @@ export interface BoundingBox {
 export interface TooFarValidationResult {
   isTooFar: boolean;
   areaPercent: number;
+  /** The object's longest bounding-box side, as a % of the image's longest side. See `thresholdMinHeightPercent`. */
   heightPercent: number;
   thresholdMinAreaPercent: number;
   thresholdMinHeightPercent: number;
@@ -309,7 +320,12 @@ export async function validateTooFar(
       const totalArea = w * h;
       const areaPercent = totalArea > 0 ? Math.round((foregroundPixels / totalArea) * 10000) / 100 : 0;
       const boundingHeight = maxY >= minY ? maxY - minY : 0;
-      const heightPercent = h > 0 ? Math.round((boundingHeight / h) * 10000) / 100 : 0;
+      const boundingWidth = maxX >= minX ? maxX - minX : 0;
+      // Longest bounding-box side vs. longest image side — orientation-independent (see thresholdMinHeightPercent).
+      const maxImageDim = Math.max(w, h);
+      const heightPercent = maxImageDim > 0
+        ? Math.round((Math.max(boundingWidth, boundingHeight) / maxImageDim) * 10000) / 100
+        : 0;
 
       const isTooFar = areaPercent < thresholdMinAreaPercent || heightPercent < thresholdMinHeightPercent;
 
@@ -375,7 +391,11 @@ export async function validateTooFar(
         width: rect.width,
         height: rect.height,
       };
-      heightPercent = Math.round((rect.height / height) * 10000) / 100;
+      // Longest bounding-box side vs. longest image side — orientation-independent (see thresholdMinHeightPercent).
+      const maxImageDim = Math.max(width, height);
+      heightPercent = maxImageDim > 0
+        ? Math.round((Math.max(rect.width, rect.height) / maxImageDim) * 10000) / 100
+        : 0;
     }
 
     // Clean up OpenCV Mats
@@ -431,7 +451,7 @@ export async function validateAllImages(
     warnings.push(`Imagen demasiado oscura (Brillo: ${dark.averageBrightness} < ${dark.threshold})`);
   }
   if (tooFar.isTooFar) {
-    warnings.push(`Lima demasiado lejos (Área: ${tooFar.areaPercent}% < ${tooFar.thresholdMinAreaPercent}%, Altura: ${tooFar.heightPercent}% < ${tooFar.thresholdMinHeightPercent}%)`);
+    warnings.push(`Lima demasiado lejos (Área: ${tooFar.areaPercent}% < ${tooFar.thresholdMinAreaPercent}%, Extensión: ${tooFar.heightPercent}% < ${tooFar.thresholdMinHeightPercent}%)`);
   }
 
   return {

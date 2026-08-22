@@ -46,7 +46,7 @@ export default function ImageValidationBanner({ results, className = "" }: Image
           <div className="flex-1">
             <span className="font-semibold block">Lima Demasiado Lejos</span>
             <span className="text-[11px] text-rose-200/80">
-              Área: {tooFar.areaPercent}% (Umbral: &lt;{tooFar.thresholdMinAreaPercent}%), Altura: {tooFar.heightPercent}%. Acerque la cámara.
+              Área: {tooFar.areaPercent}% (Umbral: &lt;{tooFar.thresholdMinAreaPercent}%), Extensión: {tooFar.heightPercent}%. Acerque la cámara.
             </span>
           </div>
         </div>
