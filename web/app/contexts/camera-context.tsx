@@ -343,7 +343,7 @@ export function CameraContextProvider({
    * Render the same 3:4 crop into two canvases off the same source bounds:
    *   - displayCanvas: 480x640, aspect preserved, what the user sees and what
    *     gets saved into history.
-   *   - modelCanvas:   480x480, the 3:4 crop squished into 1:1, what the
+   *   - modelCanvas:   448x448, the 3:4 crop squished into 1:1, what the
    *     TensorFlow.js graph expects (see endofile-model-context.tsx).
    *
    * Returns null only if the browser refuses to allocate a 2D context for
@@ -363,13 +363,23 @@ export function CameraContextProvider({
     if (!displayCtx) return null;
 
     const modelCanvas = document.createElement('canvas');
-    modelCanvas.width = 480;
-    modelCanvas.height = 480;
+    modelCanvas.width = 448;
+    modelCanvas.height = 448;
     const modelCtx = modelCanvas.getContext('2d');
     if (!modelCtx) return null;
 
     displayCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 480, 640);
-    modelCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 480, 480);
+    modelCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 448, 448);
+
+    // Debug temporal
+    const debugData = modelCtx.getImageData(0, 0, 10, 1).data;
+    const debugCenter = modelCtx.getImageData(200, 200, 10, 1).data; // Centro del canvas
+    console.log('[Debug Canvas] Esquina superior izq:', Array.from(debugData));
+    console.log('[Debug Canvas] Centro del canvas:', Array.from(debugCenter));
+    console.log('[Debug Canvas] Primeros 10 píxeles RGBA:', Array.from(debugData));
+    console.log('[Debug Canvas] cropW:', cropW, 'cropH:', cropH);
+    console.log('[Debug Canvas] sx:', sx, 'sy:', sy);
+    console.log('[Debug Canvas] sourceWidth:', sourceWidth, 'sourceHeight:', sourceHeight);
 
     return {
       displayDataUrl: displayCanvas.toDataURL('image/jpeg'),
@@ -441,7 +451,21 @@ export function CameraContextProvider({
       const img = new Image();
       img.src = reader.result as string;
       img.onload = async () => {
+        console.log('[Debug] Image loaded:', img.naturalWidth, img.naturalHeight);
+        // Verificar si el canvas está tainted
+        const testCanvas = document.createElement('canvas');
+        testCanvas.width = 10;
+        testCanvas.height = 10;
+        const testCtx = testCanvas.getContext('2d');
+        testCtx?.drawImage(img, 0, 0, 10, 10);
         try {
+          const testData = testCtx?.getImageData(0, 0, 10, 10);
+          console.log('[Debug] Canvas NOT tainted, first pixel:', testData?.data.slice(0, 4));
+        } catch (e) {
+          console.log('[Debug] Canvas IS tainted (CORS):', e);
+        }
+
+        try {          
           const iw = img.naturalWidth || img.width;
           const ih = img.naturalHeight || img.height;
 

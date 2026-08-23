@@ -129,7 +129,7 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
         // Sync execute(): the graph has no control flow or dynamic output shapes (see
         // model/README.md §5), so executeAsync()'s extra async round-trip buys nothing —
         // it only exists for graphs that need it, and TF.js warns on every run otherwise.
-        const warmupPrediction = loadedModel.execute(dummyInput);
+        const warmupPrediction = await loadedModel.executeAsync(dummyInput);
         tfjs.dispose(dummyInput);
         tfjs.dispose(warmupPrediction);
 
@@ -194,17 +194,36 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
     try {
       // Wrap intermediate preprocessing tensors in tf.tidy to prevent WebGL memory leaks
       const inputTensor = tf.tidy(() => {
-        const tensor = tf.browser.fromPixels(src);
-        const resized = tf.image.resizeBilinear(tensor, [448, 448]);
-        // The model has its own Rescaling + Normalization layers baked into the graph
-        // (1/255 then ImageNet mean/std, see model/README.md §3) and expects raw [0, 255]
-        // pixels — normalizing here a second time would feed it a near-constant input.
-        const casted = resized.cast('float32');
+        // Crear canvas limpio para garantizar lectura correcta por fromPixels
+        const cleanCanvas = document.createElement('canvas');
+        cleanCanvas.width = 448;
+        cleanCanvas.height = 448;
+        const cleanCtx = cleanCanvas.getContext('2d', { willReadFrequently: true });
+        cleanCtx!.drawImage(src as HTMLCanvasElement, 0, 0, 448, 448);
+
+        const tensor = tf.browser.fromPixels(cleanCanvas);
+        const casted = tensor.cast('float32');
         return casted.expandDims(0);
       });
 
-      // Sync execute(): no control flow or dynamic shapes in this graph (see warm-up above).
-      const prediction = model.execute(inputTensor);
+      // Debug full range - fuera del tidy porque necesita await
+      const allData = await inputTensor.data();
+      let minVal = Infinity;
+      let maxVal = -Infinity; 
+      for (let i = 0; i < allData.length; i++) {
+        if (allData[i] < minVal) minVal = allData[i];
+        if (allData[i] > maxVal) maxVal = allData[i];
+      }
+      console.log('[Debug] Input min FULL:', minVal);
+      console.log('[Debug] Input max FULL:', maxVal);
+
+      // Debug temporal
+      const debugData = await inputTensor.data();
+      console.log('[Debug] Input min:', Math.min(...Array.from(debugData).slice(0, 1000)));
+      console.log('[Debug] Input max:', Math.max(...Array.from(debugData).slice(0, 1000)));
+      console.log('[Debug] Input sample:', Array.from(debugData).slice(0, 5));
+
+      const prediction = await model.executeAsync(inputTensor);
 
       let rawOutput: Float32Array;
       if (Array.isArray(prediction)) {
@@ -235,8 +254,8 @@ export function EndofileContextProvider({ children }: { children: React.ReactNod
       // for quick re-enable during debugging. Uncomment to inspect raw confidences.
       devLog(`[TF.js Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
 
-      // Confidence threshold check (35% minimum probability across all 29 classes)
-      const MIN_CONFIDENCE_THRESHOLD = 0.35;
+      // Confidence threshold check (15% minimum probability across all 29 classes)
+      const MIN_CONFIDENCE_THRESHOLD = 0.15;
       const topConfidence = topN[0]?.confidence || 0;
 
       if (topConfidence < MIN_CONFIDENCE_THRESHOLD) {
