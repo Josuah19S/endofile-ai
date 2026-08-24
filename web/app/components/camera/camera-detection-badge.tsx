@@ -145,7 +145,7 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
         {/*
           Disambiguation affordances — appear while the model has a pending pick.
           Two side-by-side buttons:
-            - "Otras alternativas" opens the drawer so the doctor can pick a
+            - "Alternativas" opens the drawer so the doctor can pick a
               different candidate when the model's top guess is wrong.
             - "Continuar" is just "move on" — clears the camera back to the
               live stream so the doctor can take the next shot. Persisting
@@ -153,19 +153,19 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
               history-store; the badge only owns the dismissal gesture.
         */}
         {pendingConfirmation && hasMatch ? (
-          <div className="shrink-0 flex flex-col items-center gap-1.5">
+          <div className="shrink-0 flex flex-col items-center gap-1">
             {onOpenAlternatives && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpenAlternatives();
                 }}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline text-on-surface text-xs font-semibold hover:bg-surface-container-highest active:scale-95 transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-surface-container-high border border-outline text-on-surface text-[11px] sm:text-xs font-semibold hover:bg-surface-container-highest active:scale-95 transition-all cursor-pointer whitespace-nowrap"
                 aria-label="Ver otras alternativas"
                 title="Ver otras alternativas"
               >
-                <ListChecks size={14} />
-                Otras alternativas
+                <ListChecks size={13} />
+                Alternativas
               </button>
             )}
             <button
@@ -173,11 +173,11 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
                 e.stopPropagation();
                 resetDetection();
               }}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-md"
+              className="inline-flex items-center justify-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-primary text-on-primary text-[11px] sm:text-xs font-semibold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-md w-full"
               aria-label="Continuar"
               title="Continuar — descartar la captura y volver a la cámara en vivo"
             >
-              <ArrowRight size={14} />
+              <ArrowRight size={13} />
               Continuar
             </button>
           </div>
@@ -188,11 +188,11 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
                 e.stopPropagation();
                 resetDetection();
               }}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline text-on-surface text-xs font-semibold hover:bg-surface-container-highest active:scale-95 transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg bg-surface-container-high border border-outline text-on-surface text-[11px] sm:text-xs font-semibold hover:bg-surface-container-highest active:scale-95 transition-all cursor-pointer"
               aria-label="Reintentar"
               title="Tomar otra foto"
             >
-              <ArrowRight size={14} />
+              <ArrowRight size={13} />
               Reintentar
             </button>
           </div>

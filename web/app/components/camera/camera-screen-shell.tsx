@@ -195,16 +195,18 @@ export default function CameraScreenShell() {
         setSidebarOpen={setSidebarOpen}
       />
 
-      {/* Center Layout Container: Viewport with Detection Badge directly underneath */}
-      <div className="absolute inset-x-0 top-14 bottom-24 sm:bottom-28 z-10 flex flex-col items-center justify-center p-3 pointer-events-none">
-        {/* Camera Viewport Area */}
-        <div className="relative w-[82vw] max-w-[340px] aspect-[3/4] max-h-[58vh] shrink pointer-events-auto">
-          <CameraViewport />
+      {/* Center Flexible Layout: Viewport + Detection Badge */}
+      <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center px-3 py-1 sm:py-2 pointer-events-none z-10">
+        {/* Camera Viewport Area - automatically scales to fit available height & width */}
+        <div className="flex-1 min-h-0 w-full max-w-[340px] flex items-center justify-center pointer-events-auto">
+          <div className="h-full max-h-full aspect-[3/4] max-w-full relative">
+            <CameraViewport />
+          </div>
         </div>
 
         {/* Detection Badge directly below the camera viewport */}
         {!controlsHidden && (
-          <div className="w-[82vw] max-w-[340px] mt-2.5 shrink-0 pointer-events-auto">
+          <div className="w-full max-w-[340px] mt-1.5 sm:mt-2 shrink-0 pointer-events-auto">
             <CameraDetectionBadge
               onOpenDetail={handleOpenDetail}
               onOpenAlternatives={openAlternatives}
@@ -214,45 +216,45 @@ export default function CameraScreenShell() {
       </div>
 
       {/*
-        Bottom Bar — h-24 when idle, grows to h-[65vh] (or fullHeight for the
-        catalog / alternatives grid) when a drawer view is active. The view
-        itself is rendered inside the bar via `children` so each view can size
-        itself to the available space.
+        Bottom Bar Container — shrink-0 so it occupies its exact flex slot and never overlays center content.
+        Grows as an overlay when a drawer view is active.
       */}
-      <CameraBottomBar
-        expanded={drawer !== null}
-        fullHeight={drawer?.view === 'catalog' || drawer?.view === 'alternatives'}
-        controlsHidden={controlsHidden}
-        onClose={closeDrawer}
-        onOpenRecents={openRecents}
-      >
-        {drawer?.view === 'recents' && (
-          <RecentDetectionsView onSelectCard={handleOpenDetail} />
-        )}
-        {drawer?.view === 'catalog' && (
-          <FileCatalogView
-            query={catalogQuery}
-            onQueryChange={setCatalogQuery}
-            scrollTopRef={catalogScrollTop}
-            onSelectFile={handleOpenCatalogFile}
-          />
-        )}
-        {drawer?.view === 'detail' && activeClassId && (
-          <FileDetailView
-            classId={activeClassId}
-            photoUrl={activePhotoUrl}
-            backLabel={drawer.from === 'catalog' ? 'Volver al catálogo' : 'Volver a Detecciones Recientes'}
-            onBack={handleDetailBack}
-            onNewer={historyIndex >= 0 ? handleNewerDetail : undefined}
-            onOlder={historyIndex >= 0 ? handleOlderDetail : undefined}
-            hasNewer={hasNewerDetail}
-            hasOlder={hasOlderDetail}
-          />
-        )}
-        {drawer?.view === 'alternatives' && (
-          <AlternativesView onPicked={closeDrawer} />
-        )}
-      </CameraBottomBar>
+      <div className="shrink-0 w-full z-30">
+        <CameraBottomBar
+          expanded={drawer !== null}
+          fullHeight={drawer?.view === 'catalog' || drawer?.view === 'alternatives'}
+          controlsHidden={controlsHidden}
+          onClose={closeDrawer}
+          onOpenRecents={openRecents}
+        >
+          {drawer?.view === 'recents' && (
+            <RecentDetectionsView onSelectCard={handleOpenDetail} />
+          )}
+          {drawer?.view === 'catalog' && (
+            <FileCatalogView
+              query={catalogQuery}
+              onQueryChange={setCatalogQuery}
+              scrollTopRef={catalogScrollTop}
+              onSelectFile={handleOpenCatalogFile}
+            />
+          )}
+          {drawer?.view === 'detail' && activeClassId && (
+            <FileDetailView
+              classId={activeClassId}
+              photoUrl={activePhotoUrl}
+              backLabel={drawer.from === 'catalog' ? 'Volver al catálogo' : 'Volver a Detecciones Recientes'}
+              onBack={handleDetailBack}
+              onNewer={historyIndex >= 0 ? handleNewerDetail : undefined}
+              onOlder={historyIndex >= 0 ? handleOlderDetail : undefined}
+              hasNewer={hasNewerDetail}
+              hasOlder={hasOlderDetail}
+            />
+          )}
+          {drawer?.view === 'alternatives' && (
+            <AlternativesView onPicked={closeDrawer} />
+          )}
+        </CameraBottomBar>
+      </div>
 
       {/* Sidebar Component */}
       <Sidebar

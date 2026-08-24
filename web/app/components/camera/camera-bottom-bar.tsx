@@ -46,7 +46,11 @@ export default function CameraBottomBar({
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
+      className={`${
+        expanded
+          ? 'fixed bottom-0 left-0 right-0 z-40'
+          : 'relative w-full z-20 shrink-0'
+      } bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
         expanded
           ? fullHeight
             ? 'h-[calc(100dvh-96px)] max-h-[calc(100dvh-96px)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'

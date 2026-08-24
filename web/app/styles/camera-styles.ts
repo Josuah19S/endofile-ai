@@ -2,23 +2,23 @@
  * Camera Screen Tailwind Utility Classes
  */
 export const cameraStyles = {
-  // Main screen container - uses theme background and text tokens
-  screenContainer: "relative w-full h-screen h-dvh bg-background text-on-surface overflow-hidden select-none",
+  // Main screen container - uses theme background and text tokens with flex column
+  screenContainer: "relative w-full h-screen h-dvh bg-background text-on-surface overflow-hidden select-none flex flex-col justify-between",
 
   // Top header area containing menu, status, aspect-ratio controls
-  topHeader: "absolute top-0 left-0 right-0 z-20 flex justify-between items-start p-4 md:p-6 w-full pointer-events-none",
+  topHeader: "w-full z-20 flex justify-between items-start p-3 sm:p-4 md:p-6 pointer-events-none shrink-0",
 
   // Left control stack (contains menu button)
-  leftControls: "pointer-events-auto",
+  leftControls: "pointer-events-auto flex items-center gap-2.5 sm:gap-3",
 
   // Right control stack (contains aspect ratio & flash stacked vertically)
-  rightControls: "flex flex-col gap-3 pointer-events-auto",
+  rightControls: "pointer-events-auto flex flex-col gap-2 sm:gap-2.5",
 
   // Icon buttons (menu, fullscreen, flash, upload, history)
-  iconButton: "flex items-center justify-center w-12 h-12 rounded-xl bg-surface-container-low border border-outline text-on-surface shadow-md transition-all duration-200 active:scale-95 hover:bg-surface-container-high hover:border-primary/60 hover:text-primary cursor-pointer",
+  iconButton: "flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-surface-container-low border border-outline text-on-surface shadow-md transition-all duration-200 active:scale-95 hover:bg-surface-container-high hover:border-primary/60 hover:text-primary cursor-pointer",
 
   // Status badge (Modelo: ---)
-  statusBadge: "pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-low border border-outline text-xs text-on-surface-variant shadow-md tracking-wide",
+  statusBadge: "pointer-events-auto flex items-center gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-surface-container-low border border-outline text-xs text-on-surface-variant shadow-md tracking-wide",
 
   // Active dot
   statusDot: "w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#22adfa]",
@@ -50,21 +50,21 @@ export const cameraStyles = {
   // Bottom info overlay (Lima detectada container)
   infoOverlayContainer: "w-full flex justify-center pointer-events-auto",
 
-  // Lima detectada card
-  infoCard: "pointer-events-auto flex items-center gap-3 w-full px-4 py-2.5 sm:py-3 rounded-xl bg-surface-container border border-outline shadow-xl transition-all duration-300",
+  // Lima detectada card - compact and responsive
+  infoCard: "pointer-events-auto flex items-center gap-2.5 sm:gap-3 w-full px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-surface-container border border-outline shadow-xl transition-all duration-300",
 
   // Blue check icon container
-  infoIconContainer: "flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/40",
+  infoIconContainer: "flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/40 shrink-0",
 
   // Lima status text
-  infoText: "text-sm font-semibold tracking-wide text-on-surface",
+  infoText: "text-xs sm:text-sm font-semibold tracking-wide text-on-surface",
 
   // Solid dark bottom action bar - padded more at the bottom to avoid mobile browser toolbar overlap
   bottomActionBar: "absolute bottom-0 left-0 right-0 z-20 w-full bg-surface-container-lowest px-6 py-6 pb-12 md:pb-6 flex justify-between items-center border-t border-outline shadow-[0_-10px_30px_rgba(0,0,0,0.5)]",
 
   // Camera shutter button (center action)
-  shutterOuterRing: "flex items-center justify-center w-20 h-20 rounded-full border-4 border-primary/90 bg-transparent transition-all duration-300 active:scale-90 cursor-pointer shadow-[0_0_20px_rgba(34,173,250,0.35)] hover:shadow-[0_0_30px_rgba(34,173,250,0.6)] hover:border-primary",
-  shutterInnerCircle: "w-16 h-16 p-1 rounded-full bg-primary text-on-primary border border-transparent shadow-inner transition-all duration-200 hover:opacity-90 active:scale-95",
-  shutterInnerCircleLoading: "w-16 h-16 p-4 rounded-full bg-transparent border-4 border-outline border-t-primary animate-spin",
+  shutterOuterRing: "flex items-center justify-center w-18 h-18 sm:w-20 sm:h-20 rounded-full border-4 border-primary/90 bg-transparent transition-all duration-300 active:scale-90 cursor-pointer shadow-[0_0_20px_rgba(34,173,250,0.35)] hover:shadow-[0_0_30px_rgba(34,173,250,0.6)] hover:border-primary",
+  shutterInnerCircle: "w-14 h-14 sm:w-16 sm:h-16 p-1 rounded-full bg-primary text-on-primary border border-transparent shadow-inner transition-all duration-200 hover:opacity-90 active:scale-95",
+  shutterInnerCircleLoading: "w-14 h-14 sm:w-16 sm:h-16 p-3 sm:p-4 rounded-full bg-transparent border-4 border-outline border-t-primary animate-spin",
   shutterReloadIcon: "w-full h-full text-outline-variant hover:text-primary bg-transparent border border-transparent shadow-inner transition-colors duration-200",
 };
