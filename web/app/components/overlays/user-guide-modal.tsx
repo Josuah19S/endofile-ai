@@ -12,7 +12,7 @@ export default function UserGuideModal({ isOpen, onClose }: UserGuideModalProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-2xl bg-surface-container border border-outline rounded-2xl shadow-2xl text-on-surface overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-2xl bg-surface-container border border-outline rounded-2xl shadow-2xl text-on-surface overflow-hidden flex flex-col max-h-[90%]">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-outline/60 px-5 md:px-6 py-4">

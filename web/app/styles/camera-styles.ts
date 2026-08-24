@@ -2,8 +2,8 @@
  * Camera Screen Tailwind Utility Classes
  */
 export const cameraStyles = {
-  // Main screen container - uses theme background and text tokens with flex column
-  screenContainer: "relative w-full h-screen h-dvh bg-background text-on-surface overflow-hidden select-none flex flex-col justify-between",
+  // Main screen container - uses 100% height of parent document with flex column
+  screenContainer: "relative w-full h-full min-h-0 bg-background text-on-surface overflow-hidden select-none flex flex-col justify-between",
 
   // Top header area containing menu, status, aspect-ratio controls
   topHeader: "w-full z-20 flex justify-between items-start p-3 sm:p-4 md:p-6 pointer-events-none shrink-0",

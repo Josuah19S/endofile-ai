@@ -42,7 +42,7 @@ export default function ModelScannerPage({ version = 'v2' }: ModelScannerPagePro
   }
 
   return (
-    <div className="w-full h-screen overflow-hidden animate-fade-in">
+    <div className="w-full h-full min-h-0 overflow-hidden animate-fade-in flex flex-col">
       <EndofileContextProvider version={version}>
         <ImageValidationProvider>
           <CameraScreen

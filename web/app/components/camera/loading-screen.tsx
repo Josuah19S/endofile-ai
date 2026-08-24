@@ -42,7 +42,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
   };
 
   return (
-    <div className="relative w-full h-screen h-dvh bg-[#f8fafc] text-black select-none overflow-hidden flex flex-col items-center justify-end">
+    <div className="relative w-full h-full min-h-0 bg-[#f8fafc] text-black select-none overflow-hidden flex flex-col items-center justify-end">
       {/* 1. Fullscreen Background Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <NextImage
@@ -55,7 +55,7 @@ export default function LoadingScreen({ onPermissionGranted }: LoadingScreenProp
       </div>
 
       {/* 2. AI Robot Pinned to Ground (80% Page Height) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[80vh] flex items-end justify-center pointer-events-none">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full h-[80%] flex items-end justify-center pointer-events-none">
         <div className="relative w-full h-full max-w-5xl flex items-end justify-center">
           <NextImage
             src="/elements/ai_nobg.webp"

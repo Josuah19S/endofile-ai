@@ -164,7 +164,7 @@ export default function CameraScreenShell() {
          the source PNG) visible on every viewport, while h-[80vh] always gives it
          the full intended vertical space — object-contain was width-bound on mobile
          and shrank the visible height to ~33% of the container. */}
-      <div className="absolute bottom-0 left-[10rem] right-[-30rem] sm:right-[-20rem] md:right-[-11rem] z-[5] h-[80vh] pointer-events-none">
+      <div className="absolute bottom-0 left-[10rem] right-[-30rem] sm:right-[-20rem] md:right-[-11rem] z-[5] h-[80%] pointer-events-none">
         <NextImage
           src="/elements/camera_screen_robot_arm.webp"
           alt="Brazo del Robot"
