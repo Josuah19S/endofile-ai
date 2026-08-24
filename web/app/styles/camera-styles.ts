@@ -26,8 +26,8 @@ export const cameraStyles = {
   // Flash button variation when active
   flashActive: "bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30",
 
-  // Camera viewport area - fits inside the flex parent container
-  viewportArea: "relative w-full h-full flex items-center justify-center bg-surface-container-lowest rounded-2xl border border-primary/40 shadow-[0_16px_40px_rgba(0,0,0,0.6)] overflow-hidden",
+  // Camera viewport area - fits inside the flex parent container (dark camera viewfinder backdrop)
+  viewportArea: "relative w-full h-full flex items-center justify-center bg-black rounded-2xl border border-primary/40 shadow-[0_16px_40px_rgba(0,0,0,0.6)] overflow-hidden",
 
   // The interactive video stream
   videoPreview: "w-full h-full object-cover",

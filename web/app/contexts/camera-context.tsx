@@ -172,6 +172,8 @@ export function CameraContextProvider({
     }
   };
 
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
+
   // Enumerate all video inputs to allow switching between lenses
   const enumerateCameras = async () => {
     try {
@@ -187,31 +189,86 @@ export function CameraContextProvider({
     enumerateCameras();
   }, []);
 
-  // Request user camera stream with specific device index
-  const requestCameraAccess = async (deviceIndex: number = 0) => {
+  // Helper to safely get user media with fallback cascade
+  const obtainCameraStream = async (constraints: MediaStreamConstraints): Promise<MediaStream> => {
     try {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      return await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (primaryErr) {
+      if (debug) console.warn("Primary camera constraint failed, attempting fallback:", primaryErr);
+      
+      // Fallback 1: Ideal facingMode instead of exact deviceId
+      try {
+        return await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1080 },
+            height: { ideal: 1920 },
+          },
+          audio: false,
+        });
+      } catch (fallbackErr1) {
+        if (debug) console.warn("FacingMode fallback failed, attempting basic video:", fallbackErr1);
+        
+        // Fallback 2: Basic video constraint
+        return await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+      }
+    }
+  };
+
+  // Request user camera stream with specific device index or facing mode
+  const requestCameraAccess = async (targetFacingOrIndex?: 'environment' | 'user' | number) => {
+    try {
+      let targetConstraints: MediaTrackConstraints;
+      let nextFacing = facingMode;
+
+      if (targetFacingOrIndex === 'environment' || targetFacingOrIndex === 'user') {
+        nextFacing = targetFacingOrIndex;
+        targetConstraints = {
+          facingMode: { ideal: nextFacing },
+          width: { ideal: 1080 },
+          height: { ideal: 1920 },
+        };
+      } else if (typeof targetFacingOrIndex === 'number' && videoDevices[targetFacingOrIndex]?.deviceId) {
+        const devId = videoDevices[targetFacingOrIndex].deviceId;
+        targetConstraints = {
+          deviceId: { exact: devId },
+          width: { ideal: 1080 },
+          height: { ideal: 1920 },
+        };
+        setActiveDeviceIndex(targetFacingOrIndex);
+      } else {
+        targetConstraints = {
+          facingMode: { ideal: nextFacing },
+          width: { ideal: 1080 },
+          height: { ideal: 1920 },
+        };
       }
 
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoInputs = devices.filter(device => device.kind === 'videoinput');
-      setVideoDevices(videoInputs);
-
-      const targetDevice = videoInputs[deviceIndex];
-      const videoConstraints: MediaTrackConstraints = targetDevice?.deviceId
-        ? { deviceId: { exact: targetDevice.deviceId } }
-        : { facingMode: 'environment' };
-
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: videoConstraints,
+      const newStream = await obtainCameraStream({
+        video: targetConstraints,
         audio: false,
       });
 
+      // Stop previous stream only after the new stream is successfully created
+      if (streamRef.current && streamRef.current !== newStream) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+
       setStream(newStream);
+      streamRef.current = newStream;
       setCameraAvailable(true);
-      setActiveDeviceIndex(deviceIndex);
+      setFacingMode(nextFacing);
       checkZoomCapabilities(newStream);
+
+      // Re-enumerate devices with the newly granted permissions to populate device labels
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(device => device.kind === 'videoinput');
+        setVideoDevices(videoInputs);
+      } catch {}
 
       if (isFirstCameraLoad.current) {
         setShowUserGuide(true);
@@ -224,15 +281,22 @@ export function CameraContextProvider({
       }
     } catch (err) {
       if (debug) console.warn("Camera access denied or failed:", err);
-      setCameraAvailable(false);
+      const hasLiveStream = streamRef.current?.getTracks().some(track => track.readyState === 'live') ?? false;
+      if (!hasLiveStream) {
+        setCameraAvailable(false);
+      }
     }
   };
 
-  // Cycle to next available camera lens
+  // Cycle to next available camera lens or toggle between front/back
   const handleSwitchCamera = async () => {
-    if (videoDevices.length <= 1) return;
-    const nextIndex = (activeDeviceIndex + 1) % videoDevices.length;
-    await requestCameraAccess(nextIndex);
+    if (videoDevices.length > 1) {
+      const nextIndex = (activeDeviceIndex + 1) % videoDevices.length;
+      await requestCameraAccess(nextIndex);
+    } else {
+      const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
+      await requestCameraAccess(nextFacing);
+    }
   };
 
   // Toggle flash/torch on environment camera
@@ -368,22 +432,33 @@ export function CameraContextProvider({
   }, [stream, isCameraPaused, selectedPhotoUrl, validationConfig]);
 
   useEffect(() => {
-    if (!cameraAvailable) return;
+    // If an initial live stream from LoadingScreen already exists, use it without re-requesting
+    const activeStream = streamRef.current;
+    const hasLiveStream = activeStream?.getTracks().some(track => track.readyState === 'live') ?? false;
 
-    const hasLiveStream = streamRef.current?.getTracks().some(track => track.readyState === 'live') ?? false;
-    if (!hasLiveStream) {
+    if (hasLiveStream && activeStream) {
+      checkZoomCapabilities(activeStream);
+      if (videoRef.current && videoRef.current.srcObject !== activeStream) {
+        videoRef.current.srcObject = activeStream;
+        videoRef.current.play().catch(() => { });
+      }
+    } else if (cameraAvailable) {
       requestCameraAccessRef.current();
     }
 
     return () => {
+      // Clean up media tracks when session is torn down
       streamRef.current?.getTracks().forEach(track => track.stop());
     };
-  }, [cameraAvailable]);
+  }, []);
 
   useEffect(() => {
     if (cameraAvailable && stream && videoRef.current && !selectedPhotoUrl) {
-      videoRef.current.srcObject = stream;
-      videoRef.current.play().catch(() => { });
+      const video = videoRef.current;
+      if (video.srcObject !== stream) {
+        video.srcObject = stream;
+      }
+      video.play().catch(() => { });
     }
   }, [cameraAvailable, stream, selectedPhotoUrl]);
 

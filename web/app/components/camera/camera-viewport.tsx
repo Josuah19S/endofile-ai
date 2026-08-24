@@ -85,6 +85,10 @@ export default function CameraViewport() {
           autoPlay
           playsInline
           muted
+          onLoadedMetadata={(e) => {
+            const video = e.currentTarget;
+            video.play().catch(() => {});
+          }}
           className={cameraStyles.videoPreview}
           style={
             !hasHardwareZoom && zoom > 1

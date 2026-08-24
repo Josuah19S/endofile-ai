@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "app/styles/camera-styles.ts": {
-    "mtime": 1787587756.2189245,
-    "ast_hash": "030b26c0d9b0a1a32b438717f47d8a2e",
+    "mtime": 1787592996.104462,
+    "ast_hash": "c99bc92e8e0969cc989eea387a6fdcb3",
     "semantic_hash": ""
   },
   "eslint.config.mjs": {
@@ -365,8 +365,8 @@
     "semantic_hash": ""
   },
   "app/components/camera/camera-viewport.tsx": {
-    "mtime": 1787537489.2032819,
-    "ast_hash": "240eed6ef56ec9fd5418bf8e04c5e819",
+    "mtime": 1787593025.8427095,
+    "ast_hash": "fce08c2295dde2b7ecf2323c7dab5a59",
     "semantic_hash": ""
   },
   "app/components/camera/loading-screen.tsx": {
@@ -405,7 +405,7 @@
     "semantic_hash": ""
   },
   "app/components/overlays/sidebar.tsx": {
-    "mtime": 1787536722.06987,
+    "mtime": 1787592636.0418854,
     "ast_hash": "d8d0e382cc00d0eb71e9bd0978fe51a0",
     "semantic_hash": ""
   },
@@ -420,8 +420,8 @@
     "semantic_hash": ""
   },
   "app/contexts/camera-context.tsx": {
-    "mtime": 1787537408.868241,
-    "ast_hash": "8b7cab8a44ed39428f923330605bf69a",
+    "mtime": 1787592920.0257938,
+    "ast_hash": "5011246217902c50213cbac05ccaa974",
     "semantic_hash": ""
   },
   "app/contexts/endofile-model-context.tsx": {
@@ -435,8 +435,8 @@
     "semantic_hash": ""
   },
   "public/elements/ai_nobg.webp": {
-    "mtime": 1785901933.0804017,
-    "ast_hash": "e83ba9a17ef40c2abe357cf5e6971fcd",
+    "mtime": 1787590535.136852,
+    "ast_hash": "24428bf74b248ea717aafdf2c46f355f",
     "semantic_hash": ""
   },
   "public/elements/bg_camera.webp": {
@@ -515,7 +515,7 @@
     "semantic_hash": ""
   },
   "app/constants/endofile-models.ts": {
-    "mtime": 1787535972.670413,
+    "mtime": 1787592636.042885,
     "ast_hash": "49e684d2446731096cc5449b0b847f8c",
     "semantic_hash": ""
   },
@@ -530,12 +530,12 @@
     "semantic_hash": ""
   },
   "app/modelv1/page.tsx": {
-    "mtime": 1787533679.8919444,
+    "mtime": 1787592636.0438848,
     "ast_hash": "7be8dc9065fe75a05a2befd9ad87a875",
     "semantic_hash": ""
   },
   "app/modelv2/page.tsx": {
-    "mtime": 1787533679.8919444,
+    "mtime": 1787592636.0438848,
     "ast_hash": "36b42e9630fc2716695554baf69a5375",
     "semantic_hash": ""
   },
@@ -552,6 +552,11 @@
   "app/constants/endofile-dataset-complete.ts": {
     "mtime": 1787588874.1207042,
     "ast_hash": "f509a492b5bf07d4102fdadc15d936f7",
+    "semantic_hash": ""
+  },
+  "public/elements/ai_nobg_bak.webp": {
+    "mtime": 1785901933.0804017,
+    "ast_hash": "e83ba9a17ef40c2abe357cf5e6971fcd",
     "semantic_hash": ""
   }
 }
