@@ -205,14 +205,9 @@ export function EndofileContextProvider({
         cleanCtx?.drawImage(src as CanvasImageSource, 0, 0, 448, 448);
 
         const tensor = tf.browser.fromPixels(cleanCanvas);
+        // Both v1 (EfficientNetB0) and v2 (EfficientNetB2) have internal Rescaling + Normalization
+        // layers baked into the graph and expect raw [0, 255] float32 pixels.
         const casted = tensor.cast('float32');
-
-        if (activeModelConfig.normalization === 'efficientnet') {
-          // EfficientNet normalization: [0, 255] -> [-1, 1]
-          const normalized = casted.div(127.5).sub(1.0);
-          return normalized.expandDims(0);
-        }
-        // V2 has Rescaling + Normalization layers baked into the graph
         return casted.expandDims(0);
       });
 
