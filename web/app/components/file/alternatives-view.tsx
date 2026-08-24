@@ -56,9 +56,11 @@ function AlternativeCard({ pred, onPick }: AlternativeCardProps) {
           {fullName}
         </span>
       </div>
+      {/*
       <span className="text-[10px] tabular-nums font-bold text-primary self-end">
         {(pred.confidence * 100).toFixed(0)}%
       </span>
+      */}
     </button>
   );
 }
