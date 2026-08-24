@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/layout.tsx": {
-    "mtime": 1785641172.0274327,
-    "ast_hash": "12455cb00c061a169b1568f2fe26b8b6",
+    "mtime": 1787587873.2146363,
+    "ast_hash": "3fd7f7b2ea997c5fbfc21cfd22660a69",
     "semantic_hash": ""
   },
   "app/lib/device-detection.ts": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "app/styles/camera-styles.ts": {
-    "mtime": 1787587031.0397794,
-    "ast_hash": "c4245f7bbedc35d32043d41e47ead9da",
+    "mtime": 1787587756.2189245,
+    "ast_hash": "030b26c0d9b0a1a32b438717f47d8a2e",
     "semantic_hash": ""
   },
   "eslint.config.mjs": {
@@ -340,8 +340,8 @@
     "semantic_hash": ""
   },
   "app/components/camera/camera-bottom-bar.tsx": {
-    "mtime": 1787587130.3472168,
-    "ast_hash": "cb174c52bc188024f51ecb3af5be9496",
+    "mtime": 1787587886.017003,
+    "ast_hash": "47a2d2354c2951af676eff83085a13ad",
     "semantic_hash": ""
   },
   "app/components/camera/camera-detection-badge.tsx": {
@@ -355,8 +355,8 @@
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen-shell.tsx": {
-    "mtime": 1787587168.9432611,
-    "ast_hash": "757aca1bcde81eb64715093a8380d8b9",
+    "mtime": 1787587898.5043643,
+    "ast_hash": "df6dce128652e2ef8cd90ce8223ffbca",
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen.tsx": {
@@ -370,8 +370,8 @@
     "semantic_hash": ""
   },
   "app/components/camera/loading-screen.tsx": {
-    "mtime": 1785901933.0780647,
-    "ast_hash": "65af84ad8761d7ba3b287162ef5f023b",
+    "mtime": 1787587924.7199643,
+    "ast_hash": "f40a4a7b29fd1494d24bea3442ca52fe",
     "semantic_hash": ""
   },
   "app/components/file/catalog-file-row.tsx": {
@@ -410,8 +410,8 @@
     "semantic_hash": ""
   },
   "app/components/overlays/user-guide-modal.tsx": {
-    "mtime": 1785785161.5282912,
-    "ast_hash": "ae77adf8aa9c4f6625f7ecaf277d9124",
+    "mtime": 1787587965.4306614,
+    "ast_hash": "9114632f3b2e9da82f297dce67305681",
     "semantic_hash": ""
   },
   "app/components/overlays/validation-settings-modal.tsx": {
@@ -505,13 +505,13 @@
     "semantic_hash": ""
   },
   "app/components/camera/model-scanner-page.tsx": {
-    "mtime": 1787533679.8909445,
-    "ast_hash": "3aabc52f547f957b953d84b5abe47ad4",
+    "mtime": 1787587811.2593129,
+    "ast_hash": "f96a504f977d6bf6ee1f2aa220d88572",
     "semantic_hash": ""
   },
   "app/components/file/alternatives-view.tsx": {
-    "mtime": 1787431526.106223,
-    "ast_hash": "6a2ed33536a54089991247f2ef2fd157",
+    "mtime": 1787587511.727,
+    "ast_hash": "b18628029a998014be213a017e8cd9a6",
     "semantic_hash": ""
   },
   "app/constants/endofile-models.ts": {

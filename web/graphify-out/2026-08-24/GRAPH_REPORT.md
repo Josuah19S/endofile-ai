@@ -1,16 +1,16 @@
-# Graph Report - web  (2026-08-04)
+# Graph Report - web  (2026-08-24)
 
 ## Corpus Check
-- 39 files · ~1,949,177 words
+- 48 files · ~1,973,771 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 240 nodes · 409 edges · 17 communities (13 shown, 4 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.5)
+- 264 nodes · 468 edges · 16 communities (12 shown, 4 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 3 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `dcf3c99c`
+- Built from commit: `705b9dba`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,7 +21,6 @@
 - compilerOptions
 - endofile-model-context.tsx
 - dependencies
-- validation-settings-modal.tsx
 - devDependencies
 - generate-photo-manifest.mjs
 - layout.tsx
@@ -30,64 +29,60 @@
 - GEMINI.md
 - next.config.ts
 - postcss.config.mjs
-- camera-context.tsx
+- model-scanner-page.tsx
 
 ## God Nodes (most connected - your core abstractions)
-1. `compilerOptions` - 16 edges
-2. `useEndofileAi()` - 15 edges
-3. `useCamera()` - 11 edges
-4. `saveScanItem()` - 9 edges
-5. `ImageValidationProvider()` - 8 edges
-6. `validateAllImages()` - 8 edges
-7. `isOpenCVReady()` - 8 edges
-8. `ImageValidationContextType` - 7 edges
-9. `ImageValidationResults` - 7 edges
-10. `validateTooFar()` - 7 edges
+1. `useEndofileAi()` - 17 edges
+2. `compilerOptions` - 16 edges
+3. `useCamera()` - 13 edges
+4. `EndofileContextProvider()` - 9 edges
+5. `saveScanItem()` - 9 edges
+6. `ImageValidationProvider()` - 8 edges
+7. `validateAllImages()` - 8 edges
+8. `isOpenCVReady()` - 8 edges
+9. `getFilePhoto()` - 7 edges
+10. `ImageValidationContextType` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `AlternativeCard()` --calls--> `getFilePhoto()`  [EXTRACTED]
+  app/components/file/alternatives-view.tsx → app/constants/endofile-photos.ts
 - `ImageValidationBannerProps` --references--> `ImageValidationResults`  [EXTRACTED]
   app/components/overlays/image-validation-banner.tsx → app/lib/image-validations.ts
-- `CameraContextProvider()` --calls--> `useEndofileAi()`  [EXTRACTED]
-  app/contexts/camera-context.tsx → app/contexts/endofile-model-context.tsx
+- `Sidebar()` --indirect_call--> `Home()`  [INFERRED]
+  app/components/overlays/sidebar.tsx → app/page.tsx
+- `CameraContextProvider()` --calls--> `createScanId()`  [EXTRACTED]
+  app/contexts/camera-context.tsx → app/lib/history-store.ts
 - `CameraContextProvider()` --calls--> `validateAllImages()`  [EXTRACTED]
   app/contexts/camera-context.tsx → app/lib/image-validations.ts
-- `CameraBottomBar()` --calls--> `useCamera()`  [EXTRACTED]
-  app/components/camera/camera-bottom-bar.tsx → app/contexts/camera-context.tsx
-- `CameraBottomBar()` --calls--> `useEndofileAi()`  [EXTRACTED]
-  app/components/camera/camera-bottom-bar.tsx → app/contexts/endofile-model-context.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (17 total, 4 thin omitted)
+## Communities (16 total, 4 thin omitted)
 
 ### Community 0 - "camera-screen-shell.tsx"
-Cohesion: 0.17
-Nodes (19): CameraBottomBar(), CameraBottomBarProps, CameraDetectionBadge(), CameraDetectionBadgeProps, CameraHeader(), CameraHeaderProps, CameraScreenShell(), DetailTarget (+11 more)
+Cohesion: 0.10
+Nodes (33): CameraBottomBar(), CameraBottomBarProps, CameraDetectionBadge(), CameraDetectionBadgeProps, CameraHeader(), CameraHeaderProps, CameraScreen(), CameraScreenProps (+25 more)
 
 ### Community 1 - "endofile-dataset.ts"
 Cohesion: 0.10
 Nodes (27): CatalogFileRow(), CatalogFileRowProps, EFileDetectionCard(), EFileDetectionCardProps, FileCatalogView(), FileCatalogViewProps, FileDetailView(), FileDetailViewProps (+19 more)
 
 ### Community 2 - "image-validation-context.tsx"
-Cohesion: 0.21
-Nodes (22): ImageValidationBanner(), ImageValidationBannerProps, CameraContextType, ImageValidationContext, ImageValidationContextType, ImageValidationProvider(), BlurValidationResult, BoundingBox (+14 more)
+Cohesion: 0.17
+Nodes (25): ImageValidationBanner(), ImageValidationBannerProps, ValidationSettingsModal(), ValidationSettingsModalProps, CameraContextType, ImageValidationContext, ImageValidationContextType, ImageValidationProvider() (+17 more)
 
 ### Community 3 - "compilerOptions"
 Cohesion: 0.07
 Nodes (28): dom, dom.iterable, esnext, **/*.mts, .next/dev/types/**/*.ts, next-env.d.ts, .next/types/**/*.ts, node_modules (+20 more)
 
 ### Community 4 - "endofile-model-context.tsx"
-Cohesion: 0.19
-Nodes (22): EndofileAiContext, EndofileAiContextType, EndofileContextProvider(), PredictionSource, TensorFlow, TopPrediction, clearScanHistory(), deleteKeys() (+14 more)
+Cohesion: 0.14
+Nodes (28): DEFAULT_MODEL_VERSION, FILE_CLASSES_V1, FILE_CLASSES_V2, MODEL_CONFIGS, ModelConfig, EndofileAiContext, EndofileAiContextType, EndofileContextProvider() (+20 more)
 
 ### Community 5 - "dependencies"
 Cohesion: 0.09
 Nodes (22): lucide-react, next, dependencies, lucide-react, next, react, react-dom, @techstark/opencv-js (+14 more)
-
-### Community 6 - "validation-settings-modal.tsx"
-Cohesion: 0.67
-Nodes (3): ValidationSettingsModal(), ValidationSettingsModalProps, useImageValidation()
 
 ### Community 7 - "devDependencies"
 Cohesion: 0.12
@@ -105,12 +100,12 @@ Nodes (3): geistMono, geistSans, metadata
 Cohesion: 0.50
 Nodes (3): Deploy on Vercel, Getting Started, Learn More
 
-### Community 19 - "camera-context.tsx"
-Cohesion: 0.15
-Nodes (12): CameraScreen(), CameraScreenProps, LoadingScreen(), LoadingScreenProps, CameraContext, CameraContextProvider(), ExtendedMediaTrackCapabilities, ExtendedMediaTrackConstraints (+4 more)
+### Community 19 - "model-scanner-page.tsx"
+Cohesion: 0.17
+Nodes (8): LoadingScreen(), LoadingScreenProps, ModelScannerPage(), ModelScannerPageProps, Sidebar(), SidebarProps, ModelVersion, Home()
 
 ## Knowledge Gaps
-- **98 isolated node(s):** `CameraBottomBarProps`, `CameraDetectionBadgeProps`, `CameraHeaderProps`, `DrawerView`, `DetailTarget` (+93 more)
+- **101 isolated node(s):** `CameraBottomBarProps`, `CameraDetectionBadgeProps`, `CameraHeaderProps`, `DetailTarget`, `DrawerState` (+96 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -118,16 +113,16 @@ Nodes (12): CameraScreen(), CameraScreenProps, LoadingScreen(), LoadingScreenPro
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `devDependencies` connect `devDependencies` to `dependencies`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `FILE_CLASSES` connect `endofile-dataset.ts` to `endofile-model-context.tsx`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `CameraBottomBarProps`, `CameraDetectionBadgeProps`, `CameraHeaderProps` to the rest of the system?**
-  _98 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _101 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `camera-screen-shell.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.10048309178743961 - nodes in this community are weakly interconnected._
 - **Should `endofile-dataset.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.10338680926916222 - nodes in this community are weakly interconnected._
 - **Should `compilerOptions` be split into smaller, more focused modules?**
   _Cohesion score 0.06896551724137931 - nodes in this community are weakly interconnected._
+- **Should `endofile-model-context.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.1431451612903226 - nodes in this community are weakly interconnected._
 - **Should `dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.08695652173913043 - nodes in this community are weakly interconnected._
-- **Should `devDependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.11764705882352941 - nodes in this community are weakly interconnected._

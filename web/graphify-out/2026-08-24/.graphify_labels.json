@@ -5,7 +5,6 @@
   "3": "compilerOptions",
   "4": "endofile-model-context.tsx",
   "5": "dependencies",
-  "6": "validation-settings-modal.tsx",
   "7": "devDependencies",
   "8": "generate-photo-manifest.mjs",
   "9": "opencv.js",
@@ -15,5 +14,5 @@
   "14": "GEMINI.md",
   "15": "next.config.ts",
   "16": "postcss.config.mjs",
-  "19": "camera-context.tsx"
+  "19": "model-scanner-page.tsx"
 }

@@ -304,7 +304,7 @@
       "label": "AlternativesViewProps",
       "file_type": "code",
       "source_file": "app/components/file/alternatives-view.tsx",
-      "source_location": "L66",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "app_components_file_alternatives_view_alternativesviewprops",
       "community": 0,
@@ -315,7 +315,7 @@
       "label": "AlternativesView()",
       "file_type": "code",
       "source_file": "app/components/file/alternatives-view.tsx",
-      "source_location": "L76",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "app_components_file_alternatives_view_alternativesview",
       "community": 0,
@@ -461,8 +461,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_components_file_recent_detections_view",
-      "community": 0,
-      "community_name": "camera-screen-shell.tsx",
+      "community": 1,
+      "community_name": "endofile-dataset.ts",
       "norm_label": "recent-detections-view.tsx"
     },
     {
@@ -472,8 +472,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "app_components_file_recent_detections_view_recentdetectionsviewprops",
-      "community": 0,
-      "community_name": "camera-screen-shell.tsx",
+      "community": 1,
+      "community_name": "endofile-dataset.ts",
       "norm_label": "recentdetectionsviewprops"
     },
     {
@@ -1214,10 +1214,21 @@
       "norm_label": "metadata"
     },
     {
-      "label": "RootLayout()",
+      "label": "viewport",
       "file_type": "code",
       "source_file": "app/layout.tsx",
       "source_location": "L20",
+      "_origin": "ast",
+      "id": "app_layout_viewport",
+      "community": 10,
+      "community_name": "layout.tsx",
+      "norm_label": "viewport"
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "app/layout.tsx",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "app_layout_rootlayout",
       "community": 10,
@@ -4167,7 +4178,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/components/file/alternatives-view.tsx",
-      "source_location": "L76",
+      "source_location": "L78",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_file_alternatives_view",
@@ -4178,7 +4189,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/components/file/alternatives-view.tsx",
-      "source_location": "L66",
+      "source_location": "L68",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_file_alternatives_view",
@@ -4335,7 +4346,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/components/file/alternatives-view.tsx",
-      "source_location": "L78",
+      "source_location": "L80",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_file_alternatives_view_alternativesview",
@@ -4347,7 +4358,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/components/file/alternatives-view.tsx",
-      "source_location": "L77",
+      "source_location": "L79",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_components_file_alternatives_view_alternativesview",
@@ -6405,11 +6416,22 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/layout.tsx",
-      "source_location": "L20",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_layout",
       "target": "app_layout_rootlayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/layout.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_layout",
+      "target": "app_layout_viewport",
       "confidence_score": 1.0
     },
     {
@@ -8332,5 +8354,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "705b9dbab26a736cc081c2745273d60ae59cf8eb"
+  "built_at_commit": "b15634813d4daee191062f86fad6ab8a40093951"
 }
