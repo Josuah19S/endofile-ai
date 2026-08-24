@@ -196,16 +196,23 @@ export default function CameraScreenShell() {
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      {/* Center Viewport & Reticle Area */}
-      <CameraViewport />
+      {/* Center Layout Container: Viewport with Detection Badge directly underneath */}
+      <div className="absolute inset-x-0 top-14 bottom-24 sm:bottom-28 z-10 flex flex-col items-center justify-center p-3 pointer-events-none">
+        {/* Camera Viewport Area */}
+        <div className="relative w-[82vw] max-w-[340px] aspect-[3/4] max-h-[58vh] shrink pointer-events-auto">
+          <CameraViewport />
+        </div>
 
-      {/* Info Card Overlay (Lima detectada) */}
-      {!controlsHidden && (
-        <CameraDetectionBadge
-          onOpenDetail={handleOpenDetail}
-          onOpenAlternatives={openAlternatives}
-        />
-      )}
+        {/* Detection Badge directly below the camera viewport */}
+        {!controlsHidden && (
+          <div className="w-[82vw] max-w-[340px] mt-2.5 shrink-0 pointer-events-auto">
+            <CameraDetectionBadge
+              onOpenDetail={handleOpenDetail}
+              onOpenAlternatives={openAlternatives}
+            />
+          </div>
+        )}
+      </div>
 
       {/*
         Bottom Bar — h-24 when idle, grows to h-[65vh] (or fullHeight for the

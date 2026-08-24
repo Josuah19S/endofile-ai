@@ -26,8 +26,8 @@ export const cameraStyles = {
   // Flash button variation when active
   flashActive: "bg-amber-500/20 border-amber-500/50 text-amber-400 hover:bg-amber-500/30",
 
-  // Camera viewport area - centered 3:4 aspect ratio frame for both desktop and mobile
-  viewportArea: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[82vw] max-w-[350px] aspect-[3/4] z-10 flex items-center justify-center bg-surface-container-lowest rounded-2xl border border-primary/40 shadow-[0_16px_40px_rgba(0,0,0,0.6)] overflow-hidden",
+  // Camera viewport area - fits inside the flex parent container
+  viewportArea: "relative w-full h-full flex items-center justify-center bg-surface-container-lowest rounded-2xl border border-primary/40 shadow-[0_16px_40px_rgba(0,0,0,0.6)] overflow-hidden",
 
   // The interactive video stream
   videoPreview: "w-full h-full object-cover",
@@ -47,11 +47,11 @@ export const cameraStyles = {
   // Center focusing dot
   focusCenterDot: "w-1.5 h-1.5 rounded-full bg-primary/80 shadow-[0_0_8px_#22adfa]",
 
-  // Bottom info overlay (Lima detectada card) - raised further to prevent control overlap
-  infoOverlayContainer: "absolute bottom-36 md:bottom-40 left-0 right-0 z-20 px-4 md:px-6 w-full flex justify-center pointer-events-none",
+  // Bottom info overlay (Lima detectada container)
+  infoOverlayContainer: "w-full flex justify-center pointer-events-auto",
 
   // Lima detectada card
-  infoCard: "pointer-events-auto flex items-center gap-3 w-full max-w-sm px-4 py-3 rounded-xl bg-surface-container border border-outline shadow-xl transition-all duration-300",
+  infoCard: "pointer-events-auto flex items-center gap-3 w-full px-4 py-2.5 sm:py-3 rounded-xl bg-surface-container border border-outline shadow-xl transition-all duration-300",
 
   // Blue check icon container
   infoIconContainer: "flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/40",

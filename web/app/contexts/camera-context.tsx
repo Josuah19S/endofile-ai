@@ -11,17 +11,19 @@ import {
 } from '@/app/lib/image-validations';
 
 /**
- * Torch and focus control are MediaTrack extensions that lib.dom does not declare yet,
+ * Torch, focus, and zoom control are MediaTrack extensions that lib.dom does not declare yet,
  * so the standard types are widened here instead of casting call sites to `any`.
  */
 interface ExtendedMediaTrackCapabilities extends MediaTrackCapabilities {
   torch?: boolean;
   focusMode?: string[];
+  zoom?: { min?: number; max?: number; step?: number };
 }
 
 interface ExtendedMediaTrackConstraintSet extends MediaTrackConstraintSet {
   torch?: boolean;
   focusMode?: string;
+  zoom?: number;
 }
 
 interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
@@ -38,6 +40,13 @@ export interface CameraContextType {
   showFlashOverlay: boolean;
   showTapFocus: boolean;
   isCameraPaused: boolean;
+
+  zoom: number;
+  minZoom: number;
+  maxZoom: number;
+  stepZoom: number;
+  hasHardwareZoom: boolean;
+  applyZoom: (zoom: number) => Promise<void>;
 
   videoRef: React.RefObject<HTMLVideoElement | null>;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
@@ -96,6 +105,13 @@ export function CameraContextProvider({
   const [isCameraPaused, setIsCameraPaused] = useState(false);
   const tapFocusTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Zoom management (Hardware Zoom API with Digital Crop Fallback)
+  const [zoom, setZoom] = useState<number>(1.0);
+  const [minZoom, setMinZoom] = useState<number>(1.0);
+  const [maxZoom, setMaxZoom] = useState<number>(3.5);
+  const [stepZoom, setStepZoom] = useState<number>(0.1);
+  const [hasHardwareZoom, setHasHardwareZoom] = useState<boolean>(false);
+
   const [recentsExpanded, setRecentsExpanded] = useState(false);
   const [validationResults, setValidationResults] = useState<ImageValidationResults | null>(null);
   const [validationConfig, setValidationConfig] = useState<ValidationConfig>(DEFAULT_VALIDATION_CONFIG);
@@ -109,6 +125,53 @@ export function CameraContextProvider({
 
   const { predict, isAnalyzing, setLimaDetected, addScanHistoryItem, confirmCandidate, pendingConfirmation, debug } = useEndofileAi();
 
+  const checkZoomCapabilities = (newStream: MediaStream) => {
+    const track = newStream.getVideoTracks()[0];
+    if (!track) return;
+    try {
+      const capabilities = track.getCapabilities() as ExtendedMediaTrackCapabilities;
+      if (capabilities.zoom) {
+        setHasHardwareZoom(true);
+        const min = capabilities.zoom.min || 1.0;
+        const max = Math.min(capabilities.zoom.max || 5.0, 5.0);
+        const step = capabilities.zoom.step || 0.1;
+        setMinZoom(min);
+        setMaxZoom(max);
+        setStepZoom(step);
+      } else {
+        setHasHardwareZoom(false);
+        setMinZoom(1.0);
+        setMaxZoom(3.5);
+        setStepZoom(0.1);
+      }
+    } catch {
+      setHasHardwareZoom(false);
+      setMinZoom(1.0);
+      setMaxZoom(3.5);
+      setStepZoom(0.1);
+    }
+  };
+
+  const applyZoom = async (newZoom: number) => {
+    const clamped = Math.max(minZoom, Math.min(newZoom, maxZoom));
+    const rounded = Math.round(clamped * 10) / 10;
+    setZoom(rounded);
+
+    if (hasHardwareZoom && streamRef.current) {
+      const track = streamRef.current.getVideoTracks()[0];
+      if (track) {
+        try {
+          await track.applyConstraints({
+            advanced: [{ zoom: rounded }],
+          } as ExtendedMediaTrackConstraints);
+        } catch (err) {
+          if (debug) console.warn("Failed to apply hardware zoom, falling back to digital crop:", err);
+          setHasHardwareZoom(false);
+        }
+      }
+    }
+  };
+
   // Enumerate all video inputs to allow switching between lenses
   const enumerateCameras = async () => {
     try {
@@ -116,7 +179,7 @@ export function CameraContextProvider({
       const videoInputs = devices.filter(device => device.kind === 'videoinput');
       setVideoDevices(videoInputs);
     } catch (err) {
-      console.warn("Could not enumerate camera devices:", err);
+      if (debug) console.warn("Could not enumerate camera devices:", err);
     }
   };
 
@@ -148,6 +211,7 @@ export function CameraContextProvider({
       setStream(newStream);
       setCameraAvailable(true);
       setActiveDeviceIndex(deviceIndex);
+      checkZoomCapabilities(newStream);
 
       if (isFirstCameraLoad.current) {
         setShowUserGuide(true);
@@ -159,7 +223,7 @@ export function CameraContextProvider({
         videoRef.current.play().catch(() => { });
       }
     } catch (err) {
-      console.warn("Camera access denied or failed:", err);
+      if (debug) console.warn("Camera access denied or failed:", err);
       setCameraAvailable(false);
     }
   };
@@ -186,10 +250,10 @@ export function CameraContextProvider({
         } as ExtendedMediaTrackConstraints);
         setFlashOn(nextState);
       } else {
-        console.warn("Torch capability is not supported on this device track.");
+        if (debug) console.warn("Torch capability is not supported on this device track.");
       }
     } catch (err) {
-      console.warn("Failed to toggle torch:", err);
+      if (debug) console.warn("Failed to toggle torch:", err);
     }
   };
 
@@ -213,7 +277,7 @@ export function CameraContextProvider({
         }
       }
     } catch (err) {
-      console.warn("Failed to trigger refocus constraint:", err);
+      if (debug) console.warn("Failed to trigger refocus constraint:", err);
     }
   };
 
@@ -243,7 +307,7 @@ export function CameraContextProvider({
         try {
           await requestCameraAccess(activeDeviceIndex);
         } catch (err) {
-          console.warn('Failed to resume camera:', err);
+          if (debug) console.warn('Failed to resume camera:', err);
         }
       }
     } else {
@@ -290,7 +354,7 @@ export function CameraContextProvider({
         if (isMounted && !selectedPhotoUrl) {
           setValidationResults(valResults);
         }
-      } catch (err) {
+      } catch {
         // Silent catch for live stream validation loop
       } finally {
         isValidating = false;
@@ -346,8 +410,7 @@ export function CameraContextProvider({
    *   - modelCanvas:   448x448, the 3:4 crop squished into 1:1, what the
    *     TensorFlow.js graph expects (see endofile-model-context.tsx).
    *
-   * Returns null only if the browser refuses to allocate a 2D context for
-   * either canvas; otherwise the caller can rely on both being usable.
+   * Supports hardware zoom (already framed by sensor) and digital crop zoom (scaled from center).
    */
   const buildCaptureArtifacts = (
     source: CanvasImageSource,
@@ -368,18 +431,22 @@ export function CameraContextProvider({
     const modelCtx = modelCanvas.getContext('2d');
     if (!modelCtx) return null;
 
-    displayCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 480, 640);
-    modelCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 448, 448);
+    // If using digital zoom fallback (not hardware zoom) and zoom > 1:
+    const effectiveZoom = hasHardwareZoom ? 1.0 : Math.max(1.0, zoom);
+    const finalCropW = cropW / effectiveZoom;
+    const finalCropH = cropH / effectiveZoom;
+    const finalSx = sx + (cropW - finalCropW) / 2;
+    const finalSy = sy + (cropH - finalCropH) / 2;
+
+    displayCtx.drawImage(source, finalSx, finalSy, finalCropW, finalCropH, 0, 0, 480, 640);
+    modelCtx.drawImage(source, finalSx, finalSy, finalCropW, finalCropH, 0, 0, 448, 448);
 
     if (debug) {
       const debugData = modelCtx.getImageData(0, 0, 10, 1).data;
       const debugCenter = modelCtx.getImageData(200, 200, 10, 1).data;
       console.log('[Debug Canvas] Esquina superior izq:', Array.from(debugData));
       console.log('[Debug Canvas] Centro del canvas:', Array.from(debugCenter));
-      console.log('[Debug Canvas] Primeros 10 píxeles RGBA:', Array.from(debugData));
-      console.log('[Debug Canvas] cropW:', cropW, 'cropH:', cropH);
-      console.log('[Debug Canvas] sx:', sx, 'sy:', sy);
-      console.log('[Debug Canvas] sourceWidth:', sourceWidth, 'sourceHeight:', sourceHeight);
+      console.log('[Debug Canvas] cropW:', finalCropW, 'cropH:', finalCropH, 'zoom:', zoom, 'hasHardwareZoom:', hasHardwareZoom);
     }
 
     return {
@@ -396,7 +463,7 @@ export function CameraContextProvider({
     setTimeout(() => setShowFlashOverlay(false), 200);
 
     if (!videoRef.current || !cameraAvailable) {
-      console.warn("[Camera] capturePhoto called with no active video stream.");
+      if (debug) console.warn("[Camera] capturePhoto called with no active video stream.");
       setLimaDetected('Error al analizar');
       return;
     }
@@ -408,9 +475,7 @@ export function CameraContextProvider({
     const artifacts = buildCaptureArtifacts(videoElement, vw, vh);
     if (!artifacts) return;
 
-    // New capture supersedes the previous prediction. Clearing limaDetected
-    // up front keeps the badge from flashing the old result while the new
-    // photo is being validated and predicted.
+    // New capture supersedes the previous prediction.
     setLimaDetected(null);
     setSelectedPhotoUrl(artifacts.displayDataUrl);
 
@@ -422,10 +487,7 @@ export function CameraContextProvider({
       console.warn("[Validation Gate] Photo has quality warnings:", valResults.warnings);
     }
 
-    // 2. Proceed with model prediction, then persist the top candidate so
-    //    the doctor can dismiss with "Continuar" without losing the result.
-    //    If they tap "Otras alternativas" and pick a different class, that
-    //    picker updates the entry in place (see confirmCandidate).
+    // 2. Proceed with model prediction, then persist the top candidate
     const topN = await predict(artifacts.modelCanvas);
     const top = topN[0];
     if (top && top.classId !== 'Lima no identificada') {
@@ -458,8 +520,8 @@ export function CameraContextProvider({
           try {
             const testData = testCtx?.getImageData(0, 0, 10, 10);
             console.log('[Debug] Canvas NOT tainted, first pixel:', testData?.data.slice(0, 4));
-          } catch (e) {
-            console.log('[Debug] Canvas IS tainted (CORS):', e);
+          } catch (err) {
+            console.log('[Debug] Canvas IS tainted (CORS):', err);
           }
         }
 
@@ -481,9 +543,7 @@ export function CameraContextProvider({
             console.warn("[Validation Gate] Uploaded file has quality warnings:", valResults.warnings);
           }
 
-          // 2. Proceed with model prediction and auto-save the top (same
-          //    semantics as live capture: tap "Continuar" to dismiss with the
-          //    result already in history).
+          // 2. Proceed with model prediction and auto-save the top
           const topN = await predict(artifacts.modelCanvas);
           const top = topN[0];
           if (top && top.classId !== 'Lima no identificada') {
@@ -495,7 +555,7 @@ export function CameraContextProvider({
             });
           }
         } catch (err) {
-          console.error("Uploaded file prediction error:", err);
+          if (debug) console.error("Uploaded file prediction error:", err);
         }
       };
     };
@@ -529,6 +589,12 @@ export function CameraContextProvider({
       showFlashOverlay,
       showTapFocus,
       isCameraPaused,
+      zoom,
+      minZoom,
+      maxZoom,
+      stepZoom,
+      hasHardwareZoom,
+      applyZoom,
       videoRef,
       fileInputRef,
       requestCameraAccess,
