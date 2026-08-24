@@ -418,7 +418,7 @@ export function CameraContextProvider({
     const valResults = await validateAllImages(artifacts.modelCanvas, validationConfig);
     setValidationResults(valResults);
 
-    if (valResults.hasErrors) {
+    if (debug && valResults.hasErrors) {
       console.warn("[Validation Gate] Photo has quality warnings:", valResults.warnings);
     }
 
@@ -477,7 +477,7 @@ export function CameraContextProvider({
           const valResults = await validateAllImages(artifacts.modelCanvas, validationConfig);
           setValidationResults(valResults);
 
-          if (valResults.hasErrors) {
+          if (debug && valResults.hasErrors) {
             console.warn("[Validation Gate] Uploaded file has quality warnings:", valResults.warnings);
           }
 

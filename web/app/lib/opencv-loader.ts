@@ -34,7 +34,7 @@ export function loadOpenCV(): Promise<any> {
     const checkReady = () => {
       if (!resolved && isOpenCVReady()) {
         resolved = true;
-        devLog("[OpenCV.js] Engine ready and cv.Mat available!");
+        // devLog("[OpenCV.js] Engine ready and cv.Mat available!");
         resolve(window.cv);
         return true;
       }

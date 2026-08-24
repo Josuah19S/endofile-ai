@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronLeft, Home, History, BookOpen, Info, Cpu, Layers } from 'lucide-react';
+import { ChevronLeft, Home, History, BookOpen, Info, Cpu, Layers, LayoutGrid } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,20 +18,26 @@ export default function Sidebar({ isOpen, onClose, onSelectNav, onOpenGuide }: S
 
   const modelOptions = [
     {
+      id: 'home',
+      href: '/',
+      label: 'Página Principal',
+      tag: 'Home',
+      icon: Home,
+      isActive: pathname === '/',
+    },
+    {
       id: 'v2',
       href: '/modelv2',
-      label: 'Modelo V2 (Actual)',
+      label: 'Modelo V2',
       tag: '29 clases',
-      details: 'Normalización integrada',
       icon: Cpu,
-      isActive: pathname === '/' || pathname === '/modelv2',
+      isActive: pathname === '/modelv2',
     },
     {
       id: 'v1',
       href: '/modelv1',
       label: 'Modelo V1',
       tag: '28 clases',
-      details: 'Normalización [-1, 1]',
       icon: Layers,
       isActive: pathname === '/modelv1',
     },
@@ -72,7 +78,7 @@ export default function Sidebar({ isOpen, onClose, onSelectNav, onOpenGuide }: S
               }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-container-lowest/50 hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-medium text-sm transition-all cursor-pointer border border-outline/40"
             >
-              <Home size={18} className="text-primary" />
+              <LayoutGrid size={18} className="text-primary" />
               <span>Visor Cámara</span>
             </button>
 
@@ -118,7 +124,7 @@ export default function Sidebar({ isOpen, onClose, onSelectNav, onOpenGuide }: S
                 <span>Modelos IA</span>
               </div>
               <span className="text-[10px] font-mono uppercase bg-primary/20 text-primary border border-primary/30 px-1.5 py-0.5 rounded-md font-semibold">
-                Subpáginas
+                Navegación
               </span>
             </div>
 
@@ -140,14 +146,9 @@ export default function Sidebar({ isOpen, onClose, onSelectNav, onOpenGuide }: S
                       <div className={`p-2 rounded-xl ${opt.isActive ? 'bg-primary/25 text-primary' : 'bg-surface-container text-on-surface-variant'}`}>
                         <IconComponent size={16} />
                       </div>
-                      <div className="flex flex-col text-left min-w-0">
-                        <span className="text-xs font-semibold truncate flex items-center gap-1.5">
-                          {opt.label}
-                        </span>
-                        <span className="text-[10px] text-on-surface-variant/80 truncate">
-                          {opt.details}
-                        </span>
-                      </div>
+                      <span className="text-xs font-semibold truncate">
+                        {opt.label}
+                      </span>
                     </div>
 
                     <div className="shrink-0 flex items-center gap-1">

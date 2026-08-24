@@ -130,16 +130,16 @@ export function EndofileContextProvider({
     let active = true;
     const initModel = async () => {
       try {
-        devLog(`[${activeModelConfig.name}] Loading TensorFlow.js...`);
+        if (debug) devLog(`[${activeModelConfig.name}] Loading TensorFlow.js...`);
         const tfjs = await import('@tensorflow/tfjs');
         if (!active) return;
         setTf(tfjs);
 
-        devLog(`[${activeModelConfig.name}] Loading graph model from ${activeModelConfig.modelUrl}...`);
+        if (debug) devLog(`[${activeModelConfig.name}] Loading graph model from ${activeModelConfig.modelUrl}...`);
         const loadedModel = await tfjs.loadGraphModel(activeModelConfig.modelUrl);
 
         // Warm up the model (compiles WebGL shaders in the background to avoid first-click latency)
-        devLog(`[${activeModelConfig.name}] Warming up model...`);
+        if (debug) devLog(`[${activeModelConfig.name}] Warming up model...`);
         const dummyInput = tfjs.zeros([1, 448, 448, 3]);
         const warmupPrediction = await loadedModel.executeAsync(dummyInput);
         tfjs.dispose(dummyInput);
@@ -148,7 +148,7 @@ export function EndofileContextProvider({
         if (!active) return;
         setModel(loadedModel);
         setModelStatus('ready');
-        devLog(`[${activeModelConfig.name}] Graph Model loaded and warmed up successfully! Active Tensors: ${tfjs.memory().numTensors}`);
+        if (debug) devLog(`[${activeModelConfig.name}] Graph Model loaded and warmed up successfully! Active Tensors: ${tfjs.memory().numTensors}`);
       } catch (err) {
         console.error(`Error initializing model (${activeModelConfig.name}):`, err);
         if (active) setModelStatus('error');
@@ -158,7 +158,7 @@ export function EndofileContextProvider({
     return () => {
       active = false;
     };
-  }, [activeModelConfig.modelUrl, activeModelConfig.name]);
+  }, [activeModelConfig.modelUrl, activeModelConfig.name, debug]);
 
   /**
    * Lock in `classId` as the final detection and persist it to history.
@@ -248,14 +248,18 @@ export function EndofileContextProvider({
 
       const topN = ranked.slice(0, TOP_N);
 
-      devLog(`[${activeModelConfig.name} Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
+      if (debug) {
+        devLog(`[${activeModelConfig.name} Top 10 Predictions]:\n` + ranked.slice(0, 10).map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
+      }
 
       // Confidence threshold check (15% minimum probability)
       const MIN_CONFIDENCE_THRESHOLD = 0.15;
       const topConfidence = topN[0]?.confidence || 0;
 
       if (topConfidence < MIN_CONFIDENCE_THRESHOLD) {
-        devLog(`[${activeModelConfig.name} Low Confidence]: Highest class probability was only ${(topConfidence * 100).toFixed(2)}% (< ${(MIN_CONFIDENCE_THRESHOLD * 100).toFixed(0)}%).`);
+        if (debug) {
+          devLog(`[${activeModelConfig.name} Low Confidence]: Highest class probability was only ${(topConfidence * 100).toFixed(2)}% (< ${(MIN_CONFIDENCE_THRESHOLD * 100).toFixed(0)}%).`);
+        }
         setLimaDetected('Lima no identificada');
         setTopPredictions([{ classId: 'Lima no identificada', confidence: topConfidence }, ...topN]);
 
@@ -275,8 +279,10 @@ export function EndofileContextProvider({
       tf.dispose(inputTensor);
       tf.dispose(prediction);
 
-      devLog(`[${activeModelConfig.name} Top ${TOP_N} Predictions]:\n` + topN.map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
-      devLog(`[TF.js Memory] Active Tensors after prediction: ${tf.memory().numTensors}`);
+      if (debug) {
+        devLog(`[${activeModelConfig.name} Top ${TOP_N} Predictions]:\n` + topN.map((p, i) => `  ${i + 1}. ${p.classId}: ${(p.confidence * 100).toFixed(2)}%`).join('\n'));
+        devLog(`[TF.js Memory] Active Tensors after prediction: ${tf.memory().numTensors}`);
+      }
 
       return topN;
     } catch (err) {
