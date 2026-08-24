@@ -193,7 +193,6 @@ export default function CameraScreenShell() {
         controlsHidden={controlsHidden}
         setControlsHidden={setControlsHidden}
         setSidebarOpen={setSidebarOpen}
-        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
       {/* Center Layout Container: Viewport with Detection Badge directly underneath */}
