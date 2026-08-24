@@ -1,5 +1,4 @@
 import { FILE_CLASSES } from './endofile-classes';
-import { FILE_CLASSES_V1, FILE_CLASSES_V2 } from './endofile-models';
 
 export interface EndoFileDetails {
   id: string;
@@ -781,19 +780,47 @@ export function getEndoFileInfo(classId: string | null): EndoFileDetails | null 
 /* ------------------------------------------------------------------------- */
 
 /**
- * Detected file IDs for Model v2 (29 classes / 8 systems).
- * Excludes the 4 non-detected systems (Re Treaty, S-Blue, RC-Blue, Super Files III).
+ * Files the catalog lists: the 43 rows of `dataset/limas-endodonticas.csv` in CSV order
+ * (by system, then `numero`), plus the 4 `Blue Shaper` files, as dictionary keys. 47 in all.
+ *
+ * Deliberately separate from `FILE_CLASSES`: this is the reference list the user browses,
+ * while `FILE_CLASSES` is the model's output contract. The two overlap but neither contains
+ * the other — the current (v2) model covers Blue Shaper, MG3 Blue, Apical Shaper, 3D Files,
+ * Rising, Slim Shaper, MicroMega One Curve Mini and MicroMega Remover (29 classes / 8
+ * systems). Re Treaty, S Blue, RC Blue and Super Files III (18 files) are listed here with
+ * no class in the model, and so carry `detectable: false` until a future model covers them.
+ *
+ * `Blue Shaper` is the one system with no row in the CSV: its ficha exists only here and in
+ * the dictionary, and its four files duplicate MG3 Blue's first four field for field, which
+ * suggests they are the same instruments under the model's naming. Unresolved on purpose —
+ * merging them is a data decision, not a rendering one.
+ *
+ * 3D Files, Slim Shaper and MicroMega One Curve Mini each hold two aliases per file in the
+ * dictionary — one under the retired 47-class model's ids (kept so history captured under
+ * the old model still resolves a ficha) and one under the ids the current model emits. The
+ * ids used here are always the ones the current model emits, so catalog, detection and
+ * detail key on the same string.
  */
-export const CATALOG_FILE_IDS_V2 = FILE_CLASSES_V2;
+export const CATALOG_FILE_IDS = [
+  're-treaty_1-bully', 're-treaty_2-skinny', 're-treaty_3-shapy1',
+  're-treaty_4-shapy2', 're-treaty_5-shapy3',
+  'mg3-blue_1-sv', 'mg3-blue_2-px', 'mg3-blue_3-g1', 'mg3-blue_4-g2x', 'mg3-blue_5-g2',
+  'blue-shaper_1-z1', 'blue-shaper_2-z2', 'blue-shaper_3-z3', 'blue-shaper_4-z4',
+  's-blue_1-b0', 's-blue_2-b1', 's-blue_3-b2', 's-blue_4-b3',
+  'rc-blue_1-r25', 'rc-blue_2-r40', 'rc-blue_3-r50',
+  'super-files-iii_1-sx', 'super-files-iii_2-s1', 'super-files-iii_3-s2',
+  'super-files-iii_4-f1', 'super-files-iii_5-f2', 'super-files-iii_6-f3',
+  'apical-shaper_1-z30', 'apical-shaper_2-z35', 'apical-shaper_3-z40', 'apical-shaper_4-z50',
+  '3d-files_1-f25', '3d-files_2-f30', '3d-files_3-s30',
+  'micromega-remover_1-n30',
+  'rising_1-17', 'rising_2-13', 'rising_3-25', 'rising_4-30', 'rising_5-28',
+  'slim-shaper_1-zs1', 'slim-shaper_2-zs2', 'slim-shaper_3-zs3',
+  'micromega-one-curve-mini_1-n45-0.4', 'micromega-one-curve-mini_2-n35-0.4',
+  'micromega-one-curve-mini_3-n25-0.6', 'micromega-one-curve-mini_4-n25-0.4',
+] as const;
 
-/**
- * Detected file IDs for Model v1 (28 classes / 7 systems).
- * Excludes the 4 non-detected systems and MicroMega Remover.
- */
-export const CATALOG_FILE_IDS_V1 = FILE_CLASSES_V1;
-
-/** Default active catalog IDs (v2 / 29 classes) */
-export const CATALOG_FILE_IDS = CATALOG_FILE_IDS_V2;
+/** Lookup for the detectable flag below. */
+const MODEL_CLASS_IDS: ReadonlySet<string> = new Set(FILE_CLASSES);
 
 /** A single catalog row: a dataset file plus its dictionary entry, when there is one. */
 export interface CatalogEntry {
@@ -801,7 +828,8 @@ export interface CatalogEntry {
   /** `null` when the file has no dictionary entry; callers fall back to parsing `classId`. */
   info: EndoFileDetails | null;
   /**
-   * True for classes supported by the current active model.
+   * `false` for dataset files the model has no class for: they can be consulted from the
+   * catalog, but the camera can never return them.
    */
   detectable: boolean;
 }
@@ -829,13 +857,13 @@ function compareCatalogEntries(a: CatalogEntry, b: CatalogEntry): number {
   return a.classId.localeCompare(b.classId, 'es');
 }
 
-/**
- * Builds catalog groups filtered to the provided class IDs (default: Model v2 classes).
- */
-export function buildCatalogSystems(allowedClassIds: readonly string[] = FILE_CLASSES_V2): EndoFileSystemGroup[] {
+function buildCatalogSystems(): EndoFileSystemGroup[] {
   const groups = new Map<string, CatalogEntry[]>();
 
-  for (const classId of allowedClassIds) {
+  // The catalog is derived from the dataset list, never from the dictionary keys: the
+  // dataset is the reference the fichas come from, and iterating an explicit list sidesteps
+  // the alias entries the dictionary holds for some systems.
+  for (const classId of CATALOG_FILE_IDS) {
     const info = getEndoFileInfo(classId);
     if (!info) {
       console.warn(`[Catálogo] La lima "${classId}" no tiene ficha en ENDOFILE_DICTIONARY.`);
@@ -844,7 +872,7 @@ export function buildCatalogSystems(allowedClassIds: readonly string[] = FILE_CL
     const entry: CatalogEntry = {
       classId,
       info,
-      detectable: true,
+      detectable: MODEL_CLASS_IDS.has(classId),
     };
 
     const sistema = info?.sistema || fallbackSystemName(classId);
@@ -862,12 +890,18 @@ export function buildCatalogSystems(allowedClassIds: readonly string[] = FILE_CL
   })).sort((a, b) => a.sistema.localeCompare(b.sistema, 'es'));
 }
 
+// Static data: build once so the console warning above cannot spam on re-render.
+let catalogCache: EndoFileSystemGroup[] | null = null;
+
 /**
- * Catalog derived from allowedClassIds (or Model v2 by default),
- * grouped by system (A→Z) and ordered by `numero` asc within each group.
+ * Catalog derived from CATALOG_FILE_IDS: every dataset file resolved against the
+ * dictionary, grouped by system (A→Z) and ordered by `numero` asc within each group.
  */
-export function getCatalogSystems(allowedClassIds?: readonly string[]): EndoFileSystemGroup[] {
-  return buildCatalogSystems(allowedClassIds ?? FILE_CLASSES_V2);
+export function getCatalogSystems(): EndoFileSystemGroup[] {
+  if (!catalogCache) {
+    catalogCache = buildCatalogSystems();
+  }
+  return catalogCache;
 }
 
 function matchesSearchTerm(entry: CatalogEntry, sistema: string, term: string): boolean {
@@ -878,13 +912,12 @@ function matchesSearchTerm(entry: CatalogEntry, sistema: string, term: string): 
   return haystack.some(value => normalizeSearchText(value).includes(term));
 }
 
-/** Filters by name, system or apical diameter. Scoped to the active model's available files. */
-export function searchEndoFiles(query: string, allowedClassIds?: readonly string[]): EndoFileSystemGroup[] {
+/** Filters by name, system or apical diameter. An empty query returns the full catalog. */
+export function searchEndoFiles(query: string): EndoFileSystemGroup[] {
   const term = normalizeSearchText(query.trim());
-  const systems = getCatalogSystems(allowedClassIds);
-  if (!term) return systems;
+  if (!term) return getCatalogSystems();
 
-  return systems
+  return getCatalogSystems()
     .map(group => ({
       sistema: group.sistema,
       limas: group.limas.filter(entry => matchesSearchTerm(entry, group.sistema, term)),

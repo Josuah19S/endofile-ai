@@ -2,6 +2,7 @@
 import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import { BookOpen, Search, SearchX, X } from 'lucide-react';
 import { searchEndoFiles } from '../../constants/endofile-dataset';
+import { useEndofileAi } from '../../contexts/endofile-model-context';
 import CatalogFileRow from './catalog-file-row';
 
 interface FileCatalogViewProps {
@@ -19,8 +20,12 @@ export default function FileCatalogView({
   onSelectFile,
 }: FileCatalogViewProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const { modelConfig } = useEndofileAi();
 
-  const groups = useMemo(() => searchEndoFiles(query), [query]);
+  const groups = useMemo(
+    () => searchEndoFiles(query, modelConfig?.classes),
+    [query, modelConfig?.classes]
+  );
   const totalFiles = useMemo(
     () => groups.reduce((sum, group) => sum + group.limas.length, 0),
     [groups]

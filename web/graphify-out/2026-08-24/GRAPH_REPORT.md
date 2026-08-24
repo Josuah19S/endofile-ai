@@ -1,16 +1,16 @@
 # Graph Report - web  (2026-08-24)
 
 ## Corpus Check
-- 48 files · ~1,973,771 words
+- 48 files · ~1,973,798 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 264 nodes · 468 edges · 16 communities (12 shown, 4 thin omitted)
+- 265 nodes · 469 edges · 16 communities (12 shown, 4 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 3 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `705b9dba`
+- Built from commit: `b1563481`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -61,12 +61,12 @@
 ## Communities (16 total, 4 thin omitted)
 
 ### Community 0 - "camera-screen-shell.tsx"
-Cohesion: 0.10
-Nodes (33): CameraBottomBar(), CameraBottomBarProps, CameraDetectionBadge(), CameraDetectionBadgeProps, CameraHeader(), CameraHeaderProps, CameraScreen(), CameraScreenProps (+25 more)
+Cohesion: 0.11
+Nodes (32): CameraBottomBar(), CameraBottomBarProps, CameraDetectionBadge(), CameraDetectionBadgeProps, CameraHeader(), CameraHeaderProps, CameraScreen(), CameraScreenProps (+24 more)
 
 ### Community 1 - "endofile-dataset.ts"
 Cohesion: 0.10
-Nodes (27): CatalogFileRow(), CatalogFileRowProps, EFileDetectionCard(), EFileDetectionCardProps, FileCatalogView(), FileCatalogViewProps, FileDetailView(), FileDetailViewProps (+19 more)
+Nodes (28): CatalogFileRow(), CatalogFileRowProps, EFileDetectionCard(), EFileDetectionCardProps, FileCatalogView(), FileCatalogViewProps, FileDetailView(), FileDetailViewProps (+20 more)
 
 ### Community 2 - "image-validation-context.tsx"
 Cohesion: 0.17
@@ -93,8 +93,8 @@ Cohesion: 0.17
 Nodes (9): catalogIds, catalogOrder, DATASET_FILE, entries, orphans, OUT_FILE, PHOTO_DIR, photos (+1 more)
 
 ### Community 10 - "layout.tsx"
-Cohesion: 0.40
-Nodes (3): geistMono, geistSans, metadata
+Cohesion: 0.33
+Nodes (4): geistMono, geistSans, metadata, viewport
 
 ### Community 11 - "README.md"
 Cohesion: 0.50
@@ -105,7 +105,7 @@ Cohesion: 0.17
 Nodes (8): LoadingScreen(), LoadingScreenProps, ModelScannerPage(), ModelScannerPageProps, Sidebar(), SidebarProps, ModelVersion, Home()
 
 ## Knowledge Gaps
-- **101 isolated node(s):** `CameraBottomBarProps`, `CameraDetectionBadgeProps`, `CameraHeaderProps`, `DetailTarget`, `DrawerState` (+96 more)
+- **102 isolated node(s):** `CameraBottomBarProps`, `CameraDetectionBadgeProps`, `CameraHeaderProps`, `DetailTarget`, `DrawerState` (+97 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -115,11 +115,11 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `devDependencies` connect `devDependencies` to `dependencies`?**
   _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `CameraBottomBarProps`, `CameraDetectionBadgeProps`, `CameraHeaderProps` to the rest of the system?**
-  _101 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _102 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `camera-screen-shell.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.10048309178743961 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10570824524312897 - nodes in this community are weakly interconnected._
 - **Should `endofile-dataset.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.10338680926916222 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09682539682539683 - nodes in this community are weakly interconnected._
 - **Should `compilerOptions` be split into smaller, more focused modules?**
   _Cohesion score 0.06896551724137931 - nodes in this community are weakly interconnected._
 - **Should `endofile-model-context.tsx` be split into smaller, more focused modules?**

@@ -14,7 +14,7 @@ interface AlternativeCardProps {
 
 /**
  * One alternative-prediction card. Renders the catalog reference photo (when
- * the dataset has one) plus the class label and the model's confidence.
+ * the dataset has one) plus the class label and system name.
  * Tapping it runs `onPick`, which the parent uses to lock the pick in and
  * collapse the drawer back to the idle camera.
  */
@@ -56,11 +56,6 @@ function AlternativeCard({ pred, onPick }: AlternativeCardProps) {
           {fullName}
         </span>
       </div>
-      {/*
-      <span className="text-[10px] tabular-nums font-bold text-primary self-end">
-        {(pred.confidence * 100).toFixed(0)}%
-      </span>
-      */}
     </button>
   );
 }

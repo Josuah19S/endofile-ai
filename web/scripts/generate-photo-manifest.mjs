@@ -14,7 +14,7 @@ import { createHash } from 'node:crypto';
 
 const WEB_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PHOTO_DIR = join(WEB_ROOT, 'public', 'file_photos');
-const DATASET_FILE = join(WEB_ROOT, 'app', 'constants', 'endofile-dataset.ts');
+const DATASET_FILE = join(WEB_ROOT, 'app', 'constants', 'endofile-dataset-complete.ts');
 const OUT_FILE = join(WEB_ROOT, 'app', 'constants', 'endofile-photos.ts');
 const PUBLIC_PATH = '/file_photos';
 
