@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { CheckCircle, Camera, Focus, Moon, ZoomIn, HelpCircle, ArrowRight, ListChecks } from 'lucide-react';
+import { CheckCircle, Camera, Focus, Moon, ZoomIn, HelpCircle, ArrowRight, ListChecks, AlertTriangle } from 'lucide-react';
 import { cameraStyles } from '../../styles/camera-styles';
 import { useCamera } from '../../contexts/camera-context';
 import { useEndofileAi } from '../../contexts/endofile-model-context';
@@ -19,12 +19,13 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
   const { validationResults, selectedPhotoUrl, resetDetection } = useCamera();
   const { limaDetected, isAnalyzing, pendingConfirmation } = useEndofileAi();
 
+  const isPictureTaken = Boolean(selectedPhotoUrl);
   const isUnidentified = limaDetected === 'Lima no identificada';
   const hasValidationErrors = validationResults?.hasErrors;
   const blurError = validationResults?.blur.isBlurry;
   const darkError = validationResults?.dark.isDark;
 
-  const hasMatch = limaDetected && !isUnidentified;
+  const hasMatch = Boolean(limaDetected && !isUnidentified);
   const predictedName = hasMatch ? formatClassName(limaDetected!) : null;
 
   return (
@@ -32,7 +33,7 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
       <div
         className={`${cameraStyles.infoCard} ${hasMatch
             ? 'border-primary/50 shadow-[0_10px_25px_rgba(0,0,0,0.15)] cursor-pointer hover:border-primary'
-            : isUnidentified || hasValidationErrors
+            : isUnidentified || (!isPictureTaken && hasValidationErrors)
               ? 'border-amber-500/60 bg-surface-container-low shadow-[0_10px_25px_rgba(245,158,11,0.15)]'
               : 'border-outline/80'
           }`}
@@ -41,17 +42,17 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
         <div
           className={`${cameraStyles.infoIconContainer} ${hasMatch
               ? 'bg-primary-container/30 text-on-primary-container border-primary-container/50'
-              : isUnidentified || hasValidationErrors
+              : isUnidentified || (!isPictureTaken && hasValidationErrors)
                 ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
                 : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
             }`}
         >
           {isAnalyzing ? (
             <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          ) : isUnidentified ? (
-            <HelpCircle size={14} className="animate-pulse text-amber-400" />
           ) : hasMatch ? (
             <CheckCircle size={14} className="animate-scale-in" />
+          ) : isUnidentified ? (
+            <HelpCircle size={14} className="animate-pulse text-amber-400" />
           ) : hasValidationErrors ? (
             blurError ? (
               <Focus size={14} className="animate-pulse" />
@@ -75,15 +76,56 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
           }}
         >
           <p className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant leading-none mb-1">
-            {isUnidentified || hasValidationErrors ? 'Validación de Imagen' : 'Detector de Limas'}
+            {!isPictureTaken && hasValidationErrors ? 'Validación de Imagen' : 'Detector de Limas'}
           </p>
-          <p className={cameraStyles.infoText}>
+          <div className={cameraStyles.infoText}>
             {isAnalyzing ? (
-              <span className="text-on-surface-variant font-medium">Analizando lima...</span>
+              <span className="text-on-surface-variant font-medium text-xs">Analizando lima...</span>
+            ) : hasMatch ? (
+              <div className="flex flex-col">
+                <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                  <span className="text-on-surface-variant font-normal text-xs">Lima detectada:</span>
+                  {predictedName ? (
+                    <>
+                      <span className="text-xs font-medium text-on-surface-variant/80">{predictedName.system}</span>
+                      <span className="text-sm font-semibold text-on-surface">{predictedName.orderAndName}</span>
+                    </>
+                  ) : (
+                    <span className="text-sm font-semibold text-on-surface">{limaDetected?.replace(/-/g, ' ')}</span>
+                  )}
+                </span>
+                {/* Smaller warning message when the picture is taken and main result is shown */}
+                {hasValidationErrors && (
+                  <span className="inline-flex items-center gap-1 mt-0.5 text-[11px] text-amber-300 font-normal leading-tight">
+                    <AlertTriangle size={11} className="shrink-0 text-amber-400" />
+                    <span>
+                      {blurError
+                        ? 'Imagen desenfocada'
+                        : darkError
+                          ? 'Poca iluminación'
+                          : 'Lima muy lejos'}
+                    </span>
+                  </span>
+                )}
+              </div>
             ) : isUnidentified ? (
-              <span className="text-amber-300 font-semibold text-xs">
-                Lima no identificada. Intente enfocar la lima nuevamente.
-              </span>
+              <div className="flex flex-col">
+                <span className="text-amber-300 font-semibold text-xs">
+                  Lima no identificada. Intente enfocar la lima nuevamente.
+                </span>
+                {hasValidationErrors && (
+                  <span className="inline-flex items-center gap-1 mt-0.5 text-[11px] text-amber-200/80 font-normal leading-tight">
+                    <AlertTriangle size={11} className="shrink-0 text-amber-400" />
+                    <span>
+                      {blurError
+                        ? 'Posible causa: imagen desenfocada'
+                        : darkError
+                          ? 'Posible causa: poca iluminación'
+                          : 'Posible causa: lima muy lejos'}
+                    </span>
+                  </span>
+                )}
+              </div>
             ) : hasValidationErrors ? (
               <span className="text-amber-300 font-medium text-xs">
                 {blurError
@@ -92,23 +134,12 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
                     ? 'Imagen muy oscura. Encienda la luz o el flash.'
                     : 'Lima muy lejos. Acerque la cámara a la lima.'}
               </span>
-            ) : hasMatch && predictedName ? (
-              <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
-                <span className="text-on-surface-variant font-normal">Lima detectada:</span>
-                <span className="text-xs font-medium text-on-surface-variant/80">{predictedName.system}</span>
-                <span className="text-sm font-semibold text-on-surface">{predictedName.orderAndName}</span>
-              </span>
-            ) : hasMatch && limaDetected ? (
-              <span>
-                <span className="text-on-surface-variant font-normal">Lima detectada:</span>{' '}
-                <span className="text-sm font-semibold text-on-surface">{limaDetected.replace(/-/g, ' ')}</span>
-              </span>
             ) : (
               <span className="text-emerald-400 font-medium text-xs flex items-center gap-1">
                 Lista para tomar foto
               </span>
             )}
-          </p>
+          </div>
         </div>
 
         {/*
@@ -121,7 +152,7 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
               the current pick (or not) is handled in the drawer and in
               history-store; the badge only owns the dismissal gesture.
         */}
-        {pendingConfirmation && hasMatch && (
+        {pendingConfirmation && hasMatch ? (
           <div className="shrink-0 flex flex-col items-center gap-1.5">
             {onOpenAlternatives && (
               <button
@@ -150,7 +181,22 @@ export default function CameraDetectionBadge({ onOpenDetail, onOpenAlternatives 
               Continuar
             </button>
           </div>
-        )}
+        ) : isPictureTaken && !isAnalyzing ? (
+          <div className="shrink-0 flex items-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                resetDetection();
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline text-on-surface text-xs font-semibold hover:bg-surface-container-highest active:scale-95 transition-all cursor-pointer"
+              aria-label="Reintentar"
+              title="Tomar otra foto"
+            >
+              <ArrowRight size={14} />
+              Reintentar
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -107,7 +107,7 @@ export function CameraContextProvider({
   // Latest stream, so teardown never acts on a stale render-time closure
   const streamRef = useRef<MediaStream | null>(initialStream);
 
-  const { predict, isAnalyzing, setLimaDetected, addScanHistoryItem, confirmCandidate, pendingConfirmation } = useEndofileAi();
+  const { predict, isAnalyzing, setLimaDetected, addScanHistoryItem, confirmCandidate, pendingConfirmation, debug } = useEndofileAi();
 
   // Enumerate all video inputs to allow switching between lenses
   const enumerateCameras = async () => {
@@ -371,15 +371,16 @@ export function CameraContextProvider({
     displayCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 480, 640);
     modelCtx.drawImage(source, sx, sy, cropW, cropH, 0, 0, 448, 448);
 
-    // Debug temporal
-    const debugData = modelCtx.getImageData(0, 0, 10, 1).data;
-    const debugCenter = modelCtx.getImageData(200, 200, 10, 1).data; // Centro del canvas
-    console.log('[Debug Canvas] Esquina superior izq:', Array.from(debugData));
-    console.log('[Debug Canvas] Centro del canvas:', Array.from(debugCenter));
-    console.log('[Debug Canvas] Primeros 10 píxeles RGBA:', Array.from(debugData));
-    console.log('[Debug Canvas] cropW:', cropW, 'cropH:', cropH);
-    console.log('[Debug Canvas] sx:', sx, 'sy:', sy);
-    console.log('[Debug Canvas] sourceWidth:', sourceWidth, 'sourceHeight:', sourceHeight);
+    if (debug) {
+      const debugData = modelCtx.getImageData(0, 0, 10, 1).data;
+      const debugCenter = modelCtx.getImageData(200, 200, 10, 1).data;
+      console.log('[Debug Canvas] Esquina superior izq:', Array.from(debugData));
+      console.log('[Debug Canvas] Centro del canvas:', Array.from(debugCenter));
+      console.log('[Debug Canvas] Primeros 10 píxeles RGBA:', Array.from(debugData));
+      console.log('[Debug Canvas] cropW:', cropW, 'cropH:', cropH);
+      console.log('[Debug Canvas] sx:', sx, 'sy:', sy);
+      console.log('[Debug Canvas] sourceWidth:', sourceWidth, 'sourceHeight:', sourceHeight);
+    }
 
     return {
       displayDataUrl: displayCanvas.toDataURL('image/jpeg'),
@@ -409,20 +410,16 @@ export function CameraContextProvider({
 
     // New capture supersedes the previous prediction. Clearing limaDetected
     // up front keeps the badge from flashing the old result while the new
-    // photo is being validated and (if it passes) predicted.
+    // photo is being validated and predicted.
     setLimaDetected(null);
     setSelectedPhotoUrl(artifacts.displayDataUrl);
 
-    // 1. Run independent validations BEFORE sending to model
+    // 1. Run independent validations
     const valResults = await validateAllImages(artifacts.modelCanvas, validationConfig);
     setValidationResults(valResults);
 
     if (valResults.hasErrors) {
       console.warn("[Validation Gate] Photo has quality warnings:", valResults.warnings);
-      // Validation failed: don't bother running the model on a blurry / dark /
-      // poorly-framed shot. The doctor needs to retake; no prediction, no
-      // alternatives, nothing to confirm.
-      return;
     }
 
     // 2. Proceed with model prediction, then persist the top candidate so
@@ -451,18 +448,19 @@ export function CameraContextProvider({
       const img = new Image();
       img.src = reader.result as string;
       img.onload = async () => {
-        console.log('[Debug] Image loaded:', img.naturalWidth, img.naturalHeight);
-        // Verificar si el canvas está tainted
-        const testCanvas = document.createElement('canvas');
-        testCanvas.width = 10;
-        testCanvas.height = 10;
-        const testCtx = testCanvas.getContext('2d');
-        testCtx?.drawImage(img, 0, 0, 10, 10);
-        try {
-          const testData = testCtx?.getImageData(0, 0, 10, 10);
-          console.log('[Debug] Canvas NOT tainted, first pixel:', testData?.data.slice(0, 4));
-        } catch (e) {
-          console.log('[Debug] Canvas IS tainted (CORS):', e);
+        if (debug) {
+          console.log('[Debug] Image loaded:', img.naturalWidth, img.naturalHeight);
+          const testCanvas = document.createElement('canvas');
+          testCanvas.width = 10;
+          testCanvas.height = 10;
+          const testCtx = testCanvas.getContext('2d');
+          testCtx?.drawImage(img, 0, 0, 10, 10);
+          try {
+            const testData = testCtx?.getImageData(0, 0, 10, 10);
+            console.log('[Debug] Canvas NOT tainted, first pixel:', testData?.data.slice(0, 4));
+          } catch (e) {
+            console.log('[Debug] Canvas IS tainted (CORS):', e);
+          }
         }
 
         try {          
@@ -475,14 +473,12 @@ export function CameraContextProvider({
           setLimaDetected(null);
           setSelectedPhotoUrl(artifacts.displayDataUrl);
 
-          // 1. Run independent validations BEFORE sending to model
+          // 1. Run independent validations
           const valResults = await validateAllImages(artifacts.modelCanvas, validationConfig);
           setValidationResults(valResults);
 
           if (valResults.hasErrors) {
             console.warn("[Validation Gate] Uploaded file has quality warnings:", valResults.warnings);
-            // Same gate as live capture: skip the model on a bad photo.
-            return;
           }
 
           // 2. Proceed with model prediction and auto-save the top (same

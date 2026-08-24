@@ -25,7 +25,7 @@ export default function CameraHeader({
     toggleCameraPause,
   } = useCamera();
 
-  const { modelStatus } = useEndofileAi();
+  const { modelStatus, modelConfig } = useEndofileAi();
 
   return (
     <>
@@ -61,7 +61,7 @@ export default function CameraHeader({
 
             <div className={cameraStyles.statusBadge}>
               <span className={modelStatus === 'ready' ? cameraStyles.statusDot : "w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"} />
-              <span>modelo: {modelStatus === 'ready' ? 'EndoX IA' : '---'}</span>
+              <span>modelo: {modelStatus === 'ready' ? (modelConfig?.badgeName || 'EndoX IA') : '---'}</span>
             </div>
           </div>
 
