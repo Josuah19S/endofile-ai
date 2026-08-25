@@ -195,8 +195,8 @@ export default function CameraScreenShell() {
         setSidebarOpen={setSidebarOpen}
       />
 
-      {/* Static in-flow header spacer so flex dimensions remain constant */}
-      <div className="shrink-0 w-full h-16 sm:h-20 pointer-events-none" aria-hidden="true" />
+      {/* Static in-flow header spacer so flex dimensions remain constant with comfortable top offset */}
+      <div className="shrink-0 w-full h-24 sm:h-28 md:h-32 pointer-events-none" aria-hidden="true" />
 
       {/* Center Flexible Layout: Viewport + Detection Badge */}
       <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center px-3 py-1 sm:py-2 pointer-events-none z-10">
