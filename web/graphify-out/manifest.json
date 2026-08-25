@@ -45,7 +45,7 @@
     "semantic_hash": ""
   },
   "app/styles/camera-styles.ts": {
-    "mtime": 1787592996.104462,
+    "mtime": 1787594262.1518183,
     "ast_hash": "c99bc92e8e0969cc989eea387a6fdcb3",
     "semantic_hash": ""
   },
@@ -340,8 +340,8 @@
     "semantic_hash": ""
   },
   "app/components/camera/camera-bottom-bar.tsx": {
-    "mtime": 1787587886.017003,
-    "ast_hash": "47a2d2354c2951af676eff83085a13ad",
+    "mtime": 1787673974.634355,
+    "ast_hash": "e0e888c4a7c24dae0659561d4ae2e85e",
     "semantic_hash": ""
   },
   "app/components/camera/camera-detection-badge.tsx": {
@@ -350,13 +350,13 @@
     "semantic_hash": ""
   },
   "app/components/camera/camera-header.tsx": {
-    "mtime": 1787538265.0032487,
+    "mtime": 1787597258.4078114,
     "ast_hash": "e547daee2cb695cbae4a18e87fbbc6e6",
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen-shell.tsx": {
-    "mtime": 1787589379.0132022,
-    "ast_hash": "df6dce128652e2ef8cd90ce8223ffbca",
+    "mtime": 1787673974.635356,
+    "ast_hash": "1db7879f320b26971a98ba76fccdc06d",
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen.tsx": {
@@ -365,7 +365,7 @@
     "semantic_hash": ""
   },
   "app/components/camera/camera-viewport.tsx": {
-    "mtime": 1787593025.8427095,
+    "mtime": 1787594262.1508183,
     "ast_hash": "fce08c2295dde2b7ecf2323c7dab5a59",
     "semantic_hash": ""
   },
@@ -405,7 +405,7 @@
     "semantic_hash": ""
   },
   "app/components/overlays/sidebar.tsx": {
-    "mtime": 1787592636.0418854,
+    "mtime": 1787673966.3876224,
     "ast_hash": "d8d0e382cc00d0eb71e9bd0978fe51a0",
     "semantic_hash": ""
   },
@@ -420,12 +420,12 @@
     "semantic_hash": ""
   },
   "app/contexts/camera-context.tsx": {
-    "mtime": 1787592920.0257938,
+    "mtime": 1787594262.1508183,
     "ast_hash": "5011246217902c50213cbac05ccaa974",
     "semantic_hash": ""
   },
   "app/contexts/endofile-model-context.tsx": {
-    "mtime": 1787536337.6545534,
+    "mtime": 1787597258.4098115,
     "ast_hash": "9fe9e233b73144f0e3dbef2d3721c2e2",
     "semantic_hash": ""
   },
@@ -515,7 +515,7 @@
     "semantic_hash": ""
   },
   "app/constants/endofile-models.ts": {
-    "mtime": 1787592636.042885,
+    "mtime": 1787673966.3886232,
     "ast_hash": "49e684d2446731096cc5449b0b847f8c",
     "semantic_hash": ""
   },
@@ -530,13 +530,8 @@
     "semantic_hash": ""
   },
   "app/modelv1/page.tsx": {
-    "mtime": 1787592636.0438848,
+    "mtime": 1787597258.4108114,
     "ast_hash": "7be8dc9065fe75a05a2befd9ad87a875",
-    "semantic_hash": ""
-  },
-  "app/modelv2/page.tsx": {
-    "mtime": 1787592636.0438848,
-    "ast_hash": "36b42e9630fc2716695554baf69a5375",
     "semantic_hash": ""
   },
   "public/models/v1/model.json": {

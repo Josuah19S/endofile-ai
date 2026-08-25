@@ -216,45 +216,50 @@ export default function CameraScreenShell() {
       </div>
 
       {/*
-        Bottom Bar Container — shrink-0 so it occupies its exact flex slot and never overlays center content.
-        Grows as an overlay when a drawer view is active.
+        Static in-flow spacer occupying the bottom bar's collapsed height.
+        This preserves the camera viewport aspect-ratio calculations and prevents layout shifts
+        when the real bottom bar expands upward as a floating drawer.
       */}
-      <div className="shrink-0 w-full z-30">
-        <CameraBottomBar
-          expanded={drawer !== null}
-          fullHeight={drawer?.view === 'catalog' || drawer?.view === 'alternatives'}
-          controlsHidden={controlsHidden}
-          onClose={closeDrawer}
-          onOpenRecents={openRecents}
-        >
-          {drawer?.view === 'recents' && (
-            <RecentDetectionsView onSelectCard={handleOpenDetail} />
-          )}
-          {drawer?.view === 'catalog' && (
-            <FileCatalogView
-              query={catalogQuery}
-              onQueryChange={setCatalogQuery}
-              scrollTopRef={catalogScrollTop}
-              onSelectFile={handleOpenCatalogFile}
-            />
-          )}
-          {drawer?.view === 'detail' && activeClassId && (
-            <FileDetailView
-              classId={activeClassId}
-              photoUrl={activePhotoUrl}
-              backLabel={drawer.from === 'catalog' ? 'Volver al catálogo' : 'Volver a Detecciones Recientes'}
-              onBack={handleDetailBack}
-              onNewer={historyIndex >= 0 ? handleNewerDetail : undefined}
-              onOlder={historyIndex >= 0 ? handleOlderDetail : undefined}
-              hasNewer={hasNewerDetail}
-              hasOlder={hasOlderDetail}
-            />
-          )}
-          {drawer?.view === 'alternatives' && (
-            <AlternativesView onPicked={closeDrawer} />
-          )}
-        </CameraBottomBar>
-      </div>
+      <div className="shrink-0 w-full h-24 min-h-[5.5rem] pointer-events-none" aria-hidden="true" />
+
+      {/*
+        Bottom Bar / Expandable Drawer — permanently fixed at the bottom so expanding it
+        does not perturb the flex layout or camera canvas.
+      */}
+      <CameraBottomBar
+        expanded={drawer !== null}
+        fullHeight={drawer?.view === 'catalog' || drawer?.view === 'alternatives'}
+        controlsHidden={controlsHidden}
+        onClose={closeDrawer}
+        onOpenRecents={openRecents}
+      >
+        {drawer?.view === 'recents' && (
+          <RecentDetectionsView onSelectCard={handleOpenDetail} />
+        )}
+        {drawer?.view === 'catalog' && (
+          <FileCatalogView
+            query={catalogQuery}
+            onQueryChange={setCatalogQuery}
+            scrollTopRef={catalogScrollTop}
+            onSelectFile={handleOpenCatalogFile}
+          />
+        )}
+        {drawer?.view === 'detail' && activeClassId && (
+          <FileDetailView
+            classId={activeClassId}
+            photoUrl={activePhotoUrl}
+            backLabel={drawer.from === 'catalog' ? 'Volver al catálogo' : 'Volver a Detecciones Recientes'}
+            onBack={handleDetailBack}
+            onNewer={historyIndex >= 0 ? handleNewerDetail : undefined}
+            onOlder={historyIndex >= 0 ? handleOlderDetail : undefined}
+            hasNewer={hasNewerDetail}
+            hasOlder={hasOlderDetail}
+          />
+        )}
+        {drawer?.view === 'alternatives' && (
+          <AlternativesView onPicked={closeDrawer} />
+        )}
+      </CameraBottomBar>
 
       {/* Sidebar Component */}
       <Sidebar

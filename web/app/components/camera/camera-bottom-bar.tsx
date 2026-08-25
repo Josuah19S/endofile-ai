@@ -45,19 +45,25 @@ export default function CameraBottomBar({
   } = useEndofileAi();
 
   return (
-    <div
-      className={`${
-        expanded
-          ? 'fixed bottom-0 left-0 right-0 z-40'
-          : 'relative w-full z-20 shrink-0'
-      } bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
-        expanded
-          ? fullHeight
-            ? 'h-[calc(100%-4.5rem)] max-h-[calc(100%-4.5rem)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
-            : 'h-[65%] max-h-[70%] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)]'
-          : 'h-24 min-h-[5.5rem]'
-      }`}
-    >
+    <>
+      {/* Dimmed backdrop when drawer is expanded to allow closing by clicking outside */}
+      {expanded && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-xs z-30 transition-opacity animate-[fadeIn_0.2s_ease-out]"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      <div
+        className={`fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline transition-all duration-300 ease-in-out flex flex-col justify-between ${
+          expanded
+            ? fullHeight
+              ? 'h-[calc(100%-4.5rem)] max-h-[calc(100%-4.5rem)] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)] z-40'
+              : 'h-[65%] max-h-[70%] rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.8)] z-40'
+            : 'h-24 min-h-[5.5rem] z-30'
+        }`}
+      >
       {expanded ? (
         /* Expanded Drawer Container holding children views */
         <div className="flex flex-col h-full overflow-hidden pb-[env(safe-area-inset-bottom,0px)]">
@@ -140,5 +146,6 @@ export default function CameraBottomBar({
         </div>
       )}
     </div>
-  );
+  </>
+);
 }
