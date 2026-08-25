@@ -350,13 +350,13 @@
     "semantic_hash": ""
   },
   "app/components/camera/camera-header.tsx": {
-    "mtime": 1787597258.4078114,
-    "ast_hash": "e547daee2cb695cbae4a18e87fbbc6e6",
+    "mtime": 1787674290.0153472,
+    "ast_hash": "9e9e9063b180a71657cee1d2c47328cf",
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen-shell.tsx": {
-    "mtime": 1787673974.635356,
-    "ast_hash": "1db7879f320b26971a98ba76fccdc06d",
+    "mtime": 1787674305.2717457,
+    "ast_hash": "93baa6e97193ae3b4042d336eb77d2bf",
     "semantic_hash": ""
   },
   "app/components/camera/camera-screen.tsx": {
@@ -552,6 +552,11 @@
   "public/elements/ai_nobg_bak.webp": {
     "mtime": 1785901933.0804017,
     "ast_hash": "e83ba9a17ef40c2abe357cf5e6971fcd",
+    "semantic_hash": ""
+  },
+  "app/modelv2/page.tsx": {
+    "mtime": 1787673966.3896239,
+    "ast_hash": "36b42e9630fc2716695554baf69a5375",
     "semantic_hash": ""
   }
 }

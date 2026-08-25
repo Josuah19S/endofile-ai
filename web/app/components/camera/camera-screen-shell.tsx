@@ -188,31 +188,36 @@ export default function CameraScreenShell() {
         <div className="absolute inset-0 bg-white z-50 transition-opacity duration-75 pointer-events-none" />
       )}
 
-      {/* Header Navigation Controls */}
+      {/* Header Navigation Controls (fixed at top) */}
       <CameraHeader
         controlsHidden={controlsHidden}
         setControlsHidden={setControlsHidden}
         setSidebarOpen={setSidebarOpen}
       />
 
+      {/* Static in-flow header spacer so flex dimensions remain constant */}
+      <div className="shrink-0 w-full h-16 sm:h-20 pointer-events-none" aria-hidden="true" />
+
       {/* Center Flexible Layout: Viewport + Detection Badge */}
       <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center px-3 py-1 sm:py-2 pointer-events-none z-10">
-        {/* Camera Viewport Area - automatically scales to fit available height & width */}
-        <div className="flex-1 min-h-0 w-full max-w-[340px] flex items-center justify-center pointer-events-auto">
-          <div className="h-full max-h-full aspect-[3/4] max-w-full relative">
+        {/* Camera Viewport Area - strictly 3:4 aspect ratio without stretching or distortion */}
+        <div className="flex-1 min-h-0 w-full flex items-center justify-center pointer-events-auto">
+          <div className="relative aspect-[3/4] w-full max-w-[340px] sm:max-w-[360px] max-h-full flex items-center justify-center">
             <CameraViewport />
           </div>
         </div>
 
-        {/* Detection Badge directly below the camera viewport */}
-        {!controlsHidden && (
-          <div className="w-full max-w-[340px] mt-1.5 sm:mt-2 shrink-0 pointer-events-auto">
-            <CameraDetectionBadge
-              onOpenDetail={handleOpenDetail}
-              onOpenAlternatives={openAlternatives}
-            />
-          </div>
-        )}
+        {/* Detection Badge directly below the camera viewport - fades smoothly without shifting flex layout */}
+        <div
+          className={`w-full max-w-[340px] sm:max-w-[360px] mt-1.5 sm:mt-2 shrink-0 pointer-events-auto transition-opacity duration-200 ${
+            controlsHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+        >
+          <CameraDetectionBadge
+            onOpenDetail={handleOpenDetail}
+            onOpenAlternatives={openAlternatives}
+          />
+        </div>
       </div>
 
       {/*
