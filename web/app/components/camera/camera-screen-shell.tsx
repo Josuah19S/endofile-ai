@@ -152,7 +152,7 @@ export default function CameraScreenShell() {
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <NextImage
           src="/elements/bg_camera.webp"
-          alt="Fondo Cámara Clínica"
+          alt="Fondo de despacho odontológico"
           fill
           className="object-cover object-center opacity-85 brightness-95"
           priority
@@ -209,9 +209,8 @@ export default function CameraScreenShell() {
 
         {/* Detection Badge directly below the camera viewport - fades smoothly without shifting flex layout */}
         <div
-          className={`w-full max-w-[340px] sm:max-w-[360px] mt-1.5 sm:mt-2 shrink-0 pointer-events-auto transition-opacity duration-200 ${
-            controlsHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+          className={`w-full max-w-[340px] sm:max-w-[360px] mt-1.5 sm:mt-2 shrink-0 pointer-events-auto transition-opacity duration-200 ${controlsHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
         >
           <CameraDetectionBadge
             onOpenDetail={handleOpenDetail}
