@@ -1,10 +1,8 @@
 # Endofile AI - Informe del Modelo Reducido V2
 
-**Versión:** 2.0
-**Fecha:** 2026-08-06
-**Autor:** Josue Carbajal
-**Notebook:** [`model/endox_ia_reduced_v2.ipynb`](../model/endox_ia_reduced_v2.ipynb)
-**Estado:** Vigente — es el modelo que sirve `web/public/model_proto/`.
+**Versión:** 2.1  
+**Notebook:** [`model/endox_ia_reduced_v2.ipynb`](../model/endox_ia_reduced_v2.ipynb)   
+**Estado:** Vigente y por defecto — se sirve desde `web/public/models/v2/` en `/` y `/modelv2`.
 
 ---
 
@@ -53,7 +51,9 @@ de esta tabla es la del código, que es lo que realmente se entrenó.
 | **Total** | **29** |
 
 **No** cubiertos: Re-Treaty, S-Blue, RC-Blue y Super-Files-III (18 limas — uno menos que en
-V1, porque MicroMega-Remover pasó a estar cubierto).
+V1, porque MicroMega-Remover pasó a estar cubierto). Desde que el catálogo de la app se
+construye a partir de las clases del modelo activo, esas 18 limas ya no aparecen en la
+interfaz; conservan ficha y fotografía en el repositorio.
 
 ## 5. Métricas finales
 
@@ -69,20 +69,14 @@ precisión. `MG3-Blue` sigue siendo el sistema más débil, pero mejora en conju
 clase pasa de 60,00 % a 89,36 %). La única clase que **empeoró** frente a V1 es
 `rising_3-25` (95,00 % → 85,29 %), sin explicación documentada en el notebook.
 
-## 6. Limitaciones conocidas
-
-- Discrepancia entre el log impreso de la fase 2 ("30 capas") y el código real (40 capas).
-- Constantes de normalización no reverificadas byte a byte para este grafo (sí se hizo en
-  V1); se asume la misma fórmula por ser la misma función de Keras.
-
-## 7. Dónde está todo
+## 6. Dónde está todo
 
 | Qué | Dónde |
 | --- | --- |
-| Pesos del modelo (los que sirve la app) | `web/public/model_proto/` |
+| Pesos del modelo (los que sirve la app) | `web/public/models/v2/` |
 | Notebook de entrenamiento | `model/endox_ia_reduced_v2.ipynb` |
 | Ficha técnica completa (grafo, hashes, precisión por clase) | [`model/README.md`](../model/README.md) |
-| Lista de clases (contrato con el modelo) | `web/app/constants/endofile-classes.ts` |
+| Lista de clases (contrato con el modelo) | `FILE_CLASSES_V2` en `web/app/constants/endofile-models.ts` |
 | Predecesor | [`EAI-IMRV1.md`](EAI-IMRV1.md) |
 
 Este es un informe breve. Para el detalle técnico completo (composición del grafo, hashes de

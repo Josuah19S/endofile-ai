@@ -1,10 +1,8 @@
 # Endofile AI - Informe del Modelo Reducido V1
 
-**Versión:** 1.0
-**Fecha:** 2026-08-06
-**Autor:** Josue Carbajal
-**Notebook:** [`model/endox_ia_reduced.ipynb`](../model/endox_ia_reduced.ipynb)
-**Estado:** Reemplazado por V2 ([`EAI-IMRV2.md`](EAI-IMRV2.md)); artefactos ya no se sirven en `web/public/model_proto/`.
+**Versión:** 1.1  
+**Notebook:** [`model/endox_ia_reduced.ipynb`](../model/endox_ia_reduced.ipynb)   
+**Estado:** Sustituido como modelo por defecto por V2 ([`EAI-IMRV2.md`](EAI-IMRV2.md)), pero **sigue servido**: sus artefactos están en `web/public/models/v1/` y la app los carga en la ruta `/modelv1`, para poder comparar ambas generaciones sobre las mismas fotos.
 
 ---
 
@@ -62,20 +60,14 @@ MobileNetV3-Small). Este modelo se entrenó desde cero sobre **EfficientNetB0** 
 Clases más flojas: `mg3-blue_4-g2x` (60,00 %) y el resto de `MG3-Blue` (76–89 %);
 `rising_2-13` (75,00 %) fuera de ese sistema.
 
-## 6. Limitaciones conocidas
-
-- Bug detectado y corregido durante esta generación: el cliente aplicaba una normalización
-  manual (`x/127.5 − 1`, fórmula de MobileNet) *antes* de pasar la imagen a un modelo que ya
-  normaliza internamente con la fórmula de EfficientNet — el rango dinámico de la imagen
-  quedaba casi anulado. Corregido; no se remidió la accuracy en dispositivo tras el fix.
-- Fase 2 rinde peor que fase 1 sin diagnóstico documentado.
-
-## 7. Dónde está todo
+## 6. Dónde está todo
 
 | Qué | Dónde |
 | --- | --- |
+| Pesos del modelo (servidos en `/modelv1`) | `web/public/models/v1/` |
 | Ficha técnica completa (grafo, artefactos, defectos) | [`model/README.md`](../model/README.md) (histórico de v1, documenta v2) |
 | Notebook | `model/endox_ia_reduced.ipynb` |
+| Lista de clases (contrato con el modelo) | `FILE_CLASSES_V1` en `web/app/constants/endofile-models.ts` |
 | Sucesor | [`EAI-IMRV2.md`](EAI-IMRV2.md) |
 
 Este es un informe breve. El detalle técnico completo de esta generación (grafo, hashes de
